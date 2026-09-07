@@ -1,6 +1,17 @@
 pip install minecraft-launcher-lib customtkinter
 
 
- if error do this, 
+If Encountered An Error, Do This Instead.
 
-python -m pip install minecraft-launcher-lib
+
+python -m pip install minecraft-launcher-lib 
+
+
+
+
+File Stiching, 
+
+
+
+cd %USERPROFILE%\Downloads
+copy /b FileName.part* File.Name.Extension
