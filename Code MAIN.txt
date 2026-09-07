@@ -1,126 +1,119 @@
-    import customtkinter as ctk
-    import minecraft_launcher_lib
-    import subprocess
-    import uuid
-    import threading
+import customtkinter as ctk
+import minecraft_launcher_lib
+import subprocess
+import uuid
+import threading
 
-    # 1. Setup the modern UI Theme
-    ctk.set_appearance_mode("Dark")
-    ctk.set_default_color_theme("blue")
+# 1. Setup the modern UI Theme
+ctk.set_appearance_mode("Dark")
+ctk.set_default_color_theme("blue")
 
-    class SimpleMCLauncher(ctk.CTk):
-        def __init__(self):
-            super().__init__()
-            self.title("El_KraZo's Super Tuff Launcher")
-            self.geometry("600x450")
-            self.resizable(False, False)
+class SimpleMCLauncher(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("El_KraZo's Super Tuff Launcher")
+        self.geometry("600x450")
+        self.resizable(False, False)
 
-            # Get standard Minecraft directory
-            self.mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+        # Get standard Minecraft directory
+        self.mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
 
-            # UI Container
-            self.frame = ctk.CTkFrame(self)
-            self.frame.pack(pady=20, padx=40, fill="both", expand=True)
+        # UI Container
+        self.frame = ctk.CTkFrame(self)
+        self.frame.pack(pady=20, padx=40, fill="both", expand=True)
 
-            self.title_label = ctk.CTkLabel(self.frame, text="Minecraft Launcher", font=("Helvetica", 24, "bold"))
-            self.title_label.pack(pady=(20, 10))
+        self.title_label = ctk.CTkLabel(self.frame, text="Minecraft Launcher", font=("Helvetica", 24, "bold"))
+        self.title_label.pack(pady=(20, 10))
 
-            # Username Input
-            self.username_entry = ctk.CTkEntry(self.frame, placeholder_text="Enter Username", width=300)
-            self.username_entry.pack(pady=10)
+        # Username Input
+        self.username_entry = ctk.CTkEntry(self.frame, placeholder_text="Enter Username", width=300)
+        self.username_entry.pack(pady=10)
 
-            # Fetch all official release versions from Mojang's API
-            try:
-                version_data = minecraft_launcher_lib.utils.get_version_list()
-                self.versions = [v["id"] for v in version_data if v["type"] == "release"]
-            except Exception:
-                self.versions = ["1.20.4", "1.19.4", "1.18.2", "1.16.5", "1.12.2"] # Fallback
+        # Fetch all official release versions from Mojang's API
+        try:
+            version_data = minecraft_launcher_lib.utils.get_version_list()
+            self.versions = [v["id"] for v in version_data if v["type"] == "release"]
+        except Exception:
+            self.versions = ["1.20.4", "1.19.4", "1.18.2", "1.16.5", "1.12.2"] # Fallback
 
-            # Version Selection Dropdown
-            self.version_dropdown = ctk.CTkOptionMenu(self.frame, values=self.versions, width=300)
-            self.version_dropdown.pack(pady=10)
+        # Version Selection Dropdown
+        self.version_dropdown = ctk.CTkOptionMenu(self.frame, values=self.versions, width=300)
+        self.version_dropdown.pack(pady=10)
 
-            # Forge Checkbox
-            self.forge_checkbox = ctk.CTkCheckBox(self.frame, text="Install/Use Forge")
-            self.forge_checkbox.pack(pady=10)
+        # Forge Checkbox
+        self.forge_checkbox = ctk.CTkCheckBox(self.frame, text="Install/Use Forge")
+        self.forge_checkbox.pack(pady=10)
 
-            # Launch Button
-            self.play_btn = ctk.CTkButton(self.frame, text="PLAY", font=("Helvetica", 16, "bold"), 
-                                        width=300, height=45, command=self.start_launch_thread)
-            self.play_btn.pack(pady=20)
+        # Launch Button
+        self.play_btn = ctk.CTkButton(self.frame, text="PLAY", font=("Helvetica", 16, "bold"), 
+                                    width=300, height=45, command=self.start_launch_thread)
+        self.play_btn.pack(pady=20)
 
-            # Status Label
-            self.status_label = ctk.CTkLabel(self.frame, text="Ready", text_color="gray")
-            self.status_label.pack(pady=5)
+        # Status Label
+        self.status_label = ctk.CTkLabel(self.frame, text="Ready", text_color="gray")
+        self.status_label.pack(pady=5)
 
-        def update_status(self, text):
-            # FIXED: Thread-safe UI update mechanism using self.after() 
-            # This prevents the UI from randomly crashing or hanging during downloads
-            self.after(0, lambda: self.status_label.configure(text=text))
+    def update_status(self, text):
+        self.after(0, lambda: self.status_label.configure(text=text))
 
-        def start_launch_thread(self):
-            username = self.username_entry.get()
-            if not username:
-                self.update_status("Error: Username cannot be empty!")
-                return
+    def start_launch_thread(self):
+        username = self.username_entry.get()
+        if not username:
+            self.update_status("Error: Username cannot be empty!")
+            return
 
-            self.play_btn.configure(state="disabled")
-            version = self.version_dropdown.get()
-            use_forge = self.forge_checkbox.get()
+        self.play_btn.configure(state="disabled")
+        version = self.version_dropdown.get()
+        use_forge = self.forge_checkbox.get()
 
-            # Run launch process in a background thread so the UI doesn't freeze
-            threading.Thread(target=self.launch_game, args=(username, version, use_forge), daemon=True).start()
+        threading.Thread(target=self.launch_game, args=(username, version, use_forge), daemon=True).start()
 
-        def launch_game(self, username, version, use_forge):
-            # Progress callback dictionary
-            callback = {
-                "setStatus": lambda msg: self.update_status(f"Status: {msg}")
+    def launch_game(self, username, version, use_forge):
+        callback = {
+            "setStatus": lambda msg: self.update_status(f"Status: {msg}")
+        }
+
+        try:
+            launch_id = version
+
+            self.update_status(f"Verifying Vanilla {version} assets...")
+            minecraft_launcher_lib.install.install_minecraft_version(version, self.mc_dir, callback=callback)
+
+            if use_forge:
+                self.update_status("Finding latest Forge version...")
+                forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
+                
+                if not forge_version:
+                    self.update_status(f"No Forge version found for {version}")
+                    self.play_btn.configure(state="normal")
+                    return
+                
+                self.update_status(f"Installing Forge {forge_version}...")
+                minecraft_launcher_lib.forge.install_forge_version(forge_version, self.mc_dir, callback=callback)
+                
+                launch_id = minecraft_launcher_lib.forge.forge_to_installed_version(forge_version)
+
+            options = {
+                "username": username,
+                "uuid": str(uuid.uuid3(uuid.NAMESPACE_DNS, username)),
+                "token": "",
+                "jvmArguments": ["-Xmx4G", "-Xms2G"] 
             }
 
-            try:
-                launch_id = version
+            self.update_status("Starting Minecraft...")
+            command = minecraft_launcher_lib.command.get_minecraft_command(launch_id, self.mc_dir, options)
+            
+            self.withdraw() 
+            subprocess.run(command)
+            
+            self.deiconify() 
+            self.update_status("Ready")
 
-                # FIXED: Always verify/install Vanilla first. If the folder is deleted, this auto-recreates it cleanly!
-                self.update_status(f"Verifying Vanilla {version} assets...")
-                minecraft_launcher_lib.install.install_minecraft_version(version, self.mc_dir, callback=callback)
+        except Exception as e:
+            self.update_status(f"Error: {e}")
 
-                if use_forge:
-                    self.update_status("Finding latest Forge version...")
-                    forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
-                    
-                    if not forge_version:
-                        self.update_status(f"No Forge version found for {version}")
-                        self.play_btn.configure(state="normal")
-                        return
-                    
-                    self.update_status(f"Installing Forge {forge_version}...")
-                    minecraft_launcher_lib.forge.install_forge_version(forge_version, self.mc_dir, callback=callback)
-                    
-                    # FIXED: Swapped split() logic with the official library naming convention wrapper to prevent FileNotFoundError bugs on launch
-                    launch_id = minecraft_launcher_lib.forge.forge_to_installed_version(forge_version)
+        self.play_btn.configure(state="normal")
 
-                # Offline login setup. For Microsoft auth, you would use microsoft_account.get_secure_login_data()
-                options = {
-                    "username": username,
-                    "uuid": str(uuid.uuid3(uuid.NAMESPACE_DNS, username)),
-                    "token": "",
-                    "jvmArguments": ["-Xmx4G", "-Xms2G"] # Allocates 4GB RAM 
-                }
-
-                self.update_status("Starting Minecraft...")
-                command = minecraft_launcher_lib.command.get_minecraft_command(launch_id, self.mc_dir, options)
-                
-                self.withdraw() # Hide launcher while playing
-                subprocess.run(command)
-                
-                self.deiconify() # Re-show when game is closed
-                self.update_status("Ready")
-
-            except Exception as e:
-                self.update_status(f"Error: {e}")
-
-            self.play_btn.configure(state="normal")
-
-    if __name__ == "__main__":
-        app = SimpleMCLauncher()
-        app.mainloop()
+if __name__ == "__main__":
+    app = SimpleMCLauncher()
+    app.mainloop()
