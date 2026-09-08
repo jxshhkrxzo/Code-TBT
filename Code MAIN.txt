@@ -1,118 +1,266 @@
 import customtkinter as ctk
+from tkinter import filedialog, messagebox
 import minecraft_launcher_lib
 import subprocess
 import uuid
 import threading
+import os
 
-# 1. Setup the modern UI Theme
+# Setup the Hacker Theme
 ctk.set_appearance_mode("Dark")
-ctk.set_default_color_theme("blue")
 
 class SimpleMCLauncher(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("El_KraZo's Super Tuff Launcher")
-        self.geometry("600x450")
+        self.title("⚡ CRITICAL_OVERRIDE_LAUNCHER v3.0 ⚡")
+        self.geometry("700x650")  # Expanded size for the new modules
         self.resizable(False, False)
+        
+        # Pure Black Background
+        self.configure(fg_color="#000000")
 
         # Get standard Minecraft directory
         self.mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+        self.selected_skin_path = None
 
-        # UI Container
-        self.frame = ctk.CTkFrame(self)
-        self.frame.pack(pady=20, padx=40, fill="both", expand=True)
+        # Terminal UI Container (Hacker Green Border + Pure Black Background)
+        self.frame = ctk.CTkFrame(self, fg_color="#000000", border_color="#00FF33", border_width=2, corner_radius=0)
+        self.frame.pack(pady=20, padx=30, fill="both", expand=True)
 
-        self.title_label = ctk.CTkLabel(self.frame, text="Minecraft Launcher", font=("Helvetica", 24, "bold"))
+        # Cyber Title
+        self.title_label = ctk.CTkLabel(
+            self.frame, 
+            text="[ SYSTEM.ACCESS: CORE_LAUNCHER ]", 
+            font=("Courier New", 22, "bold"), 
+            text_color="#00FF33"
+        )
         self.title_label.pack(pady=(20, 10))
 
         # Username Input
-        self.username_entry = ctk.CTkEntry(self.frame, placeholder_text="Enter Username", width=300)
-        self.username_entry.pack(pady=10)
+        self.username_entry = ctk.CTkEntry(
+            self.frame, 
+            placeholder_text="ACCESS_KEY (Username)", 
+            width=350,
+            fg_color="#051505",
+            text_color="#00FF33",
+            placeholder_text_color="#006611",
+            border_color="#00FF33",
+            border_width=1,
+            corner_radius=0,
+            font=("Courier New", 14)
+        )
+        self.username_entry.pack(pady=6)
 
-        # Fetch all official release versions from Mojang's API
+        # --- Skin Import Module ---
+        self.skin_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        self.skin_frame.pack(pady=6)
+
+        self.skin_btn = ctk.CTkButton(
+            self.skin_frame, 
+            text="LOAD_SKIN.PNG", 
+            font=("Courier New", 12, "bold"),
+            width=150, 
+            height=32,
+            fg_color="#003300",
+            text_color="#00FF33",
+            hover_color="#005500",
+            border_color="#00FF33",
+            border_width=1,
+            corner_radius=0,
+            command=self.import_skin
+        )
+        self.skin_btn.grid(row=0, column=0, padx=5)
+
+        self.skin_label = ctk.CTkLabel(
+            self.skin_frame, 
+            text="Skin: DEFAULT.CFG", 
+            font=("Courier New", 11), 
+            text_color="#00AA22"
+        )
+        self.skin_label.grid(row=0, column=1, padx=5)
+
+        # Version Selection Dropdown
         try:
             version_data = minecraft_launcher_lib.utils.get_version_list()
             self.versions = [v["id"] for v in version_data if v["type"] == "release"]
         except Exception:
-            self.versions = ["1.20.4", "1.19.4", "1.18.2", "1.16.5", "1.12.2"] # Fallback
+            self.versions = ["1.20.4", "1.19.4", "1.18.2", "1.16.5", "1.12.2"]
 
-        # Version Selection Dropdown
-        self.version_dropdown = ctk.CTkOptionMenu(self.frame, values=self.versions, width=300)
-        self.version_dropdown.pack(pady=10)
+        self.version_dropdown = ctk.CTkOptionMenu(
+            self.frame, 
+            values=self.versions, 
+            width=350,
+            fg_color="#051505",
+            button_color="#003300",
+            button_hover_color="#005500",
+            text_color="#00FF33",
+            dropdown_fg_color="#000000",
+            dropdown_text_color="#00FF33",
+            dropdown_hover_color="#003300",
+            corner_radius=0,
+            font=("Courier New", 14)
+        )
+        self.version_dropdown.pack(pady=6)
+
+        # --- NEW FEATURE: Hacker RAM Allocation Module ---
+        self.ram_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        self.ram_frame.pack(pady=8, fill="x", padx=40)
+
+        self.ram_label = ctk.CTkLabel(
+            self.ram_frame, 
+            text="ALLOCATE_RAM: 4 GB", 
+            font=("Courier New", 12, "bold"), 
+            text_color="#00FF33"
+        )
+        self.ram_label.pack(anchor="w")
+
+        self.ram_slider = ctk.CTkSlider(
+            self.ram_frame, 
+            from_=2, 
+            to=16, 
+            number_of_steps=14, 
+            fg_color="#002200", 
+            progress_color="#00FF33", 
+            button_color="#00FF33",
+            button_hover_color="#00CC22",
+            command=self.update_ram_label
+        )
+        self.ram_slider.set(4)  # Default allocation set to 4GB
+        self.ram_slider.pack(fill="x", pady=2)
 
         # Forge Checkbox
-        self.forge_checkbox = ctk.CTkCheckBox(self.frame, text="Install/Use Forge")
-        self.forge_checkbox.pack(pady=10)
+        self.forge_checkbox = ctk.CTkCheckBox(
+            self.frame, 
+            text="INJECT_FORGE_MODS", 
+            font=("Courier New", 12),
+            text_color="#00FF33",
+            fg_color="#051505",
+            border_color="#00FF33",
+            hover_color="#003300",
+            checkmark_color="#00FF33",
+            corner_radius=0
+        )
+        self.forge_checkbox.pack(pady=6)
 
         # Launch Button
-        self.play_btn = ctk.CTkButton(self.frame, text="PLAY", font=("Helvetica", 16, "bold"), 
-                                    width=300, height=45, command=self.start_launch_thread)
-        self.play_btn.pack(pady=20)
+        self.play_btn = ctk.CTkButton(
+            self.frame, 
+            text="INITIALIZE_LAUNCH", 
+            font=("Courier New", 16, "bold"), 
+            width=350, 
+            height=45, 
+            fg_color="#00FF33",
+            text_color="#000000",
+            hover_color="#00CC22",
+            corner_radius=0,
+            command=self.start_launch_thread
+        )
+        self.play_btn.pack(pady=12)
 
-        # Status Label
-        self.status_label = ctk.CTkLabel(self.frame, text="Ready", text_color="gray")
-        self.status_label.pack(pady=5)
+        # --- NEW FEATURE: Scrolling Terminal Matrix Log Output ---
+        self.log_box = ctk.CTkTextbox(
+            self.frame, 
+            width=500, 
+            height=120, 
+            fg_color="#020A02", 
+            text_color="#00FF33", 
+            border_color="#005500", 
+            border_width=1, 
+            corner_radius=0,
+            font=("Courier New", 11)
+        )
+        self.log_box.pack(pady=(5, 15), padx=20)
+        self.log_box.configure(state="disabled") # Direct updates handled safely via script logs
 
-    def update_status(self, text):
-        self.after(0, lambda: self.status_label.configure(text=text))
+        # Initialize base logs
+        self.log_message("SYSTEM_STATUS: IDLE...")
+
+    def update_ram_label(self, value):
+        self.ram_label.configure(text=f"ALLOCATE_RAM: {int(value)} GB")
+
+    def import_skin(self):
+        file_path = filedialog.askopenfilename(
+            title="Select Minecraft Skin",
+            filetypes=[("PNG Files", "*.png")]
+        )
+        if file_path:
+            self.selected_skin_path = file_path
+            filename = os.path.basename(file_path)
+            display_name = filename if len(filename) <= 15 else filename[:12] + "..."
+            self.skin_label.configure(text=f"Skin: {display_name}", text_color="#00FF33")
+            self.log_message(f"Skin mapped locally -> {filename}")
+
+    def log_message(self, text):
+        # Safely appends running updates directly into the hacker terminal window box
+        def append():
+            self.log_box.configure(state="normal")
+            self.log_box.insert("end", f">> {text.upper()}\n")
+            self.log_box.see("end")
+            self.log_box.configure(state="disabled")
+        self.after(0, append)
 
     def start_launch_thread(self):
         username = self.username_entry.get()
         if not username:
-            self.update_status("Error: Username cannot be empty!")
+            self.log_message("CRITICAL_ERR: USERNAME REGISTRY EMPTY!")
             return
 
-        self.play_btn.configure(state="disabled")
+        self.play_btn.configure(state="disabled", fg_color="#333333", text_color="#666666")
         version = self.version_dropdown.get()
         use_forge = self.forge_checkbox.get()
+        ram_allocated = int(self.ram_slider.get())
 
-        threading.Thread(target=self.launch_game, args=(username, version, use_forge), daemon=True).start()
+        threading.Thread(target=self.launch_game, args=(username, version, use_forge, ram_allocated), daemon=True).start()
 
-    def launch_game(self, username, version, use_forge):
+    def launch_game(self, username, version, use_forge, ram_allocated):
         callback = {
-            "setStatus": lambda msg: self.update_status(f"Status: {msg}")
+            "setStatus": lambda msg: self.log_message(f"CORE: {msg}")
         }
 
         try:
             launch_id = version
 
-            self.update_status(f"Verifying Vanilla {version} assets...")
+            self.log_message("SCANNING_VANILLA_ASSETS...")
             minecraft_launcher_lib.install.install_minecraft_version(version, self.mc_dir, callback=callback)
 
             if use_forge:
-                self.update_status("Finding latest Forge version...")
+                self.log_message("INDEXING_FORGE_REPOS...")
                 forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
                 
                 if not forge_version:
-                    self.update_status(f"No Forge version found for {version}")
-                    self.play_btn.configure(state="normal")
+                    self.log_message(f"ERR: NO_FORGE_FOUND_FOR_{version}")
+                    self.reset_play_button()
                     return
                 
-                self.update_status(f"Installing Forge {forge_version}...")
+                self.log_message(f"INJECTING_FORGE_{forge_version}...")
                 minecraft_launcher_lib.forge.install_forge_version(forge_version, self.mc_dir, callback=callback)
                 
                 launch_id = minecraft_launcher_lib.forge.forge_to_installed_version(forge_version)
 
+            # Custom JVM Overrides pulling dynamic allocations directly from the custom slider tool!
             options = {
                 "username": username,
                 "uuid": str(uuid.uuid3(uuid.NAMESPACE_DNS, username)),
                 "token": "",
-                "jvmArguments": ["-Xmx4G", "-Xms2G"] 
+                "jvmArguments": [f"-Xmx{ram_allocated}G", f"-Xms2G", "-Dforge.enableDataFixer=false"]
             }
 
-            self.update_status("Starting Minecraft...")
+            self.log_message(f"EXECUTING_GAME_CORE WITH {ram_allocated}GB RAM...")
             command = minecraft_launcher_lib.command.get_minecraft_command(launch_id, self.mc_dir, options)
             
             self.withdraw() 
             subprocess.run(command)
             
             self.deiconify() 
-            self.update_status("Ready")
+            self.log_message("SYSTEM_STATUS: IDLE...")
 
         except Exception as e:
-            self.update_status(f"Error: {e}")
+            self.log_message(f"CRASH_ERR: {str(e)[:40]}")
 
-        self.play_btn.configure(state="normal")
+        self.reset_play_button()
+
+    def reset_play_button(self):
+        self.play_btn.configure(state="normal", fg_color="#00FF33", text_color="#000000")
 
 if __name__ == "__main__":
     app = SimpleMCLauncher()
