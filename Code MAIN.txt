@@ -13,7 +13,7 @@ class SimpleMCLauncher(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("⚡ CRITICAL_OVERRIDE_LAUNCHER v3.0 ⚡")
-        self.geometry("700x650")  # Expanded size for the new modules
+        self.geometry("700x680")  # Expanded size for the new modules
         self.resizable(False, False)
         
         # Pure Black Background
@@ -22,6 +22,7 @@ class SimpleMCLauncher(ctk.CTk):
         # Get standard Minecraft directory
         self.mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
         self.selected_skin_path = None
+        self.selected_forge_installer_path = None
 
         # Terminal UI Container (Hacker Green Border + Pure Black Background)
         self.frame = ctk.CTkFrame(self, fg_color="#000000", border_color="#00FF33", border_width=2, corner_radius=0)
@@ -39,7 +40,7 @@ class SimpleMCLauncher(ctk.CTk):
         # Username Input
         self.username_entry = ctk.CTkEntry(
             self.frame, 
-            placeholder_text="ACCESS_KEY (Username)", 
+            placeholder_text="ACCESS_KEY", 
             width=350,
             fg_color="#051505",
             text_color="#00FF33",
@@ -131,7 +132,7 @@ class SimpleMCLauncher(ctk.CTk):
         # Forge Checkbox
         self.forge_checkbox = ctk.CTkCheckBox(
             self.frame, 
-            text="INJECT_FORGE_MODS", 
+            text="INJECT_FORGE_LOADER", 
             font=("Courier New", 12),
             text_color="#00FF33",
             fg_color="#051505",
@@ -142,10 +143,38 @@ class SimpleMCLauncher(ctk.CTk):
         )
         self.forge_checkbox.pack(pady=6)
 
+        # --- NEW FEATURE: Offline Forge Loader Import Module ---
+        self.forge_installer_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        self.forge_installer_frame.pack(pady=6)
+
+        self.forge_installer_btn = ctk.CTkButton(
+            self.forge_installer_frame,
+            text="LOAD_FORGE_LOADER.JAR",
+            font=("Courier New", 12, "bold"),
+            width=200,
+            height=32,
+            fg_color="#003300",
+            text_color="#00FF33",
+            hover_color="#005500",
+            border_color="#00FF33",
+            border_width=1,
+            corner_radius=0,
+            command=self.import_forge_installer
+        )
+        self.forge_installer_btn.grid(row=0, column=0, padx=5)
+
+        self.forge_installer_label = ctk.CTkLabel(
+            self.forge_installer_frame,
+            text="Loader: AUTO_DOWNLOAD",
+            font=("Courier New", 11),
+            text_color="#00AA22"
+        )
+        self.forge_installer_label.grid(row=0, column=1, padx=5)
+
         # Launch Button
         self.play_btn = ctk.CTkButton(
             self.frame, 
-            text="INITIALIZE_LAUNCH", 
+            text="EXECUTE_LAUNCH", 
             font=("Courier New", 16, "bold"), 
             width=350, 
             height=45, 
@@ -190,6 +219,21 @@ class SimpleMCLauncher(ctk.CTk):
             self.skin_label.configure(text=f"Skin: {display_name}", text_color="#00FF33")
             self.log_message(f"Skin mapped locally -> {filename}")
 
+    def import_forge_installer(self):
+        # Lets the user pick a Forge installer .jar they already downloaded
+        # themselves, so the launcher never reaches out to the internet to
+        # fetch Forge on its own when "INJECT_FORGE_MODS" is used.
+        file_path = filedialog.askopenfilename(
+            title="Select Forge Installer JAR",
+            filetypes=[("JAR Files", "*.jar")]
+        )
+        if file_path:
+            self.selected_forge_installer_path = file_path
+            filename = os.path.basename(file_path)
+            display_name = filename if len(filename) <= 22 else filename[:19] + "..."
+            self.forge_installer_label.configure(text=f"Loader: {display_name}", text_color="#00FF33")
+            self.log_message(f"Offline forge loader mapped -> {filename}")
+
     def log_message(self, text):
         # Safely appends running updates directly into the hacker terminal window box
         def append():
@@ -212,6 +256,37 @@ class SimpleMCLauncher(ctk.CTk):
 
         threading.Thread(target=self.launch_game, args=(username, version, use_forge, ram_allocated), daemon=True).start()
 
+    def install_forge_offline(self):
+        # Runs the user's own Forge installer jar instead of downloading one
+        # via minecraft_launcher_lib. The official installer GUI doesn't hand
+        # back the resulting version id directly, so we snapshot the versions
+        # folder before/after it runs and pick up whatever new folder appears.
+        versions_dir = os.path.join(self.mc_dir, "versions")
+        before = set(os.listdir(versions_dir)) if os.path.isdir(versions_dir) else set()
+
+        self.log_message("LAUNCHING_OFFLINE_FORGE_INSTALLER (GUI WILL OPEN)...")
+        self.log_message("CLICK INSTALL_CLIENT, CONFIRM THE PATH, THEN CLOSE IT")
+
+        try:
+            subprocess.run(["java", "-jar", self.selected_forge_installer_path])
+        except FileNotFoundError:
+            self.log_message("CRASH_ERR: JAVA_NOT_FOUND_ON_PATH")
+            return None
+        except Exception as e:
+            self.log_message(f"CRASH_ERR: {str(e)[:40]}")
+            return None
+
+        after = set(os.listdir(versions_dir)) if os.path.isdir(versions_dir) else set()
+        new_versions = after - before
+
+        if not new_versions:
+            self.log_message("ERR: NO_NEW_FORGE_PROFILE_DETECTED")
+            return None
+
+        launch_id = new_versions.pop()
+        self.log_message(f"OFFLINE_FORGE_INSTALL_COMPLETE -> {launch_id}")
+        return launch_id
+
     def launch_game(self, username, version, use_forge, ram_allocated):
         callback = {
             "setStatus": lambda msg: self.log_message(f"CORE: {msg}")
@@ -224,18 +299,24 @@ class SimpleMCLauncher(ctk.CTk):
             minecraft_launcher_lib.install.install_minecraft_version(version, self.mc_dir, callback=callback)
 
             if use_forge:
-                self.log_message("INDEXING_FORGE_REPOS...")
-                forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
-                
-                if not forge_version:
-                    self.log_message(f"ERR: NO_FORGE_FOUND_FOR_{version}")
-                    self.reset_play_button()
-                    return
-                
-                self.log_message(f"INJECTING_FORGE_{forge_version}...")
-                minecraft_launcher_lib.forge.install_forge_version(forge_version, self.mc_dir, callback=callback)
-                
-                launch_id = minecraft_launcher_lib.forge.forge_to_installed_version(forge_version)
+                if self.selected_forge_installer_path:
+                    launch_id = self.install_forge_offline()
+                    if launch_id is None:
+                        self.reset_play_button()
+                        return
+                else:
+                    self.log_message("INDEXING_FORGE_REPOS...")
+                    forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
+
+                    if not forge_version:
+                        self.log_message(f"ERR: NO_FORGE_FOUND_FOR_{version}")
+                        self.reset_play_button()
+                        return
+
+                    self.log_message(f"INJECTING_FORGE_{forge_version}...")
+                    minecraft_launcher_lib.forge.install_forge_version(forge_version, self.mc_dir, callback=callback)
+
+                    launch_id = minecraft_launcher_lib.forge.forge_to_installed_version(forge_version)
 
             # Custom JVM Overrides pulling dynamic allocations directly from the custom slider tool!
             options = {
