@@ -4,8 +4,6 @@ pip install minecraft-launcher-lib
 Step 2,
 
 
-
-
 pip install minecraft-launcher-lib customtkinter
 
 
@@ -20,8 +18,8 @@ python -m pip install minecraft-launcher-lib
 
 
 
-File Stiching, 
 
+File Stiching, 
 
 
 cd %USERPROFILE%\Downloads
