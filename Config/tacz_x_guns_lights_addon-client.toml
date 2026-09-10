@@ -1,0 +1,57 @@
+
+[muzzle_flash]
+	#Enable muzzle-flash dynamic lighting when firing TaCZ guns.
+	enabled = true
+	#Light level of an unsuppressed muzzle flash (1..15).
+	#Range: 1 ~ 15
+	lightLevel = 14
+	#Muzzle flash brightness (as % of lightLevel) when a silencer or a
+	#muzzle brake/compensator is attached (TaCZ keeps both in the same slot).
+	#100 = unaffected, 50 = half brightness, 0 = flash fully disabled (Off).
+	#Range: 0 ~ 100
+	muzzleDeviceLightPercent = 100
+	#How many client ticks a muzzle flash stays lit (1 tick = 1/20 sec).
+	#Range: 1 ~ 20
+	durationTicks = 2
+	#Gun IDs that should never spawn a muzzle-flash light (e.g. crossbows,
+	#grenade launchers — anything that doesn't realistically flash).
+	#One entry per line, format "namespace:path", e.g. "tacz:crossbow".
+	#Find the exact ID from the gun's data-pack file name (without .json).
+	muzzleFlashBlacklist = []
+	#TaCZ has no real "is this a bow/crossbow" flag — every weapon (including
+	#crossbows made from TaCZ) is the exact same gun type under the hood, just a
+	#different resource-pack skin. So this is a heuristic, not a hard detector:
+	#if enabled, a gun is auto-skipped when its ID (namespace:path) contains any
+	#of the keywords below, case-insensitive. Good enough to catch most crossbow/
+	#bow-style weapons out of the box without listing every one by hand. Use the
+	#exact muzzleFlashBlacklist above for anything this heuristic misses.
+	autoDetectBowLikeWeapons = true
+	#Keywords checked against each gun's ID when autoDetectBowLikeWeapons is on.
+	muzzleFlashAutoDetectKeywords = ["bow", "crossbow", "arrow"]
+
+[bullet_trail]
+	#Enable dynamic trail-light following TaCZ bullets in flight.
+	enabled = true
+
+[bullet_tracer]
+	#Distance in blocks between consecutive trail sparks.
+	#Range: 0.5 ~ 16.0
+	stepBlocks = 3.0
+	#How many ticks each spark stays lit (1 tick = 1/20 sec).
+	#Range: 1 ~ 20
+	ttlTicks = 3
+	#Light level emitted by each spark (1..15).
+	#Range: 1 ~ 15
+	lightLevel = 10
+
+[render]
+	#Global brightness multiplier applied to all new light sources.
+	#1.0 = use configured levels as-is.
+	#0.0 = effectively disable lighting without unloading the mixin.
+	#Range: 0.0 ~ 1.0
+	globalBrightnessScale = 1.0
+
+[internals]
+	#If true, print active light-source counts to INFO log every 10 seconds.
+	debugLogStats = false
+

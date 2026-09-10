@@ -1,0 +1,308 @@
+[
+  {
+    "displayName": "FallingTree",
+    "pattern": "FallingTree-1.20.1-4.3.4.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/falling-tree/download/5010620",
+    "destination": "mods"
+  },
+  {
+    "displayName": "DEUF - Duplicate Entity UUID Fix",
+    "pattern": "deuf-1.20.1-1.3.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/deuf-duplicate-entity-uuid-fix/download/4598640",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Reset Controls Confirmation",
+    "pattern": "reset_controls_confirmation-forge-1.0.0-1.20.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/reset-controls-confirmation/download/7180166",
+    "destination": "mods"
+  },
+  {
+    "displayName": "FTB XMod Compat",
+    "pattern": "ftb-xmod-compat-forge-2.1.3.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/ftb-xmod-compat/download/6402486",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Temporal API",
+    "pattern": "temporalapi-1.6.7.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/temporal-api/download/5509183",
+    "destination": "mods"
+  },
+  {
+    "displayName": "FLIB",
+    "pattern": "flib-1.20.1-0.0.16.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/flib/download/8070669",
+    "destination": "mods"
+  },
+  {
+    "displayName": "NaNny Reforked",
+    "pattern": "nanny-1.0.6.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/nanny-reforked/download/6671993",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Twilight\u0027s Flavors \u0026 Delight",
+    "pattern": "twilightdelight-2.2.2.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/twilights-flavors-delight/download/8208651",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Sinytra Connector",
+    "pattern": "Connector-1.0.0-beta.48+1.20.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/sinytra-connector/download/7594389",
+    "destination": "mods"
+  },
+  {
+    "displayName": "FTB Library (NeoForge)",
+    "pattern": "ftb-library-forge-2001.2.13.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/ftb-library-forge/download/8226927",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Crash Assistant",
+    "pattern": "CrashAssistant-forge-1.19-1.20.1-1.11.10.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/crash-assistant/download/8262170",
+    "destination": "mods"
+  },
+  {
+    "displayName": "The Twilight Forest",
+    "pattern": "twilightforest-1.20.1-4.3.2508-universal.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/the-twilight-forest/download/5468648",
+    "destination": "mods"
+  },
+  {
+    "displayName": "FTB Teams (NeoForge)",
+    "pattern": "ftb-teams-forge-2001.3.2.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/ftb-teams-forge/download/7499810",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Item Split Bug Fix",
+    "pattern": "item_split_bug_fix-1.20.1-1.4.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/item-split-bug-fix/download/6675232",
+    "destination": "mods"
+  },
+  {
+    "displayName": "You\u0027re in Grave Dangers",
+    "pattern": "youre-in-grave-danger-forge-1.20.1-2.0.19.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/youre-in-grave-dangers/download/7611933",
+    "destination": "mods"
+  },
+  {
+    "displayName": "FTB Quests (NeoForge)",
+    "pattern": "ftb-quests-forge-2001.4.22.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/ftb-quests-forge/download/8078538",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Item Filters",
+    "pattern": "item-filters-forge-2001.1.0-build.59.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/item-filters/download/4838266",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Leaderboards",
+    "pattern": "leaderboards-1.20.1-Forge-2.0.4.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/leaderboards/download/8201372",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Loading Protection",
+    "pattern": "loadingprotection-1.0.2-1.20.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/loading-protection/download/7465176",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Framework",
+    "pattern": "framework-forge-1.20.1-0.8.0.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/framework/download/7573740",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Goblin Traders",
+    "pattern": "goblintraders-forge-1.20.1-1.11.5.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/goblin-traders/download/6891922",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Server Browser - In Game Server Listings",
+    "pattern": "ServerBrowser-1.20.1-FORGE-1.3.3.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/server-browser/download/7043678",
+    "destination": "mods"
+  },
+  {
+    "displayName": "StopRendering",
+    "pattern": "stop_rendering-forge-1.0.3.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/stoprendering/download/7615281",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Bee Fix",
+    "pattern": "BeeFix-1.20-1.0.7.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/bee-fix/download/4618962",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Long NBT Killer",
+    "pattern": "LongNbtKiller-Forge-1.20.1-1.0.0.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/long-nbt-killer/download/4956449",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Mowzie\u0027s Cataclysm",
+    "pattern": "mowzies_cataclysm-1.2.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/mowzies-cataclysm/download/8142902",
+    "destination": "mods"
+  },
+  {
+    "displayName": "AllTheLeaks (Memory Leak Fix)",
+    "pattern": "alltheleaks-1.1.1+1.20.1-forge.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/alltheleaks/download/7235989",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Enderdragon Loot",
+    "pattern": "dragonloot-1.1.15-1.20.1-forge.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/enderdragon-loot/download/7611988",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Umbral Skies",
+    "pattern": "umbral_skies-1.3.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/umbral-skies/download/4768252",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Deeper and Darker to Cataclysm Progression",
+    "pattern": "deeper_and_darker_to_cataclysm-1.2.0-forge-1.20.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/deeper-and-darker-to-cataclysm-progression/download/6973586",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Forge CIT",
+    "pattern": "citresewn-1.20.1-5.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/forge-cit/download/4774651",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Forgery",
+    "pattern": "forgery-3.6.6+1.20.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/forgery/download/7554497",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Fixed Diagonal Walls",
+    "pattern": "diagonalwallfix-1.0.0-forge-1.20.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/fixed-walls/download/7107048",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Inmis (Forge/NeoForge)",
+    "pattern": "inmis-2.7.2-2.9.3-1.20.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/inmis-forge-port/download/7801897",
+    "destination": "mods"
+  },
+  {
+    "displayName": "FTB Filter System",
+    "pattern": "ftb-filter-system-forge-20.0.1.jar",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/ftb-filter-system/download/6466153",
+    "destination": "mods"
+  },
+  {
+    "displayName": "Backpacked Recipe Fix",
+    "pattern": "backpacked_recipe_fix_datapack.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/backpacked-recipe-fix/download/4905038",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Biomes o\u0027 Plenty x Farmer\u0027s Delight Bark Cutting Compat",
+    "pattern": "BoP x FD Bark Cutting Compat.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/biomes-o-plenty-x-farmers-delight-bark-cutting/download/5046894",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Climate Rivers language Fix",
+    "pattern": "climate_rivers_language_fix_v1.0 [1.20.1].zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/cr-lang-fix/download/7127919",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Stay True",
+    "pattern": "Stay_True_1.20.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/stay-true/download/4624707",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Quark x Farmer\u0027s Delight Bark Cutting Compat",
+    "pattern": "Quark x FD Bark Cutting Compat.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/quark-x-farmers-delight-bark-cutting-compat/download/5046887",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Mandala\u0027s GUI - Dark mode",
+    "pattern": "MandalasGUI+Dakmode_1.21.8_v2.5.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/mandalas-gui-dark-mode/download/7564643",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Fresh Waystones Texture",
+    "pattern": "waystones_1.20.1_update_5.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/fresh-waystones-texture/download/7704801",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "(Unofficial) Mandala\u0027s GUI - Dark Mode Mod Compatibility",
+    "pattern": "Mandala\u0027s GUI - Dark Mode Compat 0.3.2.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/unofficial-mandalas-gui-dark-mode-mod/download/7063749",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Enchantment Descriptions Compat",
+    "pattern": "Enchantment Descriptions Compat 1.3.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/enchantment-descriptions-compat/download/6835902",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "\"Better End Cities\" for Better End",
+    "pattern": "BetterEndCities-BetterEndForge5-from Raijin2312.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/better-end-city-for-better-end/download/8063503",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Armor Trim Compat",
+    "pattern": "Armor Trims Compat 1.1.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/armor-trim-compats/download/6418621",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Scaring the Scarecrows",
+    "pattern": "Scaring_The_Scarecrows_1.20.1.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/scaring-the-scarecrows/download/6702142",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Mandala\u0027s GUI - Dark mode - Utopia extension",
+    "pattern": "Mandala Utopia.zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/mandala-gui-dark-mode-utopia-extension/download/7570245",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Stay Clear",
+    "pattern": "Stay Clear V1.1 [1.20.1].zip",
+    "url": "https://www.curseforge.com/minecraft/texture-packs/stay-clear/download/6612027",
+    "destination": "resourcepacks"
+  },
+  {
+    "displayName": "Quark : Corundumless Corundum Recipes",
+    "pattern": "Quark_Corundumless_Corundum.zip",
+    "url": "https://www.curseforge.com/minecraft/data-packs/quark-corundumless-corundum-recipes/download/7732877",
+    "destination": "datapacks"
+  },
+  {
+    "displayName": "Ender Dragon Loot x Advanced Netherite Compat",
+    "pattern": "DLxAN_1.20-1.20.1.zip",
+    "url": "https://www.curseforge.com/minecraft/data-packs/enderdragon-loot-x-advanced-netherite/download/7452780",
+    "destination": "datapacks"
+  }
+]

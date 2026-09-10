@@ -1,0 +1,17 @@
+{
+	id: "61818116-8a7e-3807-84ba-c7cc7e1ebc36"
+	type: "player"
+	player_name: "El_KraZo"
+	ranks: {
+		61818116-8a7e-3807-84ba-c7cc7e1ebc36: "owner"
+	}
+	properties: {
+		"ftbteams:display_name": "El_KraZo"
+		"ftbteams:description": ""
+		"ftbteams:color": "#FF5988"
+		"ftbteams:free_to_join": 0b
+		"ftbteams:max_msg_history_size": 1000
+	}
+	message_history: [ ]
+	extra: { }
+}

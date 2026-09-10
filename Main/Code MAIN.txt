@@ -1,0 +1,445 @@
+import customtkinter as ctk
+from tkinter import filedialog, messagebox
+import minecraft_launcher_lib
+import subprocess
+import uuid
+import threading
+import os
+import json
+import traceback
+import zipfile
+
+# Setup the Hacker Theme
+ctk.set_appearance_mode("Dark")
+
+class SimpleMCLauncher(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("⚡ CRITICAL_OVERRIDE_LAUNCHER v3.0 ⚡")
+        self.geometry("700x680")  # Expanded size for the new modules
+        self.resizable(False, False)
+        
+        # Pure Black Background
+        self.configure(fg_color="#000000")
+
+        # Get standard Minecraft directory
+        self.mc_dir = minecraft_launcher_lib.utils.get_minecraft_directory()
+        # FIX: make sure the .minecraft folder (and everything above it)
+        # actually exists on disk. On a fresh PC this folder is often
+        # missing entirely, which caused problems further down the line.
+        os.makedirs(self.mc_dir, exist_ok=True)
+        self.selected_skin_path = None
+        self.selected_forge_installer_path = None
+
+        # Terminal UI Container (Hacker Green Border + Pure Black Background)
+        self.frame = ctk.CTkFrame(self, fg_color="#000000", border_color="#00FF33", border_width=2, corner_radius=0)
+        self.frame.pack(pady=20, padx=30, fill="both", expand=True)
+
+        # Cyber Title
+        self.title_label = ctk.CTkLabel(
+            self.frame, 
+            text="[ SYSTEM.ACCESS: CORE_LAUNCHER ]", 
+            font=("Courier New", 22, "bold"), 
+            text_color="#00FF33"
+        )
+        self.title_label.pack(pady=(20, 10))
+
+        # Username Input
+        self.username_entry = ctk.CTkEntry(
+            self.frame, 
+            placeholder_text="ACCESS_KEY", 
+            width=350,
+            fg_color="#051505",
+            text_color="#00FF33",
+            placeholder_text_color="#006611",
+            border_color="#00FF33",
+            border_width=1,
+            corner_radius=0,
+            font=("Courier New", 14)
+        )
+        self.username_entry.pack(pady=6)
+
+        # --- Skin Import Module ---
+        self.skin_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        self.skin_frame.pack(pady=6)
+
+        self.skin_btn = ctk.CTkButton(
+            self.skin_frame, 
+            text="LOAD_SKIN.PNG", 
+            font=("Courier New", 12, "bold"),
+            width=150, 
+            height=32,
+            fg_color="#003300",
+            text_color="#00FF33",
+            hover_color="#005500",
+            border_color="#00FF33",
+            border_width=1,
+            corner_radius=0,
+            command=self.import_skin
+        )
+        self.skin_btn.grid(row=0, column=0, padx=5)
+
+        self.skin_label = ctk.CTkLabel(
+            self.skin_frame, 
+            text="Skin: DEFAULT.CFG", 
+            font=("Courier New", 11), 
+            text_color="#00AA22"
+        )
+        self.skin_label.grid(row=0, column=1, padx=5)
+
+        # Version Selection Dropdown
+        try:
+            version_data = minecraft_launcher_lib.utils.get_version_list()
+            self.versions = [v["id"] for v in version_data if v["type"] == "release"]
+        except Exception:
+            self.versions = ["1.20.4", "1.19.4", "1.18.2", "1.16.5", "1.12.2"]
+
+        self.version_dropdown = ctk.CTkOptionMenu(
+            self.frame, 
+            values=self.versions, 
+            width=350,
+            fg_color="#051505",
+            button_color="#003300",
+            button_hover_color="#005500",
+            text_color="#00FF33",
+            dropdown_fg_color="#000000",
+            dropdown_text_color="#00FF33",
+            dropdown_hover_color="#003300",
+            corner_radius=0,
+            font=("Courier New", 14)
+        )
+        self.version_dropdown.pack(pady=6)
+
+        # --- NEW FEATURE: Hacker RAM Allocation Module ---
+        self.ram_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        self.ram_frame.pack(pady=8, fill="x", padx=40)
+
+        self.ram_label = ctk.CTkLabel(
+            self.ram_frame, 
+            text="ALLOCATE_RAM: 4 GB", 
+            font=("Courier New", 12, "bold"), 
+            text_color="#00FF33"
+        )
+        self.ram_label.pack(anchor="w")
+
+        self.ram_slider = ctk.CTkSlider(
+            self.ram_frame, 
+            from_=2, 
+            to=16, 
+            number_of_steps=14, 
+            fg_color="#002200", 
+            progress_color="#00FF33", 
+            button_color="#00FF33",
+            button_hover_color="#00CC22",
+            command=self.update_ram_label
+        )
+        self.ram_slider.set(4)  # Default allocation set to 4GB
+        self.ram_slider.pack(fill="x", pady=2)
+
+        # Forge Checkbox
+        self.forge_checkbox = ctk.CTkCheckBox(
+            self.frame, 
+            text="INJECT_FORGE_LOADER", 
+            font=("Courier New", 12),
+            text_color="#00FF33",
+            fg_color="#051505",
+            border_color="#00FF33",
+            hover_color="#003300",
+            checkmark_color="#00FF33",
+            corner_radius=0
+        )
+        self.forge_checkbox.pack(pady=6)
+
+        # --- NEW FEATURE: Offline Forge Loader Import Module ---
+        self.forge_installer_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
+        self.forge_installer_frame.pack(pady=6)
+
+        self.forge_installer_btn = ctk.CTkButton(
+            self.forge_installer_frame,
+            text="LOAD_FORGE_LOADER.JAR",
+            font=("Courier New", 12, "bold"),
+            width=200,
+            height=32,
+            fg_color="#003300",
+            text_color="#00FF33",
+            hover_color="#005500",
+            border_color="#00FF33",
+            border_width=1,
+            corner_radius=0,
+            command=self.import_forge_installer
+        )
+        self.forge_installer_btn.grid(row=0, column=0, padx=5)
+
+        self.forge_installer_label = ctk.CTkLabel(
+            self.forge_installer_frame,
+            text="Loader: AUTO_DOWNLOAD",
+            font=("Courier New", 11),
+            text_color="#00AA22"
+        )
+        self.forge_installer_label.grid(row=0, column=1, padx=5)
+
+        # Launch Button
+        self.play_btn = ctk.CTkButton(
+            self.frame, 
+            text="EXECUTE_LAUNCH", 
+            font=("Courier New", 16, "bold"), 
+            width=350, 
+            height=45, 
+            fg_color="#00FF33",
+            text_color="#000000",
+            hover_color="#00CC22",
+            corner_radius=0,
+            command=self.start_launch_thread
+        )
+        self.play_btn.pack(pady=12)
+
+        # --- NEW FEATURE: Scrolling Terminal Matrix Log Output ---
+        self.log_box = ctk.CTkTextbox(
+            self.frame, 
+            width=500, 
+            height=120, 
+            fg_color="#020A02", 
+            text_color="#00FF33", 
+            border_color="#005500", 
+            border_width=1, 
+            corner_radius=0,
+            font=("Courier New", 11)
+        )
+        self.log_box.pack(pady=(5, 15), padx=20)
+        self.log_box.configure(state="disabled") # Direct updates handled safely via script logs
+
+        # Initialize base logs
+        self.log_message("SYSTEM_STATUS: IDLE...")
+        self.log_message(f"MC_DIR -> {self.mc_dir}")
+        self.ensure_launcher_profile()
+
+    def update_ram_label(self, value):
+        self.ram_label.configure(text=f"ALLOCATE_RAM: {int(value)} GB")
+
+    def import_skin(self):
+        file_path = filedialog.askopenfilename(
+            title="Select Minecraft Skin",
+            filetypes=[("PNG Files", "*.png")]
+        )
+        if file_path:
+            self.selected_skin_path = file_path
+            filename = os.path.basename(file_path)
+            display_name = filename if len(filename) <= 15 else filename[:12] + "..."
+            self.skin_label.configure(text=f"Skin: {display_name}", text_color="#00FF33")
+            self.log_message(f"Skin mapped locally -> {filename}")
+
+    def import_forge_installer(self):
+        # Lets the user pick a Forge installer .jar they already downloaded
+        # themselves, so the launcher never reaches out to the internet to
+        # fetch Forge on its own when "INJECT_FORGE_MODS" is used.
+        file_path = filedialog.askopenfilename(
+            title="Select Forge Installer JAR",
+            filetypes=[("JAR Files", "*.jar")]
+        )
+        if file_path:
+            self.selected_forge_installer_path = file_path
+            filename = os.path.basename(file_path)
+            display_name = filename if len(filename) <= 22 else filename[:19] + "..."
+            self.forge_installer_label.configure(text=f"Loader: {display_name}", text_color="#00FF33")
+            self.log_message(f"Offline forge loader mapped -> {filename}")
+
+    def ensure_launcher_profile(self):
+        # FIX for the school PC issue: the official Forge installer refuses
+        # to install (or shows a "no launcher profile found" warning) if
+        # launcher_profiles.json doesn't already exist in the target folder.
+        # That file is normally created the first time the REAL Minecraft
+        # Launcher is opened - on a computer that has never had the real
+        # launcher run on it (like a school PC), it's simply missing. This
+        # creates a minimal, valid one ourselves so Forge stops complaining.
+        profile_path = os.path.join(self.mc_dir, "launcher_profiles.json")
+        if os.path.exists(profile_path):
+            return
+        minimal_profile = {
+            "profiles": {},
+            "settings": {
+                "enableAdvanced": False,
+                "enableAnalytics": True,
+                "enableHistorical": False,
+                "enableReleases": True,
+                "enableSnapshots": False,
+                "keepLauncherOpen": False,
+                "profileSorting": "ByLastPlayed",
+                "showGameLog": False,
+                "showMenu": False,
+                "soundOn": False
+            },
+            "version": 3
+        }
+        try:
+            os.makedirs(self.mc_dir, exist_ok=True)
+            with open(profile_path, "w") as f:
+                json.dump(minimal_profile, f, indent=2)
+            self.log_message("CREATED_MISSING_LAUNCHER_PROFILE.JSON")
+        except Exception:
+            traceback.print_exc()
+            self.log_message("WARN: COULD_NOT_CREATE_LAUNCHER_PROFILE")
+
+    def log_message(self, text):
+        # Safely appends running updates directly into the hacker terminal window box
+        def append():
+            self.log_box.configure(state="normal")
+            self.log_box.insert("end", f">> {text.upper()}\n")
+            self.log_box.see("end")
+            self.log_box.configure(state="disabled")
+        self.after(0, append)
+
+    def start_launch_thread(self):
+        username = self.username_entry.get()
+        if not username:
+            self.log_message("CRITICAL_ERR: USERNAME REGISTRY EMPTY!")
+            return
+
+        self.play_btn.configure(state="disabled", fg_color="#333333", text_color="#666666")
+        version = self.version_dropdown.get()
+        use_forge = self.forge_checkbox.get()
+        ram_allocated = int(self.ram_slider.get())
+
+        threading.Thread(target=self.launch_game, args=(username, version, use_forge, ram_allocated), daemon=True).start()
+
+    def get_forge_launch_id(self, installer_jar_path):
+        # Reads the exact resulting Forge version ID straight out of the
+        # installer jar's own install_profile.json, instead of guessing by
+        # comparing what's in the versions folder before and after.
+        with zipfile.ZipFile(installer_jar_path) as zf:
+            with zf.open("install_profile.json") as f:
+                profile = json.load(f)
+        return profile["version"]
+
+    def install_forge_offline(self):
+        # FIX: runs the Forge installer's own command-line mode
+        # (--installClient) instead of opening its GUI. This skips the
+        # manual "click Install Client, confirm the path, then close it"
+        # steps entirely, and avoids the GUI's own folder picker - which is
+        # exactly where the "no minecraft directory" warning was showing up.
+        # Forge still requires the .minecraft folder and launcher_profiles.json
+        # to exist first (even in this mode), so we make sure of that here.
+        self.ensure_launcher_profile()
+
+        try:
+            launch_id = self.get_forge_launch_id(self.selected_forge_installer_path)
+        except Exception as e:
+            traceback.print_exc()
+            self.log_message(f"CRASH_ERR: COULD_NOT_READ_INSTALLER_JAR: {str(e)[:100]}")
+            return None
+
+        self.log_message(f"RUNNING_HEADLESS_FORGE_INSTALL -> {launch_id}")
+
+        try:
+            result = subprocess.run(
+                ["java", "-jar", self.selected_forge_installer_path, "--installClient", self.mc_dir],
+                capture_output=True,
+                text=True
+            )
+        except FileNotFoundError:
+            self.log_message("CRASH_ERR: JAVA_NOT_FOUND_ON_PATH")
+            return None
+        except Exception as e:
+            traceback.print_exc()
+            self.log_message(f"CRASH_ERR: {str(e)[:120]}")
+            return None
+
+        # Show exactly what the installer printed - this is the real place
+        # to look if an install ever fails.
+        for line in (result.stdout or "").splitlines():
+            if line.strip():
+                self.log_message(f"FORGE: {line.strip()[:100]}")
+        for line in (result.stderr or "").splitlines():
+            if line.strip():
+                self.log_message(f"FORGE_ERR: {line.strip()[:100]}")
+
+        version_dir = os.path.join(self.mc_dir, "versions", launch_id)
+        if result.returncode != 0 or not os.path.isdir(version_dir):
+            self.log_message("ERR: FORGE_INSTALL_FAILED (SEE_MESSAGES_ABOVE)")
+            return None
+
+        self.log_message(f"OFFLINE_FORGE_INSTALL_COMPLETE -> {launch_id}")
+        return launch_id
+
+    def launch_game(self, username, version, use_forge, ram_allocated):
+        callback = {
+            "setStatus": lambda msg: self.log_message(f"CORE: {msg}")
+        }
+
+        try:
+            launch_id = version
+
+            self.log_message("SCANNING_VANILLA_ASSETS...")
+            minecraft_launcher_lib.install.install_minecraft_version(version, self.mc_dir, callback=callback)
+
+            if use_forge:
+                if self.selected_forge_installer_path:
+                    launch_id = self.install_forge_offline()
+                    if launch_id is None:
+                        self.reset_play_button()
+                        return
+                else:
+                    self.log_message("INDEXING_FORGE_REPOS...")
+                    forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
+
+                    if not forge_version:
+                        self.log_message(f"ERR: NO_FORGE_FOUND_FOR_{version}")
+                        self.reset_play_button()
+                        return
+
+                    self.log_message(f"INJECTING_FORGE_{forge_version}...")
+                    minecraft_launcher_lib.forge.install_forge_version(forge_version, self.mc_dir, callback=callback)
+
+                    launch_id = minecraft_launcher_lib.forge.forge_to_installed_version(forge_version)
+
+            # Custom JVM Overrides pulling dynamic allocations directly from the custom slider tool!
+            options = {
+                "username": username,
+                "uuid": str(uuid.uuid3(uuid.NAMESPACE_DNS, username)),
+                "token": "",
+                "jvmArguments": [f"-Xmx{ram_allocated}G", f"-Xms2G", "-Dforge.enableDataFixer=false"]
+            }
+
+            self.log_message(f"EXECUTING_GAME_CORE WITH {ram_allocated}GB RAM...")
+            command = minecraft_launcher_lib.command.get_minecraft_command(launch_id, self.mc_dir, options)
+
+            self.withdraw()
+            try:
+                subprocess.run(command)
+            finally:
+                # FIX: no matter what happens while the game window is open
+                # (including the game crashing), always bring the launcher
+                # window back. Before, if anything went wrong here, the
+                # launcher window just stayed hidden forever - it looked
+                # exactly like the whole thing had crashed.
+                self.deiconify()
+
+            self.log_message("SYSTEM_STATUS: IDLE...")
+
+        except Exception as e:
+            # FIX: show the FULL error, not just the first 40 characters,
+            # and print the complete details to the terminal too, so we can
+            # actually see what broke instead of guessing.
+            traceback.print_exc()
+            self.log_message(f"CRASH_ERR: {str(e)[:120]}")
+            full_error = str(e)
+            self.after(0, lambda: messagebox.showerror(
+                "Launch Failed",
+                f"{full_error}\n\nFull details were printed to the VS Code terminal."
+            ))
+            self.deiconify()
+
+        self.reset_play_button()
+
+    def reset_play_button(self):
+        self.play_btn.configure(state="normal", fg_color="#00FF33", text_color="#000000")
+
+if __name__ == "__main__":
+    try:
+        app = SimpleMCLauncher()
+        app.mainloop()
+    except Exception:
+        # FIX: if something goes wrong before the window even opens, print
+        # the full error and keep the terminal open so it's actually
+        # readable instead of the window just flashing shut.
+        traceback.print_exc()
+        input("\nThe launcher hit an error and had to close. Press Enter to exit...")

@@ -1,0 +1,18 @@
+
+#KeepSmelting — offline furnace smelting
+[catchup]
+	#Master toggle. False = vanilla smelting only.
+	catchupEnabled = true
+	#Max offline ticks to simulate per catch-up. Default: 24000 (1 MC day). Range: 1 – 192000.
+	#Range: 1 ~ 192000
+	maxCatchupTicks = 24000
+	#Min tick gap before catchup fires. Default: 20 (1 sec). Below this = vanilla tick.
+	#Range: 1 ~ 72000
+	minDeltaThreshold = 20
+	#Debug output mode: OFF, CHAT (send to nearby players), LOG (print to Minecraft log).
+	#Allowed Values: OFF, CHAT, LOG
+	debugMode = "OFF"
+	#Time mode: REALTIME (wall clock, works while paused) or GAMETIME (MC ticks, only when game runs).
+	#Allowed Values: REALTIME, GAMETIME
+	timeMode = "REALTIME"
+

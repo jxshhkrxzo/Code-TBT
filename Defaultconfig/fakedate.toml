@@ -1,0 +1,13 @@
+#Specifies the year to fake (0 = disable)
+fakeYear = 2000
+#Specifies the month to fake (0 = disable, 1 = January, 2 = February, ...)
+fakeMonth = 10
+#Specifies the day to fake (0 = disable)
+fakeDayOfMonth = 10
+#Only fake date when queried by specified mods
+#Use * to allow any (not recommended)
+filter = ["supplementaries", "amendments", "suppsquared", "subtle_effects"]
+#When enabled, prints verbose information when faking date
+debugFakingDate = false
+#When enabled, prints verbose information when not faking date (mod not in filter)
+debugNonFakingDate = false

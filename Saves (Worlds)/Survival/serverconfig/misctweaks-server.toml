@@ -1,0 +1,14 @@
+sneakingPreventsBerryBushDamage = true
+legArmorPreventsBerryBushDamage = true
+lodestoneChangesBackport = true
+elytraSwimTweak = true
+soulSpeedNoDamage = true
+thornsNoDamage = true
+creeperExplosionDropsAllItems = true
+flammableCobweb = true
+fasterObsidianMining = true
+#Range: 1.0 ~ 2.0
+obsidianMiningSpeedMultiplier = 1.6
+randomizeDiscLoot = true
+preventShulkerDuplication = false
+

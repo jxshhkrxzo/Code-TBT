@@ -1,0 +1,14 @@
+{
+	version: 1
+	uuid: "618181168a7e380784bac7cc7e1ebc36"
+	name: "El_KraZo#61818116"
+	lock: false
+	rewards_blocked: false
+	task_progress: { }
+	started: { }
+	completed: { }
+	repeatable: { }
+	completion_count: { }
+	claimed_rewards: { }
+	player_data: { }
+}
