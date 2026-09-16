@@ -33,4 +33,11 @@ npm install
 npm start
 
 
-Enjoy gng
+opencode install,
+
+
+
+npm install -g opencode-ai
+
+
+opencode
