@@ -1,0 +1,7 @@
+#Not supported right now, will be available soon
+CustomMobsSupport = false
+#Enable chat messages about waves?
+ChatMessages = true
+#Enable command that allows to skip waves?
+EnableSkipCommand = false
+

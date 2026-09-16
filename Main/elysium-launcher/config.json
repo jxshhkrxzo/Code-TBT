@@ -1,0 +1,11 @@
+{
+  "proxy_base": "http://localhost:3000/proxy?url=",
+  "use_proxy_for_forge": true,
+  "use_proxy_fallback": true,
+  "max_retries": 3,
+  "minecraft_dir": "./.elysium",
+  "mc_version": "1.20.1",
+  "forge_version": "47.2.0",
+  "forge_full": "1.20.1-47.2.0",
+  "java_min_major": 17
+}

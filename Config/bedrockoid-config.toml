@@ -1,0 +1,30 @@
+
+[lists]
+
+	[lists.bedrockoid]
+		disableSnowUnderTreesIn = []
+
+[flags]
+
+	[flags.bedrockoid]
+		entitySharesFire = true
+		fallenTrees = true
+		armorStandArms = true
+		frostwalkerBoost = true
+		canPlantsBeBonemeal = true
+		reachAroundPlacement = false
+		snowSpawnsUnderTrees = true
+		cauldronNaturalFilling = true
+		wetSpongesDryOut = true
+		shieldActivatesWhenSneaking = false
+		snowCoversVines = true
+		stopElytraByPressingSpace = true
+		shulkersCanBeDyed = true
+		snowlogging = true
+		fireAspectImprovements = true
+		cauldronWaterloggability = true
+		snowCoversLeaves = false
+		composterCollisionFix = true
+		redstoneConnectsToPiston = true
+		sheepFurColorFix = true
+

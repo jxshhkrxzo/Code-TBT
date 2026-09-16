@@ -1,0 +1,118 @@
+
+#============================================================
+#AIRDROPS
+#Catalog airdrop: the player chooses items by point cost.
+#Standard airdrop: the crate is filled from a loot table.
+#Dead Air is optional and does not own these settings.
+#============================================================
+[airdrop]
+	#----- START HERE: AIRDROP SIZE AND LOOT -----
+	#Minimum points required to launch a catalog airdrop.
+	#Must be between 10 and 500 in 10-point steps. Default: 10.
+	minimumCatalogPoints = 10
+	#Maximum points a player can spend on one catalog airdrop.
+	#Default: 100.
+	#Range: 20 ~ 500
+	maxTotalDifficulty = 100
+	#Loot table used by standard (non-catalog) airdrop crates.
+	#Built-in: radiotowers:chests/airdrop_loot (default),
+	#radiotowers:airdrop_loot_easy, radiotowers:airdrop_loot_medium, radiotowers:airdrop_loot_hard.
+	#Or any datapack loot table id. Switch in-game with /radiotowers loot <easy|medium|hard|default>.
+	standardAirdropLootTable = "radiotowers:chests/airdrop_loot"
+	#If false, the standard loot-table lever does nothing.
+	enableStandardAirdrop = true
+	#If false, players cannot start a catalog (point-buy) airdrop.
+	enableCatalogAirdrop = true
+	#Optional profile name under config/radiotowers/profiles/<name>.json.
+	#Empty = use this toml only. /radiotowers profile save|load <name> writes that folder.
+	activeAirdropProfile = ""
+	#Minutes before the player can request another standard airdrop.
+	#Range: 0 ~ 120
+	standardAirdropCooldownMinutes = 3
+	#Minutes before the player can request another wave-delivered catalog airdrop.
+	#Range: 0 ~ 120
+	waveDeliveryCooldownMinutes = 10
+	#----- CATALOG CONTENT -----
+	#Add TaCZ ammo automatically when TaCZ is installed.
+	includeTaczAmmo = true
+	#Add TaCZ guns automatically when TaCZ is installed.
+	includeTaczGuns = true
+	#Use neutral placeholders if TaCZ icons appear wrong or missing.
+	simplifyTaczIconsInAirdropList = false
+	#Add specific items or override their point costs.
+	#Format: "namespace:item=points", for example "other_mod:medkit=15".
+	#TaCZ uses the same id aliases as blacklistItems: tacz:gun/m1911=80 also reprices tacz:m1911
+	#and any catalog row whose id or GunId/AmmoId ends in m1911. Bare names (m1911=80) work too.
+	#This changes only the point cost of matching auto-detected rows; it does not register new TaCZ items.
+	customCatalogEntries = []
+	#Optional file under config/radiotowers/ with one item=points entry per line.
+	#Example: custom_catalog.txt. Empty means disabled.
+	customCatalogFile = ""
+	#----- ADVANCED CATALOG FILTERS -----
+	#Extra Forge item tags to include. Empty uses the built-in defaults.
+	#Vanilla valuables are added separately; use blacklistItems to remove them.
+	whitelistTags = []
+	#Item ids that must never appear in the catalog, including TaCZ and addon entries.
+	#Supports glob patterns: tacz:gun/* blocks all TaCZ guns, minecraft:*_sword blocks all swords.
+	#TaCZ: tacz:gun/m1911 also hides tacz:m1911 and any id ending in /m1911. Bare names (m1911, 9mm) work too.
+	#Custom catalog lines cannot put a blacklisted id back.
+	blacklistItems = ["minecraft:nether_star", "minecraft:command_block", "minecraft:barrier", "minecraft:structure_block", "minecraft:jigsaw", "minecraft:bedrock", "minecraft:spectral_arrow", "minecraft:tipped_arrow"]
+	#Optional file under config/radiotowers/ with one extra tag id per line.
+	#Example: whitelist.txt. Empty means disabled.
+	whitelistFile = ""
+	#Optional file under config/radiotowers/ with one excluded item id per line.
+	#Example: blacklist.txt. Empty means disabled.
+	blacklistFile = ""
+	#Point cost assigned to items loaded from tags. Rare built-in items may cost more.
+	#Range: 1 ~ 20
+	defaultDifficultyPerItem = 2
+	#Allow modded items from broad forge:ingots, forge:gems, and forge:foods tags.
+	#Leave false to avoid flooding the catalog with every modded material.
+	includeNonVanillaForgeTagItems = false
+	#Include dragon egg, dragon head, and dragon breath in the catalog.
+	enableEndRecipeItems = false
+
+#============================================================
+#DEFENSE WAVES
+#Catalog airdrops use Extra Special LIB waves when ESL is installed.
+#If ESL is absent, Berezka Zombie Waves API is used when present.
+#Set useZombieWavesForAirdrop=false for immediate plane delivery.
+#============================================================
+[waves]
+	#true: catalog airdrops start defense waves when ESL or Berezka is installed.
+	#false: the plane arrives immediately, even when a wave backend is installed.
+	useZombieWavesForAirdrop = true
+	#Maximum number of rounds before the airdrop is delivered.
+	#Range: 1 ~ 20
+	maxWaves = 5
+	#Zombies in each round at difficulty tier 1 (10 airdrop points).
+	#Range: 1 ~ 200
+	baseZombiesPerWave = 20
+	#Extra zombies added per difficulty tier.
+	#Example with defaults: tier 1 = 20, tier 2 = 30, tier 3 = 40.
+	#Range: 0 ~ 100
+	zombiesPerTierStep = 10
+	#Minutes allowed for each defense round before it times out.
+	#Range: 1 ~ 60
+	waveDurationMinutes = 3
+	#Entities that defense-wave aggro must ignore.
+	#Use registry ids such as minecraft:enderman or minecraft:creeper.
+	aggroExcludeEntityIds = ["minecraft:enderman"]
+
+#============================================================
+#RADIO TOWER WORLD GENERATION
+#These options affect RadioTowers structures, not Dead Air signal range.
+#Density changes only affect newly generated chunks.
+#============================================================
+[worldgen]
+	#Natural tower density as a percentage of the built-in datapack setting.
+	#100 = normal, 200 = denser, 50 = rarer. New chunks only.
+	#Range: 50 ~ 200
+	towerSpawnDensityPercent = 100
+	#Place one inactive STANDARD tower near world spawn once per overworld.
+	guaranteeSpawnTower = true
+	#How far to search for a safe location for the guaranteed tower.
+	#Only already-loaded chunks are considered.
+	#Range: 4 ~ 32
+	spawnTowerSearchRadiusChunks = 12
+

@@ -23,3 +23,14 @@ File Stiching,
 
 cd %USERPROFILE%\Downloads
 copy /b FileName.part* File.Name.Extension
+
+
+
+Proxy,
+
+npm install
+
+npm start
+
+
+Enjoy gng

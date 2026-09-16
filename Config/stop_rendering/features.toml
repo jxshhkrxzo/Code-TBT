@@ -1,0 +1,18 @@
+
+#General mod settings
+[general]
+	#Enables or disables every feature this mod provides. Handy for testing how much it helps.
+	modActive = true
+	#Path to check for the curios class to cancel non player renders for
+	mod_Curios_classpath = "top.theillusivec4.curios.client.render.CuriosLayer"
+	#Hyper optimizes curios use to only run for players not all entities, might help a bit if you have a large number of entities
+	mod_Curios_disableOnNonPlayers = true
+	#Same as disableCuriosOnNonPlayers but for Artifacts mod
+	mod_Artifacts_disableOnNonPlayers = true
+	#The mods expensive mob stacking code needlessly runs on the client causing a frame stutter 20 times a second, this stops it
+	mod_EnhancedHordes_disableClientHordeTickProcedure = true
+	#Stops more expensive unneeded client side calculations for non players
+	mod_ArmorSetBonuses_disableClientBonusApplyingOnNonPlayers = true
+	#Alternative to disableCuriosOnNonPlayers, not as extensive
+	disableZombieAndHuskExtraRenderLayers = true
+

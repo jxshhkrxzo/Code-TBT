@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mini Proxy Browser</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --accent: #38bdf8;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1e3a5f, var(--bg));
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 2.5rem 1rem 1rem;
+    text-align: center;
+  }
+  header h1 { margin: 0; font-size: 2rem; letter-spacing: 0.5px; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); margin: 0.5rem 0 0; }
+  .search-wrap {
+    max-width: 720px;
+    margin: 1.5rem auto 0;
+    padding: 0 1rem;
+    width: 100%;
+  }
+  .search-bar {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--card);
+    border: 1px solid #334155;
+    border-radius: 999px;
+    padding: 0.4rem 0.4rem 0.4rem 1.2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 1rem;
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+  .btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.7rem 1.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--accent);
+    color: #082f49;
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: scale(0.97); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid #334155;
+  }
+  .toolbar {
+    max-width: 1100px;
+    margin: 1rem auto 0;
+    padding: 0 1rem;
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .toolbar .current {
+    flex: 1;
+    min-width: 200px;
+    background: #0b1220;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .chips {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .chips button {
+    background: transparent;
+    border: 1px solid #334155;
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 0.3rem 0.9rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .chips button:hover { color: var(--text); border-color: var(--accent); }
+  main {
+    flex: 1;
+    max-width: 1100px;
+    width: 100%;
+    margin: 1rem auto 2rem;
+    padding: 0 1rem;
+  }
+  .viewer {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #334155;
+    height: 65vh;
+    min-height: 420px;
+    position: relative;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+  }
+  .empty, .loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    color: #475569;
+    gap: 0.6rem;
+    text-align: center;
+    padding: 2rem;
+  }
+  .hidden { display: none !important; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 4px solid #e2e8f0;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding-bottom: 1.5rem; }
+  code { background: #0b1220; padding: 0.15rem 0.45rem; border-radius: 6px; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mini <span>Proxy</span> Browser</h1>
+  <p>Paste any link below — it loads through <code>/proxy?url=...</code></p>
+</header>
+
+<div class="search-wrap">
+  <form id="proxyForm" class="search-bar">
+    <input id="urlInput" type="text" placeholder="Paste link, e.g. https://example.com" autocomplete="off" spellcheck="false" />
+    <button class="btn" type="submit">Go</button>
+  </form>
+  <div class="chips">
+    <button data-url="https://example.com">example.com</button>
+    <button data-url="https://en.wikipedia.org/wiki/Proxy_server">wikipedia</button>
+    <button data-url="https://news.ycombinator.com">hacker news</button>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="current" id="currentLabel">No page loaded yet</div>
+  <button class="btn ghost" id="reloadBtn" type="button">Reload</button>
+  <button class="btn ghost" id="openBtn" type="button">Open direct</button>
+</div>
+
+<main>
+  <div class="viewer">
+    <div class="empty" id="emptyState">
+      <div style="font-size:2.5rem">🌐</div>
+      <strong>Enter a URL to start browsing via proxy</strong>
+      <span>Assets and links are rewritten by the backend so pages don't break instantly.</span>
+    </div>
+    <div class="loading hidden" id="loadingState">
+      <div class="spinner"></div>
+      <span>Fetching through proxy…</span>
+    </div>
+    <iframe id="viewer" title="Proxied site" sandbox="allow-scripts allow-forms allow-same-origin allow-popups"></iframe>
+  </div>
+</main>
+
+<footer>Backend: <code>GET /proxy?url=ENCODED_URL</code> · Full-fidelity alt: <code>/proxy-direct?url=...</code></footer>
+
+<script>
+  const form = document.getElementById('proxyForm');
+  const input = document.getElementById('urlInput');
+  const viewer = document.getElementById('viewer');
+  const emptyState = document.getElementById('emptyState');
+  const loadingState = document.getElementById('loadingState');
+  const currentLabel = document.getElementById('currentLabel');
+  const reloadBtn = document.getElementById('reloadBtn');
+  const openBtn = document.getElementById('openBtn');
+
+  let lastTarget = '';
+
+  function normalizeUrl(raw) {
+    raw = (raw || '').trim();
+    if (!raw) return '';
+    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(raw)) {
+      raw = 'https://' + raw;
+    }
+    return raw;
+  }
+
+  function toProxyUrl(target) {
+    return '/proxy?url=' + encodeURIComponent(target);
+  }
+
+  function loadUrl(raw) {
+    const target = normalizeUrl(raw);
+    if (!target) return;
+    try { new URL(target); } catch { alert('Invalid URL'); return; }
+    lastTarget = target;
+    emptyState.classList.add('hidden');
+    loadingState.classList.remove('hidden');
+    currentLabel.textContent = target;
+    // Cleanly route input to backend proxy endpoint
+    viewer.src = toProxyUrl(target);
+    history.replaceState(null, '', '?u=' + encodeURIComponent(target));
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    loadUrl(input.value);
+  });
+
+  document.querySelectorAll('.chips button').forEach(b => {
+    b.addEventListener('click', () => {
+      input.value = b.dataset.url;
+      loadUrl(b.dataset.url);
+    });
+  });
+
+  viewer.addEventListener('load', () => {
+    loadingState.classList.add('hidden');
+  });
+
+  // Keep address bar in sync when user clicks links inside iframe
+  // (server injects postMessage { type:'proxy-navigated', url })
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'proxy-navigated' && e.data.url) {
+      lastTarget = e.data.url;
+      currentLabel.textContent = e.data.url;
+      history.replaceState(null, '', '?u=' + encodeURIComponent(e.data.url));
+    }
+  });
+
+  reloadBtn.addEventListener('click', () => {
+    if (lastTarget) loadUrl(lastTarget);
+  });
+
+  openBtn.addEventListener('click', () => {
+    if (lastTarget) window.open(lastTarget, '_blank', 'noopener');
+  });
+
+  // Deep-link: index.html?u=https://example.com
+  const preset = new URLSearchParams(location.search).get('u');
+  if (preset) {
+    input.value = preset;
+    loadUrl(preset);
+  }
+</script>
+</body>
+</html>
