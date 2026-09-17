@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>StarClass — Joyful Classroom Management</title>
+<script>
+/* Prevent theme flash: apply saved theme before paint */
+(function(){ try{
+  var t = localStorage.getItem('starclass_theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if(t==='dark') document.documentElement.classList.add('dark');
+}catch(e){} })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        nunito: ['Nunito','sans-serif'],
+        poppins: ['Poppins','sans-serif'],
+      },
+      colors: {
+        primary: '#4F46E5',
+        primaryDark: '#4338CA',
+        skyEdu: '#0EA5E9',
+        mint: '#10B981',
+        coral: '#F43F5E',
+      },
+      boxShadow: {
+        card: '0 10px 30px rgba(79,70,229,0.10)',
+        cardHover: '0 18px 45px rgba(79,70,229,0.18)',
+        glass: '0 8px 32px rgba(31,38,135,0.18)',
+        pop: '0 20px 60px rgba(0,0,0,0.25)',
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      }
+    }
+  }
+}
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Nunito', sans-serif; background: linear-gradient(120deg,#E0F2FE 0%, #BAE6FD 22%, #E0F7FF 48%, #BFDBFE 74%, #F0F9FF 100%); background-size: 200% 200%; animation: coolDrift 18s ease-in-out infinite; min-height:100vh; }
+  @keyframes coolDrift { 0%,100%{ background-position: 0% 40%; } 50%{ background-position: 100% 60%; } }
+  body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background:
+    radial-gradient(600px 320px at 12% 8%, rgba(56,189,248,.28), transparent 60%),
+    radial-gradient(700px 360px at 88% 18%, rgba(2,132,199,.20), transparent 60%),
+    radial-gradient(600px 420px at 50% 100%, rgba(125,211,252,.30), transparent 60%); }
+  .font-poppins { font-family:'Poppins',sans-serif; }
+  .glass { background: rgba(255,255,255,0.68); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(186,230,253,0.9); box-shadow: 0 10px 30px rgba(2,132,199,.10); }
+  .glass-strong { background: rgba(255,255,255,0.90); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 1px solid rgba(186,230,253,.9); }
+  .blob { position: fixed; border-radius: 50%; filter: blur(95px); opacity:.55; pointer-events:none; z-index:0; animation: float 12s ease-in-out infinite; }
+  @keyframes float { 0%,100%{ transform: translateY(0) scale(1);} 50%{ transform: translateY(-24px) scale(1.06);} }
+  .sidebar-link.active { background: linear-gradient(135deg,#0284C7,#0EA5E9 55%,#38BDF8); color:white; box-shadow:0 10px 25px rgba(2,132,199,.45), 0 0 0 1px rgba(186,230,253,.6) inset; }
+  .sidebar-link.active .sub { color: rgba(255,255,255,.88); }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#7DD3FC,#38BDF8); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#38BDF8,#0284C7); }
+  .student-card { transition: all .22s cubic-bezier(.34,1.56,.64,1); }
+  .student-card:hover { transform: translateY(-6px); }
+  .student-card:active { transform: scale(.97); }
+  .modal-bg { transition: opacity .25s ease; }
+  .modal-panel { transition: transform .28s cubic-bezier(.34,1.4,.64,1), opacity .25s ease; }
+  .modal-hidden { opacity:0; pointer-events:none; }
+  .modal-hidden .modal-panel { transform: translateY(24px) scale(.96); opacity:0; }
+  .modal-visible { opacity:1; pointer-events:auto; }
+  .modal-visible .modal-panel { transform: translateY(0) scale(1); opacity:1; }
+  .tab-btn { transition: all .2s ease; }
+  .pop-in { animation: popIn .35s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { 0%{ transform:scale(.7); opacity:0;} 100%{ transform:scale(1); opacity:1;} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+  .shake { animation: shake .45s ease; }
+  @keyframes bounceSoft { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .bounce-soft { animation: bounceSoft 1.2s ease-in-out infinite; }
+  @keyframes pickerGlow { 0%,100%{ box-shadow:0 0 0 6px rgba(79,70,229,.25), 0 20px 60px rgba(79,70,229,.35);} 50%{ box-shadow:0 0 0 14px rgba(14,165,233,.18), 0 20px 60px rgba(14,165,233,.35);} }
+  .picker-glow { animation: pickerGlow 1.1s ease-in-out infinite; }
+  @keyframes toastIn { from{ transform:translateY(20px); opacity:0;} to{ transform:translateY(0); opacity:1;} }
+  .toast-in { animation: toastIn .3s ease; }
+  @keyframes bannerDrop { 0%{ transform:translateY(-100%);} 12%,82%{ transform:translateY(0);} 100%{ transform:translateY(-130%);} }
+  .banner-anim { animation: bannerDrop 2.2s ease forwards; }
+  .points-bump { animation: bump .45s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes bump { 0%{transform:scale(1)} 40%{transform:scale(1.35)} 100%{transform:scale(1)} }
+  .timer-ring-bg { stroke:#BAE6FD; }
+  .timer-ring-fg { transition: stroke-dashoffset .5s linear, stroke .3s; stroke-linecap:round; }
+  .bar-fill { transition: width .8s cubic-bezier(.22,1,.36,1); }
+  .chip-active { background:linear-gradient(135deg,#0284C7,#0EA5E9) !important; color:white !important; border-color:#0284C7 !important; box-shadow:0 6px 16px rgba(2,132,199,.4); }
+  input[type="file"]::file-selector-button { display:none; }
+  .monster-pattern { background-image: radial-gradient(rgba(255,255,255,.35) 2px, transparent 2px); background-size:14px 14px; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; } .no-scrollbar{ scrollbar-width:none; }
+
+  /* ---------- Dojo classroom menu (like screenshot) ---------- */
+  .dojo-board { background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(224,242,254,.72)); border:1px solid rgba(125,211,252,.7); border-radius:28px; padding:18px; box-shadow:0 12px 34px rgba(2,132,199,.14), 0 0 0 1px rgba(255,255,255,.5) inset; }
+  html.dark .dojo-board { background: rgba(15,23,42,.55); border-color: rgba(148,163,184,.14); }
+  .dojo-toggle { background:linear-gradient(180deg,#E0F2FE,#BAE6FD); border:1px solid rgba(125,211,252,.6); border-radius:999px; padding:4px; display:inline-flex; gap:2px; }
+  html.dark .dojo-toggle { background:#1E293B; }
+  .dojo-toggle button { border-radius:999px; padding:6px 22px; font-size:13px; font-weight:900; color:#0369A1; transition:all .2s; }
+  .dojo-toggle button.on { background:linear-gradient(135deg,#0284C7,#0EA5E9); color:#fff; box-shadow:0 4px 12px rgba(2,132,199,.45); }
+  html.dark .dojo-toggle button.on { background:#4F46E5; color:#fff; }
+  .dojo-tile { position:relative; background:linear-gradient(180deg,#FFFFFF,#F0F9FF); border:2px solid #BAE6FD; border-radius:18px; padding:14px 8px 10px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:all .2s cubic-bezier(.34,1.4,.64,1); min-height:148px; box-shadow: 0 4px 14px rgba(2,132,199,.08); }
+  .dojo-tile:hover { transform:translateY(-5px); box-shadow:0 16px 34px rgba(2,132,199,.24); border-color:#38BDF8; }
+  .dojo-tile:active { transform:scale(.96); }
+  html.dark .dojo-tile { background:#1E293B; border-color:#334155; }
+  html.dark .dojo-tile:hover { border-color:#4F46E5; }
+  .dojo-pts { position:absolute; top:8px; right:8px; min-width:30px; height:30px; padding:0 7px; border-radius:999px; background:linear-gradient(180deg,#8ADD5B,#5FBF2E); color:#fff; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(122,199,79,.45), 0 0 0 2px rgba(255,255,255,.7) inset; z-index:2; }
+  .dojo-pts.neg { background:linear-gradient(180deg,#FB7185,#E11D48); box-shadow:0 3px 8px rgba(244,63,94,.4); }
+  .dojo-pts.zero { background:#CBD5E1; box-shadow:none; }
+  .dojo-name { margin-top:8px; font-weight:800; font-size:13.5px; color:#0C4A6E; text-align:center; line-height:1.2; }
+  html.dark .dojo-name { color:#E2E8F0; }
+  .dojo-add { border-style:dashed !important; border-color:#38BDF8 !important; color:#0284C7; background:linear-gradient(180deg,#F0F9FF,#E0F2FE) !important; }
+  .dojo-dock { position:fixed; bottom:12px; left:50%; transform:translateX(-50%); z-index:45; background:rgba(255,255,255,.94); backdrop-filter:blur(20px); border:1px solid rgba(125,211,252,.8); border-radius:28px; box-shadow:0 18px 50px rgba(2,132,199,.25); display:flex; align-items:flex-end; gap:2px; padding:8px 14px; }
+  html.dark .dojo-dock { background:rgba(15,23,42,.95); border-color:#334155; }
+  .dock-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:18px; font-size:10px; font-weight:900; color:#64748B; transition:all .2s; min-width:72px; }
+  .dock-btn:hover { background:#E0F2FE; color:#0284C7; }
+  html.dark .dock-btn:hover { background:#1E293B; }
+  .dock-btn.dock-active { color:#0284C7; }
+  .dock-fab { width:62px; height:62px; margin:-32px 6px 0; border-radius:999px; background:linear-gradient(135deg,#0284C7,#0EA5E9 55%,#38BDF8); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 12px 28px rgba(2,132,199,.45), 0 0 0 3px rgba(186,230,253,.7); border:4px solid #fff; transition:all .2s; }
+  html.dark .dock-fab { border-color:#0F172A; }
+  .dock-fab:hover { transform:scale(1.06); }
+  .dojo-tile.everyone-tile { overflow:hidden; }
+  .dojo-tile.everyone-tile::after { content:''; position:absolute; inset:-40%; background: conic-gradient(from 0deg, transparent 0 40%, rgba(56,189,248,.28) 50%, transparent 60% 100%); animation: everyoneSpin 3.2s linear infinite; pointer-events:none; }
+  @keyframes everyoneSpin { to { transform: rotate(360deg); } }
+
+  /* ---------- Point color animations ---------- */
+  @keyframes tilePop { 0%{transform:scale(1)} 35%{transform:scale(1.07) rotate(-1.2deg)} 70%{transform:scale(.97)} 100%{transform:scale(1)} }
+  @keyframes glowPos { 0%{ box-shadow:0 0 0 0 rgba(16,185,129,0);} 35%{ box-shadow:0 0 0 7px rgba(16,185,129,.45), 0 14px 30px rgba(16,185,129,.35);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
+  @keyframes glowNeg { 0%{ box-shadow:0 0 0 0 rgba(244,63,94,0);} 35%{ box-shadow:0 0 0 7px rgba(244,63,94,.40), 0 14px 30px rgba(244,63,94,.30);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
+  @keyframes badgePop { 0%{transform:scale(1)} 40%{transform:scale(1.45) rotate(6deg)} 100%{transform:scale(1)} }
+  @keyframes floatUp { 0%{opacity:0; transform:translate(-50%,6px) scale(.7);} 15%{opacity:1;} 100%{opacity:0; transform:translate(-50%,-52px) scale(1.25);} }
+  @keyframes waveGlow { 0%,100%{ filter:saturate(1);} 50%{ filter:saturate(1.6) brightness(1.06);} }
+  .dojo-tile.celebrate { animation: tilePop .5s cubic-bezier(.34,1.56,.64,1), waveGlow .5s ease; }
+  .dojo-tile.flash-pos { animation: tilePop .5s cubic-bezier(.34,1.56,.64,1), glowPos .7s ease; border-color:#34D399 !important; }
+  .dojo-tile.flash-neg { animation: glowNeg .6s ease; border-color:#FB7185 !important; }
+  .dojo-pts.badge-pop { animation: badgePop .45s cubic-bezier(.34,1.56,.64,1); }
+  .float-plus { position:absolute; left:50%; top:34px; z-index:5; font-weight:900; font-size:20px; pointer-events:none; animation: floatUp 1s ease-out forwards; text-shadow:0 2px 8px rgba(0,0,0,.25); }
+  .float-plus.pos { color:#10B981; }
+  .float-plus.neg { color:#F43F5E; }
+
+  /* ---------- Navigation polish ---------- */
+  html { scroll-behavior: smooth; }
+  .nav-link { transition: all .2s ease; }
+  .nav-link.nav-active { background:linear-gradient(135deg,#0284C7,#0EA5E9) !important; color:#fff !important; box-shadow:0 6px 18px rgba(2,132,199,.45); }
+  .nav-link.nav-active svg, .nav-link.nav-active i, .nav-link.nav-active span { color:#fff !important; }
+  kbd.kbd { font-family:'Nunito',sans-serif; font-size:10px; font-weight:900; background:#E0F2FE; border:1px solid #BAE6FD; border-bottom-width:2px; border-radius:6px; padding:1px 6px; color:#0369A1; }
+  #backToTop { transition: all .3s cubic-bezier(.34,1.4,.64,1); }
+  #backToTop.show { opacity:1 !important; pointer-events:auto !important; transform:translateY(0) !important; }
+  #sidebarWrap { transition: margin .3s ease, width .3s ease, opacity .25s ease; }
+  body.sidebar-collapsed #sidebarWrap { margin-left:-316px; opacity:0; pointer-events:none; }
+  .crumb-sep { opacity:.4; }
+  section.scroll-anchor { scroll-margin-top: 110px; }
+
+  /* ---------- Dark mode (deep ocean blue) ---------- */
+  html.dark body { background: linear-gradient(135deg,#020617 0%, #082F49 38%, #0C4A6E 68%, #020617 100%); color:#E0F2FE; animation: coolDrift 22s ease-in-out infinite; background-size:200% 200%; }
+  html.dark body::before { background:
+    radial-gradient(600px 320px at 12% 8%, rgba(14,165,233,.22), transparent 60%),
+    radial-gradient(700px 360px at 88% 18%, rgba(56,189,248,.14), transparent 60%),
+    radial-gradient(600px 420px at 50% 100%, rgba(2,132,199,.22), transparent 60%); }
+  html.dark .blob { opacity:.14; }
+  html.dark .glass { background: rgba(30,41,59,0.72); border-color: rgba(148,163,184,0.14); }
+  html.dark .glass-strong { background: rgba(15,23,42,0.94); border-color: rgba(148,163,184,0.14); }
+  html.dark .bg-white { background-color:#1E293B !important; border-color:#334155 !important; }
+  html.dark .bg-slate-50 { background-color:#0F172A !important; }
+  html.dark .bg-slate-100 { background-color:#1E293B !important; }
+  html.dark .bg-indigo-50 { background-color: rgba(79,70,229,.16) !important; }
+  html.dark .border-white { border-color:#334155 !important; }
+  html.dark .border-slate-100, html.dark .border-slate-200, html.dark .border-indigo-100 { border-color:#334155 !important; }
+  html.dark .border-indigo-50 { border-color:#312e81 !important; }
+  html.dark .border-emerald-50, html.dark .border-rose-50 { border-color:#334155 !important; }
+  html.dark .text-slate-900 { color:#F8FAFC !important; }
+  html.dark .text-slate-800 { color:#E2E8F0 !important; }
+  html.dark .text-slate-700, html.dark .text-slate-600 { color:#CBD5E1 !important; }
+  html.dark .text-slate-500, html.dark .text-slate-400 { color:#94A3B8 !important; }
+  html.dark .text-indigo-700, html.dark .text-indigo-900 { color:#C7D2FE !important; }
+  html.dark .text-emerald-900 { color:#A7F3D0 !important; }
+  html.dark .text-rose-900 { color:#FECDD3 !important; }
+  html.dark input, html.dark select { background-color:#0F172A !important; color:#F1F5F9 !important; border-color:#334155 !important; }
+  html.dark input::placeholder { color:#64748B !important; }
+  html.dark .student-card { background:#1E293B !important; border-color:#334155 !important; }
+  html.dark .student-card:hover { border-color:#4F46E5 !important; }
+  html.dark kbd.kbd { background:#1E293B; border-color:#475569; color:#94A3B8; }
+  html.dark .bg-emerald-50\/50, html.dark .bg-rose-50\/50 { background-color: rgba(30,41,59,.6) !important; }
+  html.dark #historyPanel { background: rgba(15,23,42,.97); }
+  html.dark .timer-ring-bg { stroke:#334155; }
+  html.dark ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#0284C7,#0EA5E9); }
+
+  /* ---------- Cool blue recolor (same UI, cooler tone) ---------- */
+  .bg-indigo-600 { background-color:#0284C7 !important; }
+  .hover\:bg-indigo-700:hover { background-color:#0369A1 !important; }
+  .text-indigo-600, .text-indigo-700 { color:#0284C7 !important; }
+  .text-indigo-500 { color:#0EA5E9 !important; }
+  .bg-indigo-100 { background-color:#E0F2FE !important; }
+  .border-indigo-100, .border-indigo-200, .border-indigo-300 { border-color:#7DD3FC !important; }
+  .from-\[\#4F46E5\] { --tw-gradient-from:#0284C7 !important; --tw-gradient-to: rgb(2 132 199 / 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+  .to-\[\#0EA5E9\] { --tw-gradient-to:#38BDF8 !important; }
+  .shadow-indigo-300, .shadow-indigo-200 { --tw-shadow-color: rgba(2,132,199,.35) !important; }
+  #backToTop { background:linear-gradient(135deg,#0284C7,#0EA5E9) !important; box-shadow:0 12px 28px rgba(2,132,199,.45) !important; }
+</style>
+</head>
+<body class="text-slate-800 overflow-x-hidden">
+
+<!-- ambient blobs -->
+<div class="blob w-[440px] h-[440px] bg-sky-300 -top-24 -left-24"></div>
+<div class="blob w-[400px] h-[400px] bg-blue-300 top-1/3 -right-28" style="animation-delay:-4s"></div>
+<div class="blob w-[340px] h-[340px] bg-cyan-200 bottom-0 left-1/3" style="animation-delay:-8s"></div>
+
+<!-- success banner -->
+<div id="successBanner" class="fixed top-4 left-1/2 -translate-x-1/2 z-[120] hidden">
+  <div id="successBannerInner" class="glass-strong rounded-2xl shadow-pop px-5 py-3 flex items-center gap-3 border-2 border-emerald-200">
+    <div id="successBannerIcon" class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-xl">+1</div>
+    <div>
+      <p id="successBannerTitle" class="font-extrabold text-slate-800 leading-tight">Awesome!</p>
+      <p id="successBannerSub" class="text-sm text-slate-500 leading-tight">Sophia earned +1</p>
+    </div>
+  </div>
+</div>
+
+<div class="relative z-10 flex min-h-screen">
+
+  <!-- ============ SIDEBAR (desktop) ============ -->
+  <aside id="sidebarWrap" class="hidden lg:flex flex-col w-[300px] shrink-0 p-4 pl-5 py-5 sticky top-0 h-screen">
+    <div class="glass rounded-3xl shadow-card flex-1 flex flex-col overflow-hidden">
+      <!-- Logo -->
+      <div class="p-5 pb-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4F46E5] to-[#0EA5E9] flex items-center justify-center shadow-lg shadow-indigo-300 rotate-3">
+          <i data-lucide="star" class="w-7 h-7 text-yellow-300 fill-yellow-300"></i>
+        </div>
+        <div class="flex-1">
+          <h1 class="font-poppins font-800 font-extrabold text-[22px] leading-none tracking-tight text-slate-900">StarClass</h1>
+          <p class="text-[12px] font-bold text-indigo-500 tracking-wide uppercase mt-1">Joyful Classrooms</p>
+        </div>
+        <button onclick="toggleSidebar()" title="Hide sidebar ( [ )" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-400 flex items-center justify-center transition-all">
+          <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Main nav -->
+      <div class="px-5">
+        <div class="grid grid-cols-3 gap-1.5 bg-slate-100 rounded-2xl p-1.5">
+          <button id="navStudents" onclick="goSection('students')" class="nav-link nav-active rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="layout-grid" class="w-4 h-4"></i>Students</button>
+          <button id="navToolkit" onclick="goSection('toolkit')" class="nav-link rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="wand-2" class="w-4 h-4"></i>Toolkit</button>
+          <button id="navReportsSide" onclick="switchView('reports')" class="nav-link rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>Reports</button>
+        </div>
+      </div>
+
+      <!-- Quick add buttons -->
+      <div class="px-5 grid grid-cols-2 gap-2">
+        <button onclick="openClassroomModal()" class="flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[13px] font-extrabold rounded-2xl py-2.5 transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-95">
+          <i data-lucide="plus" class="w-4 h-4"></i> Class
+        </button>
+        <button onclick="openStudentModal()" class="flex items-center justify-center gap-1.5 bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 text-[13px] font-extrabold rounded-2xl py-2.5 transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-95">
+          <i data-lucide="user-plus" class="w-4 h-4"></i> Student
+        </button>
+      </div>
+
+      <!-- Classrooms -->
+      <div class="px-5 mt-5 flex items-center justify-between">
+        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-400">My Classrooms</h2>
+        <span id="classCountBadge" class="text-[11px] font-extrabold bg-indigo-100 text-indigo-700 rounded-full px-2 py-0.5">0</span>
+      </div>
+      <div id="classroomList" class="px-3 mt-2 space-y-2 overflow-y-auto flex-1 pb-2"></div>
+
+      <!-- Sidebar footer / toolkit mini -->
+      <div class="p-4 space-y-2">
+        <div class="flex gap-2">
+          <button onclick="toggleTheme()" title="Toggle dark mode" class="flex-1 glass rounded-2xl py-2.5 text-[12px] font-extrabold text-slate-600 hover:text-indigo-700 flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5">
+            <span id="themeIconSide"><i data-lucide="moon" class="w-4 h-4"></i></span><span id="themeLabelSide">Dark</span>
+          </button>
+          <button onclick="toggleSound()" title="Toggle sounds" class="flex-1 glass rounded-2xl py-2.5 text-[12px] font-extrabold text-slate-600 hover:text-indigo-700 flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5">
+            <span id="soundIconSide"><i data-lucide="volume-2" class="w-4 h-4"></i></span><span id="soundLabelSide">Sound</span>
+          </button>
+          <button onclick="openSettings('shortcuts')" title="Settings & shortcuts (?)" class="w-11 glass rounded-2xl py-2.5 text-slate-500 hover:text-indigo-700 flex items-center justify-center transition-all">
+            <i data-lucide="settings-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div class="rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-sky-500 p-4 text-white relative overflow-hidden">
+          <div class="absolute -right-6 -top-6 w-28 h-28 bg-white/15 rounded-full"></div>
+          <div class="absolute -right-2 top-10 w-12 h-12 bg-yellow-300/30 rounded-full"></div>
+          <p class="font-extrabold text-[15px] flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Toolkit ready</p>
+          <p class="text-[12px] text-indigo-100 mt-1 font-semibold">Picker • Timer • Group Maker below</p>
+          <button onclick="scrollToToolkit()" class="mt-3 w-full bg-white text-indigo-700 font-extrabold text-[13px] rounded-xl py-2 hover:bg-indigo-50 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <i data-lucide="wand-2" class="w-4 h-4"></i> Open Tools
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 min-w-0 flex flex-col">
+
+    <!-- Global top utility nav (desktop): breadcrumbs + quick nav + theme/sound -->
+    <div class="hidden lg:block sticky top-0 z-40 px-8 pt-4">
+      <div class="glass rounded-2xl shadow-card px-4 py-2.5 flex items-center gap-3">
+        <button onclick="toggleSidebar()" title="Toggle sidebar ( [ )" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-500 flex items-center justify-center transition-all shrink-0">
+          <i data-lucide="panel-left" class="w-4 h-4"></i>
+        </button>
+        <nav class="flex items-center gap-1.5 text-[13px] font-extrabold text-slate-500 min-w-0">
+          <button onclick="goSection('students')" class="hover:text-indigo-700 flex items-center gap-1.5 shrink-0"><i data-lucide="home" class="w-4 h-4"></i> Home</button>
+          <span class="crumb-sep">/</span>
+          <span id="crumbClass" class="truncate max-w-[220px] text-slate-800">Classroom</span>
+          <span class="crumb-sep">/</span>
+          <span id="crumbView" class="text-indigo-600">Students</span>
+        </nav>
+        <div class="flex-1"></div>
+        <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+          <button id="topNavStudents" onclick="goSection('students')" class="nav-link nav-active px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5"></i>Students</button>
+          <button id="topNavToolkit" onclick="goSection('toolkit')" class="nav-link px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i>Toolkit</button>
+          <button id="topNavReports" onclick="switchView('reports')" class="nav-link px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>Reports</button>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <div class="flex items-center bg-slate-100 rounded-xl p-1">
+            <button onclick="prevClassroom()" title="Previous classroom (←)" class="w-8 h-8 rounded-lg hover:bg-white text-slate-500 hover:text-indigo-700 flex items-center justify-center transition-all"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+            <button onclick="nextClassroom()" title="Next classroom (→)" class="w-8 h-8 rounded-lg hover:bg-white text-slate-500 hover:text-indigo-700 flex items-center justify-center transition-all"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+          </div>
+          <button onclick="toggleTheme()" title="Light / dark mode (D)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 flex items-center justify-center transition-all"><span id="themeIconTop"><i data-lucide="moon" class="w-4 h-4"></i></span></button>
+          <button onclick="toggleSound()" title="Sounds on/off (M)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 flex items-center justify-center transition-all relative"><span id="soundIconTop"><i data-lucide="volume-2" class="w-4 h-4"></i></span></button>
+          <button onclick="openSettings('general')" title="Settings" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-500 hover:text-indigo-700 hidden xl:flex items-center justify-center transition-all"><i data-lucide="settings-2" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile top bar -->
+    <div class="lg:hidden sticky top-0 z-40 glass border-b border-white/60 px-4 pt-3 pb-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#4F46E5] to-[#0EA5E9] flex items-center justify-center shadow-md rotate-3">
+            <i data-lucide="star" class="w-6 h-6 text-yellow-300 fill-yellow-300"></i>
+          </div>
+          <h1 class="font-poppins font-extrabold text-xl tracking-tight">StarClass</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="toggleTheme()" title="Dark mode" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95"><span id="themeIconMobile"><i data-lucide="moon" class="w-5 h-5 text-slate-700"></i></span></button>
+          <button onclick="toggleSound()" title="Sounds" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95"><span id="soundIconMobile"><i data-lucide="volume-2" class="w-5 h-5 text-slate-700"></i></span></button>
+          <button onclick="openStudentModal()" class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md active:scale-95"><i data-lucide="user-plus" class="w-5 h-5"></i></button>
+          <button onclick="toggleHistory(true)" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95 relative">
+            <i data-lucide="history" class="w-5 h-5 text-slate-700"></i>
+            <span id="historyDotMobile" class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full hidden"></span>
+          </button>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button onclick="prevClassroom()" class="w-10 shrink-0 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-500"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+        <div id="classroomPillsMobile" class="flex gap-2 flex-1 overflow-x-auto no-scrollbar pb-1"></div>
+        <button onclick="nextClassroom()" class="w-10 shrink-0 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-500"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+
+    <!-- Desktop header -->
+    <header class="hidden lg:block px-8 pt-6 pb-2">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <h2 id="activeClassName" class="font-poppins font-extrabold text-[30px] leading-tight tracking-tight text-slate-900">Classroom</h2>
+            <span id="activeClassEmoji" class="text-3xl">🚀</span>
+          </div>
+          <p class="text-slate-500 font-semibold text-[14px] mt-1 flex items-center gap-2">
+            <span id="activeClassMeta">0 students</span>
+            <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+            <span class="flex items-center gap-1"><i data-lucide="calendar-days" class="w-4 h-4"></i> <span id="todayLabel"></span></span>
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- View switch -->
+          <div class="glass rounded-2xl p-1 flex gap-1 shadow-sm">
+            <button id="tabClassroom" onclick="switchView('classroom')" class="px-4 py-2 rounded-xl text-[13px] font-extrabold bg-indigo-600 text-white shadow flex items-center gap-2 transition-all"><i data-lucide="layout-grid" class="w-4 h-4"></i> Classroom</button>
+            <button id="tabReports" onclick="switchView('reports')" class="px-4 py-2 rounded-xl text-[13px] font-extrabold text-slate-500 hover:text-indigo-700 flex items-center gap-2 transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports</button>
+          </div>
+          <button onclick="toggleHistory(true)" class="glass rounded-2xl px-4 py-2.5 text-[13px] font-extrabold text-slate-700 hover:text-indigo-700 shadow-sm flex items-center gap-2 hover:-translate-y-0.5 transition-all">
+            <i data-lucide="history" class="w-4 h-4"></i> History
+            <span id="historyCountBadge" class="bg-indigo-600 text-white text-[11px] rounded-full px-2 py-0.5 min-w-[24px] text-center">0</span>
+          </button>
+          <button onclick="confirmResetPoints()" class="rounded-2xl px-4 py-2.5 text-[13px] font-extrabold bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="grid grid-cols-4 gap-3 mt-5">
+        <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-sky-400 flex items-center justify-center text-white shrink-0"><i data-lucide="trophy" class="w-5 h-5"></i></div>
+          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Class Points</p><p id="statTotalPoints" class="font-poppins font-extrabold text-2xl leading-none">0</p></div>
+        </div>
+        <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shrink-0"><i data-lucide="thumbs-up" class="w-5 h-5"></i></div>
+          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Positive</p><p id="statPositive" class="font-poppins font-extrabold text-2xl leading-none text-emerald-600">0</p></div>
+        </div>
+        <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-400 to-orange-400 flex items-center justify-center text-white shrink-0"><i data-lucide="thumbs-down" class="w-5 h-5"></i></div>
+          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Needs Work</p><p id="statNeedsWork" class="font-poppins font-extrabold text-2xl leading-none text-rose-500">0</p></div>
+        </div>
+        <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shrink-0"><i data-lucide="crown" class="w-5 h-5"></i></div>
+          <div class="min-w-0"><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Top Star</p><p id="statTopStudent" class="font-extrabold text-[15px] leading-tight truncate">—</p></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile stats compact -->
+    <div class="lg:hidden px-4 mt-3">
+      <div class="glass rounded-2xl shadow-card p-3 flex items-center justify-between">
+        <div class="min-w-0">
+          <h2 id="activeClassNameMobile" class="font-poppins font-extrabold text-lg truncate">Classroom</h2>
+          <p id="activeClassMetaMobile" class="text-[12px] font-bold text-slate-500">0 students • 0 pts</p>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="switchView('classroom')" id="tabClassroomM" class="px-3 py-2 rounded-xl text-[12px] font-extrabold bg-indigo-600 text-white">Class</button>
+          <button onclick="switchView('reports')" id="tabReportsM" class="px-3 py-2 rounded-xl text-[12px] font-extrabold text-slate-500 bg-white border border-slate-200">Reports</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-2 mt-2">
+        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-indigo-50"><p class="text-[10px] font-extrabold uppercase text-slate-400">Points</p><p id="statTotalPointsM" class="font-extrabold text-lg text-indigo-700">0</p></div>
+        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-emerald-50"><p class="text-[10px] font-extrabold uppercase text-slate-400">Positive</p><p id="statPositiveM" class="font-extrabold text-lg text-emerald-600">0</p></div>
+        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-rose-50"><p class="text-[10px] font-extrabold uppercase text-slate-400">Needs Work</p><p id="statNeedsWorkM" class="font-extrabold text-lg text-rose-500">0</p></div>
+      </div>
+    </div>
+
+    <!-- ============ VIEW: CLASSROOM (Dojo menu) ============ -->
+    <main id="view-classroom" class="px-4 lg:px-8 py-4 flex-1 pb-32">
+      <!-- Dojo top bar: class switcher + Students/Groups toggle + shuffle -->
+      <div class="dojo-board mb-4">
+        <div class="flex items-center gap-2">
+          <button onclick="openClassroomModal(state.selectedClassroom)" title="Class settings" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-indigo-100 text-slate-500 hover:text-indigo-700 flex items-center justify-center transition-all shrink-0"><i data-lucide="check-check" class="w-5 h-5"></i></button>
+          <div class="flex-1 min-w-0 text-center">
+            <button onclick="cycleClassroom()" title="Tap to switch class" class="font-poppins font-extrabold text-lg lg:text-xl tracking-tight hover:text-indigo-700 transition-all truncate max-w-full">
+              <span id="dojoClassName">Mighty Lions</span> <i data-lucide="chevrons-up-down" class="w-4 h-4 inline text-slate-400"></i>
+            </button>
+            <div class="mt-1.5 flex justify-center">
+              <div class="dojo-toggle">
+                <button id="dojoTabStudents" onclick="setClassTab('students')" class="on">Students</button>
+                <button id="dojoTabGroups" onclick="setClassTab('groups')">Groups</button>
+              </div>
+            </div>
+          </div>
+          <button onclick="openRandomPicker()" title="Random picker" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-600 flex items-center justify-center transition-all shrink-0"><i data-lucide="shuffle" class="w-5 h-5"></i></button>
+        </div>
+        <!-- classroom quick-switch pills -->
+        <div id="dojoClassPills" class="flex gap-2 mt-3 overflow-x-auto no-scrollbar justify-start sm:justify-center pb-0.5"></div>
+      </div>
+
+      <!-- Toolbar: search / sort (compact, always visible) -->
+      <section id="section-students" class="scroll-anchor">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <div class="relative flex-1 min-w-[160px]">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="searchInput" oninput="renderGrid()" type="text" placeholder="Search monsters...  ( / )" class="w-full glass rounded-2xl pl-10 pr-4 py-2.5 text-sm font-bold placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm" />
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="sortSelect" onchange="renderGrid()" class="glass rounded-2xl px-3 py-2.5 text-[13px] font-extrabold text-slate-600 outline-none shadow-sm cursor-pointer">
+            <option value="name">Sort: Name</option>
+            <option value="pointsDesc">Sort: Top points</option>
+            <option value="pointsAsc">Sort: Lowest points</option>
+          </select>
+          <button onclick="openRandomPicker()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl px-4 py-2.5 text-[13px] font-extrabold items-center gap-2 shadow-md hover:-translate-y-0.5 transition-all active:scale-95 hidden sm:flex">
+            <i data-lucide="dices" class="w-4 h-4"></i> Pick Random
+          </button>
+        </div>
+      </div>
+
+      <!-- Student grid (Dojo tiles) -->
+      <div id="dojoStudentsWrap">
+        <div id="studentGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-4"></div>
+        <div id="emptyGrid" class="hidden text-center py-16">
+          <div class="w-24 h-24 mx-auto p-2 bg-indigo-50 rounded-3xl" id="emptyMonster"></div>
+          <h3 class="font-poppins font-extrabold text-xl mt-4">No monsters yet</h3>
+          <p class="text-slate-500 font-semibold text-sm mt-1">Add your first superstar to fill the class!</p>
+          <button onclick="openStudentModal()" class="mt-4 bg-indigo-600 text-white font-extrabold text-sm rounded-2xl px-6 py-3 shadow-lg hover:-translate-y-0.5 transition-all">+ Add Student</button>
+        </div>
+      </div>
+      <!-- Groups view (Dojo Groups tab) -->
+      <div id="dojoGroupsWrap" class="hidden">
+        <div class="glass rounded-3xl p-5 shadow-card">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white"><i data-lucide="users" class="w-5 h-5"></i></div>
+              <div><h4 class="font-extrabold">Groups for today</h4><p class="text-[12px] font-bold text-slate-500">Shuffled from this class</p></div>
+            </div>
+            <div class="flex-1"></div>
+            <div class="flex items-center bg-white rounded-2xl border border-slate-200 px-3">
+              <input id="groupSizeInputTop" type="number" min="2" max="10" value="2" class="w-14 px-1 py-2.5 text-sm font-extrabold outline-none bg-transparent text-center" />
+              <span class="text-[11px] font-bold text-slate-400">per group</span>
+            </div>
+            <button onclick="makeGroupsTop()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl px-5 py-2.5 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> Shuffle Groups</button>
+          </div>
+          <div id="groupResultsTop" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-4"></div>
+        </div>
+      </div>
+      </section>
+
+      <!-- Toolkit -->
+      <section id="section-toolkit" class="scroll-anchor">
+      <div id="toolkit" class="mt-8 mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-sky-500 flex items-center justify-center text-white"><i data-lucide="wand-2" class="w-4 h-4"></i></div>
+          <h3 class="font-poppins font-extrabold text-lg">Classroom Toolkit</h3>
+          <div class="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4">
+
+          <!-- Random picker card -->
+          <div class="glass rounded-3xl p-5 shadow-card relative overflow-hidden group">
+            <div class="absolute -top-8 -right-8 w-28 h-28 bg-amber-200/50 rounded-full blur-xl"></div>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-md"><i data-lucide="dices" class="w-6 h-6"></i></div>
+              <div><h4 class="font-extrabold">Random Picker</h4><p class="text-[12px] font-bold text-slate-500">Cold-call with fun</p></div>
+            </div>
+            <div id="pickerPreview" class="mt-4 bg-white/70 border-2 border-dashed border-amber-200 rounded-2xl py-4 text-center font-extrabold text-slate-400 text-sm">Tap to pick a star ⭐</div>
+            <button onclick="openRandomPicker()" class="mt-3 w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-sm rounded-2xl py-2.5 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">Pick a Student</button>
+          </div>
+
+          <!-- Timer card -->
+          <div class="glass rounded-3xl p-5 shadow-card relative overflow-hidden">
+            <div class="absolute -top-8 -right-8 w-28 h-28 bg-sky-200/60 rounded-full blur-xl"></div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-white shadow-md"><i data-lucide="timer" class="w-6 h-6"></i></div>
+                <div><h4 class="font-extrabold">Class Timer</h4><p class="text-[12px] font-bold text-slate-500">Focus & transitions</p></div>
+              </div>
+              <div class="flex bg-slate-100 rounded-xl p-0.5 text-[11px] font-extrabold">
+                <button id="modeCountdownBtn" onclick="setTimerMode('countdown')" class="px-2.5 py-1.5 rounded-lg bg-white shadow text-indigo-700">Count</button>
+                <button id="modeStopwatchBtn" onclick="setTimerMode('stopwatch')" class="px-2.5 py-1.5 rounded-lg text-slate-500">Watch</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 mt-4">
+              <div class="relative w-[92px] h-[92px] shrink-0">
+                <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke-width="10" class="timer-ring-bg"/>
+                  <circle id="timerRing" cx="50" cy="50" r="42" fill="none" stroke="#4F46E5" stroke-width="10" stroke-dasharray="263.9" stroke-dashoffset="0" class="timer-ring-fg"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span id="timerDisplay" class="font-poppins font-extrabold text-[17px] leading-none tabular-nums">05:00</span>
+                  <span id="timerStateLabel" class="text-[10px] font-extrabold text-slate-400 uppercase mt-0.5">Ready</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex gap-1.5">
+                  <button onclick="setTimerPreset(60)" class="flex-1 bg-white border border-slate-200 rounded-xl py-1.5 text-[12px] font-extrabold hover:border-indigo-300 hover:text-indigo-700 transition-all">1m</button>
+                  <button onclick="setTimerPreset(300)" class="flex-1 bg-white border border-slate-200 rounded-xl py-1.5 text-[12px] font-extrabold hover:border-indigo-300 hover:text-indigo-700 transition-all">5m</button>
+                  <button onclick="setTimerPreset(600)" class="flex-1 bg-white border border-slate-200 rounded-xl py-1.5 text-[12px] font-extrabold hover:border-indigo-300 hover:text-indigo-700 transition-all">10m</button>
+                </div>
+                <div class="flex gap-1.5 mt-1.5">
+                  <button id="timerStartBtn" onclick="timerToggle()" class="flex-1 bg-indigo-600 text-white rounded-xl py-2 text-[12px] font-extrabold flex items-center justify-center gap-1 hover:bg-indigo-700 transition-all active:scale-95"><i data-lucide="play" class="w-3.5 h-3.5"></i> Start</button>
+                  <button onclick="timerReset()" class="flex-1 bg-slate-100 text-slate-600 rounded-xl py-2 text-[12px] font-extrabold flex items-center justify-center gap-1 hover:bg-slate-200 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group maker card -->
+          <div class="glass rounded-3xl p-5 shadow-card relative overflow-hidden">
+            <div class="absolute -top-8 -right-8 w-28 h-28 bg-emerald-200/60 rounded-full blur-xl"></div>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shadow-md"><i data-lucide="users" class="w-6 h-6"></i></div>
+              <div><h4 class="font-extrabold">Group Maker</h4><p class="text-[12px] font-bold text-slate-500">Shuffle into teams</p></div>
+            </div>
+            <div class="flex gap-2 mt-4">
+              <div class="flex items-center bg-white rounded-2xl border border-slate-200 px-3 flex-1">
+                <i data-lucide="users-round" class="w-4 h-4 text-slate-400"></i>
+                <input id="groupSizeInput" type="number" min="2" max="10" value="2" class="w-full px-2 py-2.5 text-sm font-extrabold outline-none bg-transparent" />
+                <span class="text-[11px] font-bold text-slate-400">/ group</span>
+              </div>
+              <button onclick="makeGroups()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl px-4 py-2.5 transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> Mix</button>
+            </div>
+            <div id="groupResults" class="mt-3 space-y-2 max-h-[132px] overflow-y-auto"></div>
+          </div>
+
+        </div>
+      </div>
+      </section>
+    </main>
+
+    <!-- ============ VIEW: REPORTS ============ -->
+    <main id="view-reports" class="hidden px-4 lg:px-8 py-4 flex-1">
+      <div class="glass rounded-3xl p-5 lg:p-7 shadow-card">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="font-poppins font-extrabold text-xl flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600"></i> Reports & Leaderboard</h3>
+            <p class="text-sm font-semibold text-slate-500">Live standings for <span id="reportsClassName" class="font-extrabold text-indigo-700"></span></p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-[13px] rounded-2xl px-4 py-2.5 flex items-center gap-2 transition-all hover:-translate-y-0.5"><i data-lucide="download" class="w-4 h-4"></i> Export CSV</button>
+            <button onclick="confirmResetPoints()" class="bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[13px] rounded-2xl px-4 py-2.5 flex items-center gap-2 transition-all hover:-translate-y-0.5 shadow-md shadow-rose-200"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset All Points</button>
+          </div>
+        </div>
+        <div id="leaderboard" class="mt-5 space-y-2.5"></div>
+      </div>
+      <div class="glass rounded-3xl p-5 lg:p-7 shadow-card mt-4 mb-8">
+        <h3 class="font-poppins font-extrabold text-xl flex items-center gap-2"><i data-lucide="scroll-text" class="w-5 h-5 text-indigo-600"></i> Full Activity Log</h3>
+        <div id="reportsHistory" class="mt-4 space-y-2 max-h-[420px] overflow-y-auto pr-1"></div>
+      </div>
+    </main>
+
+    <footer class="px-8 pb-6 text-center hidden lg:block">
+      <p class="text-[12px] font-bold text-slate-400">Made with <span class="text-rose-400">♥</span> for amazing teachers — StarClass keeps data safely in your browser.</p>
+    </footer>
+  </div>
+</div>
+
+<!-- Dojo dock nav (like screenshot: Classroom / Reports / Camera / History / More) -->
+<nav class="dojo-dock">
+  <button id="mNavHome" onclick="goSection('students')" class="dock-btn dock-active"><i data-lucide="users" class="w-6 h-6"></i><span>Classroom</span></button>
+  <button id="mNavReports" onclick="switchView('reports')" class="dock-btn"><i data-lucide="bar-chart-3" class="w-6 h-6"></i><span>Reports</span></button>
+  <button onclick="openRandomPicker()" title="Random picker" class="dock-fab"><i data-lucide="dices" class="w-7 h-7"></i></button>
+  <button onclick="toggleHistory(true)" class="dock-btn"><i data-lucide="history" class="w-6 h-6"></i><span>Messages</span></button>
+  <button onclick="openSettings('general')" class="dock-btn"><i data-lucide="settings-2" class="w-6 h-6"></i><span>More</span></button>
+</nav>
+<div class="h-28"></div>
+
+<!-- Back to top -->
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'}); SFX.click();" class="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-40 w-11 h-11 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl flex items-center justify-center opacity-0 pointer-events-none translate-y-3">
+  <i data-lucide="arrow-up" class="w-5 h-5"></i>
+</button>
+
+<!-- Shortcuts help modal -->
+<div id="shortcutsModal" class="fixed inset-0 z-[96] flex items-center justify-center p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeShortcuts()"></div>
+  <div class="modal-panel relative w-full max-w-[400px] bg-white rounded-[28px] shadow-pop p-6">
+    <div class="flex items-center justify-between">
+      <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="keyboard" class="w-5 h-5 text-indigo-600"></i> Shortcuts & Navigation</h3>
+      <button onclick="closeShortcuts()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="mt-4 space-y-2.5 text-[13px] font-bold text-slate-600">
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Students / Toolkit / Reports</span><span class="flex gap-1"><kbd class="kbd">1</kbd><kbd class="kbd">2</kbd><kbd class="kbd">3</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Prev / next classroom</span><span class="flex gap-1"><kbd class="kbd">←</kbd><kbd class="kbd">→</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Search students</span><kbd class="kbd">/</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>New student</span><kbd class="kbd">N</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>History log</span><kbd class="kbd">H</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Dark mode</span><kbd class="kbd">D</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Mute / unmute sounds</span><kbd class="kbd">M</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Collapse sidebar</span><kbd class="kbd">[</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Close dialogs</span><kbd class="kbd">Esc</kbd></div>
+    </div>
+    <div class="mt-4 bg-indigo-50 rounded-2xl p-3 flex items-center gap-3">
+      <button onclick="toggleSound(true)" class="flex-1 bg-white border border-indigo-100 rounded-xl py-2 text-[12px] font-extrabold text-indigo-700 flex items-center justify-center gap-1.5"><i data-lucide="volume-2" class="w-4 h-4"></i> Test sound</button>
+      <button onclick="toggleTheme()" class="flex-1 bg-indigo-600 rounded-xl py-2 text-[12px] font-extrabold text-white flex items-center justify-center gap-1.5"><i data-lucide="moon" class="w-4 h-4"></i> Toggle theme</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SETTINGS MODAL (General / Data / Shortcuts) ============ -->
+<div id="settingsModal" class="fixed inset-0 z-[97] flex items-end sm:items-center justify-center sm:p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeSettings()"></div>
+  <div class="modal-panel relative w-full sm:max-w-[440px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden max-h-[92vh] flex flex-col">
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white shrink-0">
+      <div class="flex items-center justify-between">
+        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="settings-2" class="w-5 h-5"></i> Settings</h3>
+        <button onclick="closeSettings()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 mt-4 bg-white/15 rounded-2xl p-1.5">
+        <button id="settingsTabGeneral" onclick="switchSettingsTab('general')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-indigo-700 shadow transition-all">General</button>
+        <button id="settingsTabData" onclick="switchSettingsTab('data')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all">Data</button>
+        <button id="settingsTabShortcuts" onclick="switchSettingsTab('shortcuts')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all">Shortcuts</button>
+      </div>
+    </div>
+
+    <!-- General -->
+    <div id="settingsPanelGeneral" class="p-5 space-y-3 overflow-y-auto">
+      <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3.5">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0"><i data-lucide="moon" class="w-5 h-5"></i></div>
+        <div class="flex-1"><p class="font-extrabold text-[14px]">Appearance</p><p class="text-[12px] font-bold text-slate-400">Light or dark classroom</p></div>
+        <button onclick="toggleTheme()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[12px] font-extrabold rounded-xl px-4 py-2.5 transition-all active:scale-95">Toggle</button>
+      </div>
+      <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3.5">
+        <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></div>
+        <div class="flex-1"><p class="font-extrabold text-[14px]">Sound effects</p><p class="text-[12px] font-bold text-slate-400" id="settingsSoundState">On</p></div>
+        <button onclick="toggleSound(); refreshSettingsSoundState();" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 text-[12px] font-extrabold rounded-xl px-4 py-2 transition-all active:scale-95">Toggle</button>
+      </div>
+      <button onclick="toggleSound(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-[13px] rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="play" class="w-4 h-4"></i> Test sound</button>
+      <p class="text-[11px] font-bold text-slate-400 text-center">Theme & sound are saved automatically in this browser.</p>
+    </div>
+
+    <!-- Data -->
+    <div id="settingsPanelData" class="hidden p-5 space-y-3 overflow-y-auto">
+      <div class="bg-sky-50 border border-sky-100 rounded-2xl p-3.5 text-[13px] font-bold text-sky-900" id="settingsStorageInfo">—</div>
+      <button onclick="confirmResetPoints()" class="w-full bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset points (this class)</button>
+      <div class="border-2 border-dashed border-rose-200 rounded-2xl p-4">
+        <p class="font-extrabold text-[14px] text-rose-600 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Danger zone</p>
+        <p class="text-[12px] font-bold text-slate-500 mt-1">Deletes <b>all</b> classrooms, students, photos & history on this device and starts blank. This cannot be undone.</p>
+        <button onclick="confirmResetAllData()" class="mt-3 w-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-rose-200"><i data-lucide="trash-2" class="w-4 h-4"></i> Reset all data</button>
+      </div>
+    </div>
+
+    <!-- Shortcuts -->
+    <div id="settingsPanelShortcuts" class="hidden p-5 space-y-2 overflow-y-auto text-[13px] font-bold text-slate-600">
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Students / Toolkit / Reports</span><span class="flex gap-1"><kbd class="kbd">1</kbd><kbd class="kbd">2</kbd><kbd class="kbd">3</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Prev / next classroom</span><span class="flex gap-1"><kbd class="kbd">←</kbd><kbd class="kbd">→</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Search students</span><kbd class="kbd">/</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>New student</span><kbd class="kbd">N</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>History log</span><kbd class="kbd">H</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Dark mode</span><kbd class="kbd">D</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Mute / unmute sounds</span><kbd class="kbd">M</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Settings</span><kbd class="kbd">S</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Close dialogs</span><kbd class="kbd">Esc</kbd></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HISTORY SLIDE-OVER ============ -->
+<div id="historyOverlay" onclick="toggleHistory(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] modal-hidden modal-bg"></div>
+<aside id="historyPanel" class="fixed top-0 right-0 h-full w-full sm:w-[420px] z-[71] glass-strong shadow-pop flex flex-col transition-transform duration-300 translate-x-full rounded-l-[28px] overflow-hidden">
+  <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white">
+    <div class="flex items-center justify-between">
+      <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="history" class="w-5 h-5"></i> Activity Log</h3>
+      <button onclick="toggleHistory(false)" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all active:scale-95"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="text-indigo-100 text-[13px] font-semibold mt-1">Every star earned, live as it happens ✨</p>
+  </div>
+  <div class="p-4 flex gap-2 border-b border-slate-100">
+    <button onclick="setHistoryFilter('all')" id="hfAll" class="chip-active flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all">All</button>
+    <button onclick="setHistoryFilter('positive')" id="hfPos" class="flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all">Positive</button>
+    <button onclick="setHistoryFilter('needs-work')" id="hfNeg" class="flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all">Needs Work</button>
+  </div>
+  <div id="historyList" class="flex-1 overflow-y-auto p-4 space-y-2.5"></div>
+  <div class="p-4 border-t border-slate-100 bg-white/60">
+    <button onclick="confirmResetPoints()" class="w-full bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 text-rose-600 font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset All Points for this Class</button>
+  </div>
+</aside>
+
+<!-- ============ AWARD POINT MODAL ============ -->
+<div id="awardModal" class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeAwardModal()"></div>
+  <div class="modal-panel relative w-full sm:max-w-[520px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden max-h-[92vh] flex flex-col">
+    <div id="awardHeader" class="bg-gradient-to-r from-emerald-500 to-teal-500 p-5 text-white relative overflow-hidden transition-all">
+      <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/15 rounded-full"></div>
+      <div class="flex items-center gap-4 relative">
+        <div id="awardAvatar" class="w-16 h-16 rounded-full border-4 border-white/70 shadow-lg overflow-hidden shrink-0 bg-white/20 flex items-center justify-center text-2xl font-black"></div>
+        <div class="flex-1 min-w-0">
+          <h3 id="awardStudentName" class="font-poppins font-extrabold text-xl truncate">Student</h3>
+          <div class="flex items-center gap-2 mt-1">
+            <span id="awardStudentPoints" class="bg-white text-slate-800 font-extrabold text-sm rounded-full px-3 py-1">0 pts</span>
+            <button onclick="openStudentModal(selectedStudentId)" class="bg-white/20 hover:bg-white/30 rounded-full px-3 py-1 text-[12px] font-extrabold flex items-center gap-1 transition-all"><i data-lucide="pencil" class="w-3 h-3"></i> Edit</button>
+          </div>
+        </div>
+        <button onclick="closeAwardModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+    <div class="p-3">
+      <div class="bg-slate-100 rounded-2xl p-1 grid grid-cols-2 gap-1">
+        <button id="awardTabPos" onclick="setAwardTab('positive')" class="tab-btn rounded-xl py-2.5 text-sm font-extrabold bg-white shadow text-emerald-600 flex items-center justify-center gap-2"><i data-lucide="thumbs-up" class="w-4 h-4"></i> Positive</button>
+        <button id="awardTabNeg" onclick="setAwardTab('needs-work')" class="tab-btn rounded-xl py-2.5 text-sm font-extrabold text-slate-500 flex items-center justify-center gap-2"><i data-lucide="thumbs-down" class="w-4 h-4"></i> Needs Work</button>
+      </div>
+    </div>
+    <div id="awardBehaviors" class="px-4 pb-2 grid grid-cols-2 gap-2.5 overflow-y-auto"></div>
+    <div class="p-4 pt-2">
+      <div class="bg-indigo-50 rounded-2xl p-3 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0"><i data-lucide="zap" class="w-4 h-4"></i></div>
+        <div class="flex-1">
+          <p class="text-[12px] font-extrabold text-indigo-900">Quick award</p>
+          <p class="text-[11px] font-bold text-indigo-500">Tap +1 / −1 for instant feedback</p>
+        </div>
+        <button onclick="quickAward(1)" class="w-11 h-11 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg shadow-md active:scale-90 transition-all">+1</button>
+        <button onclick="quickAward(-1)" class="w-11 h-11 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-lg shadow-md active:scale-90 transition-all">−1</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STUDENT MODAL (Add / Edit + Photo) ============ -->
+<div id="studentModal" class="fixed inset-0 z-[85] flex items-end sm:items-center justify-center sm:p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeStudentModal()"></div>
+  <div class="modal-panel relative w-full sm:max-w-[440px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden">
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white">
+      <div class="flex items-center justify-between">
+        <h3 id="studentModalTitle" class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="user-plus" class="w-5 h-5"></i> Add Student</h3>
+        <button onclick="closeStudentModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+    <div class="p-5 space-y-4">
+      <!-- Photo upload -->
+      <div class="flex items-center gap-4">
+        <div id="photoPreview" class="w-20 h-20 rounded-full overflow-hidden bg-indigo-100 border-4 border-indigo-100 flex items-center justify-center text-2xl font-black text-indigo-600 shrink-0"></div>
+        <div class="flex-1">
+          <p class="text-[13px] font-extrabold text-slate-700">Profile photo</p>
+          <p class="text-[11px] font-bold text-slate-400">Auto-compressed to fit safely</p>
+          <div class="flex gap-2 mt-2">
+            <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white text-[12px] font-extrabold rounded-xl px-3 py-2 flex items-center gap-1.5 transition-all active:scale-95">
+              <i data-lucide="camera" class="w-3.5 h-3.5"></i> Upload
+              <input id="photoInput" type="file" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)" />
+            </label>
+            <button id="removePhotoBtn" onclick="removeStagedPhoto()" class="hidden bg-rose-50 text-rose-600 border border-rose-200 text-[12px] font-extrabold rounded-xl px-3 py-2 items-center gap-1.5 hover:bg-rose-100 transition-all"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remove</button>
+          </div>
+          <p id="photoHint" class="text-[11px] font-bold text-amber-600 mt-1.5 hidden"></p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">First name</label>
+          <input id="firstNameInput" type="text" placeholder="Sophia" maxlength="20" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-2.5 text-sm font-bold outline-none transition-all" />
+        </div>
+        <div>
+          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Last name</label>
+          <input id="lastNameInput" type="text" placeholder="Carter" maxlength="20" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-2.5 text-sm font-bold outline-none transition-all" />
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center justify-between">
+          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Chubby Monster (default avatar)</label>
+          <button onclick="shuffleStagedMonster()" class="text-[12px] font-extrabold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"><i data-lucide="dices" class="w-3.5 h-3.5"></i> Shuffle</button>
+        </div>
+        <div id="monsterPicker" class="grid grid-cols-4 gap-2 mt-2"></div>
+        <p class="text-[11px] font-bold text-slate-400 mt-1.5">Tap a monster — each student gets a random one automatically.</p>
+      </div>
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeStudentModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all">Cancel</button>
+        <button onclick="saveStudent()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> <span id="saveStudentLabel">Add Student</span></button>
+      </div>
+      <button id="deleteStudentBtn" onclick="deleteStudent()" class="hidden w-full text-rose-500 hover:text-rose-700 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 transition-all flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete student</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CLASSROOM MODAL ============ -->
+<div id="classroomModal" class="fixed inset-0 z-[85] flex items-end sm:items-center justify-center sm:p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeClassroomModal()"></div>
+  <div class="modal-panel relative w-full sm:max-w-[400px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden">
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white">
+      <div class="flex items-center justify-between">
+        <h3 id="classroomModalTitle" class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="school" class="w-5 h-5"></i> New Classroom</h3>
+        <button onclick="closeClassroomModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+    <div class="p-5 space-y-4">
+      <div>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Class name</label>
+        <input id="classNameInput" type="text" placeholder="e.g. Grade 4 — Sunflowers" maxlength="40" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all" />
+      </div>
+      <div>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Class icon</label>
+        <div id="emojiPicker" class="grid grid-cols-8 gap-2 mt-2"></div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="closeClassroomModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3">Cancel</button>
+        <button onclick="saveClassroom()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95">Create Class</button>
+      </div>
+      <button id="deleteClassBtn" onclick="deleteClassroom()" class="hidden w-full text-rose-500 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete classroom</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RANDOM PICKER OVERLAY ============ -->
+<div id="pickerOverlay" class="fixed inset-0 z-[90] flex items-center justify-center p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-indigo-950/70 backdrop-blur-md" onclick="closeRandomPicker()"></div>
+  <div class="modal-panel relative w-full max-w-[420px] bg-white rounded-[32px] shadow-pop p-8 text-center overflow-hidden">
+    <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-500"></div>
+    <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="dices" class="w-7 h-7"></i></div>
+    <h3 class="font-poppins font-extrabold text-xl mt-3">Who's up next?</h3>
+    <p class="text-sm font-bold text-slate-400">Drumroll please... 🥁</p>
+    <div id="pickerStage" class="mt-5">
+      <div id="pickerAvatar" class="w-28 h-28 mx-auto rounded-full bg-indigo-100 border-4 border-indigo-200 flex items-center justify-center text-5xl overflow-hidden picker-glow">🎲</div>
+      <p id="pickerName" class="font-poppins font-extrabold text-2xl mt-4">Ready?</p>
+      <p id="pickerSub" class="text-sm font-bold text-slate-400">Picking from your class</p>
+    </div>
+    <div class="flex gap-2 mt-6">
+      <button onclick="closeRandomPicker()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3">Close</button>
+      <button id="pickerSpinBtn" onclick="spinPicker()" class="flex-[2] bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Pick Again!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM MODAL ============ -->
+<div id="confirmModal" class="fixed inset-0 z-[95] flex items-center justify-center p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+  <div class="modal-panel relative w-full max-w-[360px] bg-white rounded-[28px] shadow-pop p-6 text-center">
+    <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-100 text-rose-500 flex items-center justify-center"><i data-lucide="alert-triangle" class="w-7 h-7"></i></div>
+    <h3 id="confirmTitle" class="font-poppins font-extrabold text-lg mt-3">Are you sure?</h3>
+    <p id="confirmText" class="text-sm font-semibold text-slate-500 mt-1">This cannot be undone.</p>
+    <div class="flex gap-2 mt-5">
+      <button onclick="closeConfirm()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-extrabold text-sm rounded-2xl py-3 text-slate-600">Cancel</button>
+      <button id="confirmYesBtn" onclick="doConfirm()" class="flex-1 bg-rose-500 hover:bg-rose-600 font-extrabold text-sm rounded-2xl py-3 text-white shadow-md">Yes, do it</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div id="toastBox" class="fixed bottom-6 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-6 lg:bottom-6 z-[110] flex flex-col gap-2 items-center lg:items-end w-[calc(100%-2rem)] max-w-[360px]"></div>
+
+<script>
+/* =========================================================
+   StarClass — centralized state + persistence + all logic
+========================================================= */
+const STORAGE_KEY = 'starclass_state_v2';
+
+const AVATAR_COLORS = [
+  { name:'Indigo', from:'#6366F1', to:'#8B5CF6', bg:'#EEF2FF' },
+  { name:'Sky', from:'#0EA5E9', to:'#22D3EE', bg:'#ECFEFF' },
+  { name:'Emerald', from:'#10B981', to:'#34D399', bg:'#ECFDF5' },
+  { name:'Amber', from:'#F59E0B', to:'#FB923C', bg:'#FFFBEB' },
+  { name:'Rose', from:'#F43F5E', to:'#FB7185', bg:'#FFF1F2' },
+  { name:'Violet', from:'#8B5CF6', to:'#D946EF', bg:'#F5F3FF' },
+  { name:'Teal', from:'#14B8A6', to:'#2DD4BF', bg:'#F0FDFD' },
+];
+const MONSTERS = ['👾','👹','👻','🐲','🦄','🐸','🐙','🦊','🐝','🐢','🦁','🐼'];
+const CLASS_EMOJIS = ['🚀','🌻','🌈','⭐','🎨','📚','🧪','🎵','⚽','🦄','🐝','🌍'];
+
+/* =========================================================
+   CHUBBY MONSTERS — procedural cute avatars (no letters)
+   Each student gets a random monsterSeed -> deterministic monster.
+========================================================= */
+const CHUBBY_BODIES = ['#5ED66F','#4FB8FF','#FF8FB2','#FFA53B','#B47CFF','#3ED6C5','#FF6B6B','#FFD93D','#7DD956','#5AA9FF','#FF7BAC','#FFB020'];
+const CHUBBY_BELLY = ['#E8FBE8','#E3F2FF','#FFE4EC','#FFF0D9','#EDE4FF','#D9FBF5','#FFE0E0','#FFF6CC','#E6F9E6','#DFEDFF','#FFE0EE','#FFF1CC'];
+function hashSeed(str){
+  let h = 2166136261;
+  const s = String(str ?? Math.random());
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function monsterSeedFor(s){
+  if(s.monsterSeed !== undefined && s.monsterSeed !== null) return s.monsterSeed >>> 0;
+  return hashSeed(s.id || (s.firstName+s.lastName));
+}
+function chubbySVG(seed, extraCls){
+  const rnd = mulberry32((seed >>> 0) || 1);
+  const bi = Math.floor(rnd()*CHUBBY_BODIES.length);
+  const body = CHUBBY_BODIES[bi % CHUBBY_BODIES.length];
+  const belly = CHUBBY_BELLY[bi % CHUBBY_BELLY.length];
+  const eyeStyle = Math.floor(rnd()*5);      // 0: two big, 1: two happy, 2: one big, 3: three, 4: sleepy
+  const hornStyle = Math.floor(rnd()*5);     // 0 none, 1 horns, 2 antennae, 3 ears, 4 spikes
+  const mouthStyle = Math.floor(rnd()*4);    // 0 smile, 1 open tooth, 2 ooh, 3 grin
+  const blush = rnd() > 0.35;
+  const darken = 'rgba(0,0,0,0.12)';
+  let deco = '';
+  if(hornStyle===1){
+    deco = '<path d="M32 22 L28 8 L42 18 Z" fill="'+body+'" stroke="rgba(0,0,0,.15)" stroke-width="2" stroke-linejoin="round"/>'
+         + '<path d="M68 22 L72 8 L58 18 Z" fill="'+body+'" stroke="rgba(0,0,0,.15)" stroke-width="2" stroke-linejoin="round"/>'
+         + '<circle cx="28" cy="8" r="3.5" fill="#FFF"/>'+ '<circle cx="72" cy="8" r="3.5" fill="#FFF"/>';
+  } else if(hornStyle===2){
+    deco = '<line x1="38" y1="20" x2="32" y2="8" stroke="rgba(0,0,0,.25)" stroke-width="3" stroke-linecap="round"/>'
+         + '<line x1="62" y1="20" x2="68" y2="8" stroke="rgba(0,0,0,.25)" stroke-width="3" stroke-linecap="round"/>'
+         + '<circle cx="32" cy="7" r="5" fill="#FFD93D" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+         + '<circle cx="68" cy="7" r="5" fill="#FF8FB2" stroke="rgba(0,0,0,.12)" stroke-width="2"/>';
+  } else if(hornStyle===3){
+    deco = '<ellipse cx="24" cy="38" rx="8" ry="12" fill="'+body+'" stroke="rgba(0,0,0,.15)" stroke-width="2"/>'
+         + '<ellipse cx="76" cy="38" rx="8" ry="12" fill="'+body+'" stroke="rgba(0,0,0,.15)" stroke-width="2"/>'
+         + '<ellipse cx="24" cy="38" rx="3.5" ry="6" fill="'+belly+'"/>'
+         + '<ellipse cx="76" cy="38" rx="3.5" ry="6" fill="'+belly+'"/>';
+  } else if(hornStyle===4){
+    deco = '<path d="M38 20 L44 8 L50 20 Z" fill="#FFF" opacity=".85"/><path d="M50 20 L56 8 L62 20 Z" fill="#FFF" opacity=".85"/>';
+  }
+  let eyes = '';
+  const eyeW = '#FFFFFF', pup = '#23272F';
+  if(eyeStyle===0){
+    eyes = '<ellipse cx="38" cy="48" rx="10" ry="12" fill="'+eyeW+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+         + '<ellipse cx="62" cy="48" rx="10" ry="12" fill="'+eyeW+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+         + '<circle cx="40" cy="51" r="4.5" fill="'+pup+'"/><circle cx="60" cy="51" r="4.5" fill="'+pup+'"/>'
+         + '<circle cx="41.5" cy="49.5" r="1.5" fill="#fff"/><circle cx="61.5" cy="49.5" r="1.5" fill="#fff"/>';
+  } else if(eyeStyle===1){
+    eyes = '<path d="M30 50 Q38 40 46 50" stroke="#23272F" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
+         + '<path d="M54 50 Q62 40 70 50" stroke="#23272F" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
+  } else if(eyeStyle===2){
+    eyes = '<ellipse cx="50" cy="48" rx="14" ry="15" fill="'+eyeW+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+         + '<circle cx="50" cy="52" r="6.5" fill="'+pup+'"/><circle cx="52" cy="50" r="2" fill="#fff"/>';
+  } else if(eyeStyle===3){
+    eyes = '<circle cx="34" cy="46" r="7" fill="'+eyeW+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/><circle cx="34" cy="47" r="3" fill="'+pup+'"/>'
+         + '<circle cx="50" cy="42" r="8.5" fill="'+eyeW+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/><circle cx="50" cy="43" r="3.6" fill="'+pup+'"/>'
+         + '<circle cx="66" cy="46" r="7" fill="'+eyeW+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/><circle cx="66" cy="47" r="3" fill="'+pup+'"/>';
+  } else {
+    eyes = '<path d="M30 50 Q38 54 46 50" stroke="#23272F" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
+         + '<path d="M54 50 Q62 54 70 50" stroke="#23272F" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
+         + '<circle cx="38" cy="40" r="2" fill="rgba(0,0,0,.2)"/><circle cx="62" cy="40" r="2" fill="rgba(0,0,0,.2)"/>';
+  }
+  let mouth = '';
+  if(mouthStyle===0){
+    mouth = '<path d="M40 66 Q50 74 60 66" stroke="#23272F" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  } else if(mouthStyle===1){
+    mouth = '<ellipse cx="50" cy="68" rx="9" ry="8" fill="#5B2B2B"/><rect x="44" y="62.5" width="6" height="6" rx="1.5" fill="#fff"/><rect x="51" y="62.5" width="5" height="6" rx="1.5" fill="#fff"/>';
+  } else if(mouthStyle===2){
+    mouth = '<ellipse cx="50" cy="68" rx="5.5" ry="6.5" fill="#5B2B2B"/><ellipse cx="50" cy="70" rx="2.8" ry="3" fill="#FF8FA2"/>';
+  } else {
+    mouth = '<path d="M38 64 Q50 76 62 64 Q50 68 38 64" fill="#fff" stroke="#23272F" stroke-width="2.5" stroke-linejoin="round"/>';
+  }
+  const blushSVG = blush ? '<ellipse cx="29" cy="60" rx="5" ry="3.5" fill="#FF9AAE" opacity=".7"/><ellipse cx="71" cy="60" rx="5" ry="3.5" fill="#FF9AAE" opacity=".7"/>' : '';
+  return '<svg viewBox="0 0 100 100" class="'+(extraCls||'w-full h-full')+'" xmlns="http://www.w3.org/2000/svg" role="img">'
+    + '<ellipse cx="50" cy="92" rx="26" ry="5" fill="rgba(0,0,0,0.10)"/>'
+    + deco
+    + '<ellipse cx="22" cy="62" rx="7" ry="10" fill="'+body+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+    + '<ellipse cx="78" cy="62" rx="7" ry="10" fill="'+body+'" stroke="rgba(0,0,0,.12)" stroke-width="2"/>'
+    + '<ellipse cx="50" cy="56" rx="32" ry="34" fill="'+body+'" stroke="rgba(0,0,0,.14)" stroke-width="2.5"/>'
+    + '<ellipse cx="50" cy="70" rx="18" ry="14" fill="'+belly+'" opacity=".9"/>'
+    + '<ellipse cx="36" cy="30" rx="10" ry="6" fill="#fff" opacity=".25"/>'
+    + eyes + blushSVG + mouth
+    + '<ellipse cx="38" cy="90" rx="9" ry="6" fill="'+body+'" stroke="rgba(0,0,0,.14)" stroke-width="2"/>'
+    + '<ellipse cx="62" cy="90" rx="9" ry="6" fill="'+body+'" stroke="rgba(0,0,0,.14)" stroke-width="2"/>'
+    + '</svg>';
+}
+function randomMonsterSeed(){ return (Math.random()*4294967295) >>> 0; }
+
+const POSITIVE_BEHAVIORS = [
+  { label:'Helping Others', points:1, icon:'heart-handshake' },
+  { label:'On Task', points:1, icon:'target' },
+  { label:'Participation', points:1, icon:'hand-metal' },
+  { label:'Kindness', points:1, icon:'heart' },
+  { label:'Great Teamwork', points:2, icon:'users' },
+  { label:'Perseverance', points:2, icon:'mountain' },
+  { label:'Creativity', points:2, icon:'palette' },
+  { label:'Leadership', points:3, icon:'crown' },
+];
+const NEEDS_WORK_BEHAVIORS = [
+  { label:'Off Task', points:-1, icon:'cloud-off' },
+  { label:'No Homework', points:-1, icon:'book-x' },
+  { label:'Talking Out of Turn', points:-1, icon:'message-circle-off' },
+  { label:'Disrupting Class', points:-1, icon:'volume-x' },
+  { label:'Unprepared', points:-1, icon:'backpack' },
+  { label:'Disrespect', points:-2, icon:'thumbs-down' },
+];
+
+let state = null;
+let selectedStudentId = null;
+let awardTab = 'positive';
+let editingStudentId = null;
+let stagedPhoto = null; // base64 staged in student modal
+let stagedColor = 0; // legacy, kept for migration
+let stagedMonsterSeed = 1;
+let stagedMonsterOptions = [];
+let stagedEmoji = '🚀';
+let editingClassId = null;
+let historyFilter = 'all';
+let pickerSpinning = false;
+let confirmAction = null;
+let classTab = 'students'; // dojo toggle: students | groups
+
+/* ---------- Timer state ---------- */
+let timerMode = 'countdown';
+let timerTotal = 300;
+let timerLeft = 300;
+let timerElapsed = 0;
+let timerRunning = false;
+let timerInt = null;
+
+/* ---------- Helpers ---------- */
+function uid(){ return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initials(fn, ln){ return ((fn||'')[0]||'?').toUpperCase() + ((ln||'')[0]||'').toUpperCase(); }
+function fmtTime(ts){
+  const d = new Date(ts);
+  let h = d.getHours(), m = String(d.getMinutes()).padStart(2,'0');
+  const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return h + ':' + m + ' ' + ap;
+}
+function fmtClock(sec){
+  sec = Math.max(0, Math.floor(sec));
+  const m = String(Math.floor(sec/60)).padStart(2,'0');
+  const s = String(sec%60).padStart(2,'0');
+  return m + ':' + s;
+}
+
+/* ---------- Mock data ---------- */
+function mockData(){
+  // Start blank — no demo classes or students. Teacher creates their own.
+  return { classrooms:[], students:[], pointsHistory:[], selectedClassroom: null };
+}
+
+/* ---------- Persistence ---------- */
+function ensureMonsterSeeds(){
+  if(!state || !state.students) return;
+  let dirty = false;
+  state.students.forEach(s=>{
+    if(s.monsterSeed===undefined || s.monsterSeed===null){ s.monsterSeed = randomMonsterSeed(); dirty = true; }
+    if(s.colorIndex===undefined){ s.colorIndex = 0; dirty = true; }
+  });
+  if(dirty){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ state = mockData(); saveState(); return; }
+    const parsed = JSON.parse(raw);
+    if(!parsed.classrooms || !parsed.students || !parsed.pointsHistory){ state = mockData(); saveState(); return; }
+    state = parsed;
+    if(!state.classrooms.find(c=>c.id===state.selectedClassroom)){
+      state.selectedClassroom = state.classrooms[0]?.id || null;
+    }
+    ensureMonsterSeeds();
+  }catch(e){ state = mockData(); }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    if(e && (e.name==='QuotaExceededError' || e.code===22)){
+      toast('Storage full! Try removing a large photo.', 'error');
+    }
+  }
+}
+
+/* ---------- Selectors ---------- */
+function activeClassroom(){ return state.classrooms.find(c=>c.id===state.selectedClassroom) || null; }
+function activeStudents(){ return state.students.filter(s=>s.classroomId===state.selectedClassroom); }
+function classPoints(){ return activeStudents().reduce((a,s)=>a+ (s.points||0),0); }
+function classHistory(){
+  return state.pointsHistory
+    .filter(h=>h.classroomId===state.selectedClassroom)
+    .sort((a,b)=>b.timestamp-a.timestamp);
+}
+
+/* ---------- Sound effects (WebAudio synth, no files) ---------- */
+const SFX = {
+  enabled: true,
+  ctx: null,
+  ensure(){
+    try{
+      if(!this.ctx) this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+      if(this.ctx.state==='suspended') this.ctx.resume();
+    }catch(e){}
+    return this.ctx;
+  },
+  load(){ try{ const v = localStorage.getItem('starclass_sound'); if(v!==null) this.enabled = v==='on'; }catch(e){} },
+  save(){ try{ localStorage.setItem('starclass_sound', this.enabled?'on':'off'); }catch(e){} },
+  tone(freq, t0, dur, type, vol, slideTo){
+    if(!this.enabled) return;
+    const ctx = this.ensure(); if(!ctx) return;
+    try{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, ctx.currentTime + t0);
+      if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, ctx.currentTime + t0 + dur);
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + t0);
+      g.gain.exponentialRampToValueAtTime(vol||0.16, ctx.currentTime + t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t0 + dur);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime + t0); o.stop(ctx.currentTime + t0 + dur + 0.05);
+    }catch(e){}
+  },
+  noise(t0, dur, vol){
+    if(!this.enabled) return;
+    const ctx = this.ensure(); if(!ctx) return;
+    try{
+      const len = Math.floor(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(vol||0.12, ctx.currentTime + t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t0 + dur);
+      const f = ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value=1200;
+      src.connect(f); f.connect(g); g.connect(ctx.destination);
+      src.start(ctx.currentTime + t0);
+    }catch(e){}
+  },
+  click(){ this.tone(520,0,.07,'triangle',.32); },
+  open(){ this.tone(440,0,.09,'sine',.38,660); this.tone(660,.07,.1,'sine',.34,880); },
+  close(){ this.tone(600,0,.08,'sine',.32,380); },
+  hover(){ this.tone(880,0,.03,'sine',.12); },
+  success(){ this.tone(660,0,.12,'sine',.45); this.tone(880,.09,.16,'sine',.45); this.tone(1320,.18,.22,'triangle',.35); this.noise(.18,.15,.18); },
+  coin(){ this.tone(988,0,.08,'square',.30); this.tone(1319,.08,.28,'square',.28); },
+  error(){ this.tone(220,0,.2,'sawtooth',.32); this.tone(160,.1,.26,'sawtooth',.30); },
+  pop(){ this.tone(300,0,.12,'sine',.45,900); },
+  whoosh(){ this.noise(0,.22,.32); this.tone(300,0,.2,'sine',.25,900); },
+  tick(){ this.tone(980,0,.05,'square',.22); },
+  drum(){ this.tone(150,0,.12,'sine',.50,60); this.noise(0,.08,.30); },
+  fanfare(){ [523,659,784,1046,1319].forEach((f,i)=>this.tone(f,i*.1,.22,'triangle',.40)); this.noise(.4,.3,.22); },
+  tada(){ [523,523,523,659,784,1046].forEach((f,i)=>this.tone(f,i*.09,.16,'square',.28)); },
+};
+SFX.load();
+let audioCtx = null; // legacy alias (SFX owns the context now)
+function tone(freq, t0, dur, type, vol){ SFX.tone(freq, t0, dur, type, vol); }
+function playPositive(){ SFX.success(); }
+function playNegative(){ SFX.error(); }
+function playClick(){ SFX.click(); }
+function playTick(){ SFX.tick(); }
+function playFanfare(){ SFX.fanfare(); }
+function toggleSound(preview){
+  if(typeof preview==='boolean' && preview){ SFX.ensure(); SFX.success(); toast('🔊 Sounds are on!'); return; }
+  SFX.enabled = !SFX.enabled; SFX.save(); refreshSoundUI();
+  if(SFX.enabled){ SFX.success(); toast('🔊 Sound effects on'); }
+  else { toast('🔇 Sound effects off'); }
+  if(window.lucide) lucide.createIcons();
+}
+function refreshSoundUI(){
+  const icon = SFX.enabled ? 'volume-2' : 'volume-x';
+  const html = '<i data-lucide="'+icon+'" class="w-4 h-4"></i>';
+  const htmlBig = '<i data-lucide="'+icon+'" class="w-5 h-5 text-slate-700"></i>';
+  ['soundIconTop','soundIconSide'].forEach(id=>{ const e=document.getElementById(id); if(e) e.innerHTML = html; });
+  const m = document.getElementById('soundIconMobile'); if(m) m.innerHTML = htmlBig;
+  const lbl = document.getElementById('soundLabelSide'); if(lbl) lbl.textContent = SFX.enabled ? 'Sound' : 'Muted';
+  if(window.lucide) lucide.createIcons();
+}
+
+/* ---------- Theme (light / dark) ---------- */
+function currentTheme(){ return document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
+function applyTheme(t){
+  document.documentElement.classList.toggle('dark', t==='dark');
+  try{ localStorage.setItem('starclass_theme', t); }catch(e){}
+  refreshThemeUI();
+}
+function toggleTheme(){
+  const next = currentTheme()==='dark' ? 'light' : 'dark';
+  applyTheme(next);
+  SFX.pop();
+  toast(next==='dark' ? '🌙 Dark mode on — easy on the eyes!' : '☀️ Light mode on!');
+}
+function refreshThemeUI(){
+  const dark = currentTheme()==='dark';
+  const icon = dark ? 'sun' : 'moon';
+  const html = '<i data-lucide="'+icon+'" class="w-4 h-4"></i>';
+  ['themeIconTop','themeIconSide'].forEach(id=>{ const e=document.getElementById(id); if(e) e.innerHTML = html; });
+  const m = document.getElementById('themeIconMobile'); if(m) m.innerHTML = '<i data-lucide="'+icon+'" class="w-5 h-5 text-slate-700"></i>';
+  const lbl = document.getElementById('themeLabelSide'); if(lbl) lbl.textContent = dark ? 'Light' : 'Dark';
+  try{ document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light'; }catch(e){}
+  if(window.lucide) lucide.createIcons();
+}
+
+/* ---------- Navigation helpers ---------- */
+function toggleSidebar(){
+  document.body.classList.toggle('sidebar-collapsed');
+  SFX.click();
+}
+function goSection(which){
+  switchViewSilent('classroom');
+  if(which==='toolkit'){
+    setActiveNav('toolkit');
+    const el = document.getElementById('section-toolkit');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    setClassTab('students');
+    const el = document.getElementById('section-students');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  SFX.click();
+}
+function switchViewSilent(v){
+  currentView = v;
+  const isClass = v==='classroom';
+  document.getElementById('view-classroom').classList.toggle('hidden', !isClass);
+  document.getElementById('view-reports').classList.toggle('hidden', isClass);
+}
+function scrollToToolkit(){ goSection('toolkit'); }
+function setActiveNav(which){
+  const map = { students: ['navStudents','topNavStudents','mNavHome'], toolkit: ['navToolkit','topNavToolkit'], reports: ['navReportsSide','topNavReports','mNavReports'] };
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.remove('nav-active'));
+  (map[which]||[]).forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.add('nav-active'); });
+  document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('dock-active'));
+  if(which==='students'){ const e=document.getElementById('mNavHome'); if(e) e.classList.add('dock-active'); }
+  if(which==='reports'){ const e=document.getElementById('mNavReports'); if(e) e.classList.add('dock-active'); }
+  const cv = document.getElementById('crumbView'); if(cv) cv.textContent = which==='toolkit' ? 'Toolkit' : which==='reports' ? 'Reports' : 'Students';
+}
+function prevClassroom(){ stepClassroom(-1); }
+function nextClassroom(){ stepClassroom(1); }
+function stepClassroom(dir){
+  if(!state.classrooms.length){ toast('Create a classroom first.'); return; }
+  let i = state.classrooms.findIndex(c=>c.id===state.selectedClassroom);
+  if(i<0) i = 0;
+  i = (i + dir + state.classrooms.length) % state.classrooms.length;
+  selectClassroom(state.classrooms[i].id);
+  SFX.whoosh();
+}
+function openShortcuts(){ openSettings('shortcuts'); }
+function closeShortcuts(){ hideModal('shortcutsModal'); SFX.close(); }
+/* ---------- Settings (General / Data / Shortcuts) ---------- */
+let settingsTab = 'general';
+function openSettings(tab){
+  switchSettingsTab(tab || 'general');
+  refreshSettingsSoundState();
+  refreshSettingsStorageInfo();
+  showModal('settingsModal');
+  if(window.lucide) lucide.createIcons();
+}
+function closeSettings(){ hideModal('settingsModal'); }
+function switchSettingsTab(tab){
+  settingsTab = tab;
+  const tabs = { general: 'settingsTabGeneral', data: 'settingsTabData', shortcuts: 'settingsTabShortcuts' };
+  const panels = { general: 'settingsPanelGeneral', data: 'settingsPanelData', shortcuts: 'settingsPanelShortcuts' };
+  Object.keys(tabs).forEach(k=>{
+    const b = document.getElementById(tabs[k]);
+    if(b) b.className = 'rounded-xl py-2 text-[12px] font-extrabold transition-all ' + (k===tab ? 'bg-white text-indigo-700 shadow' : 'text-indigo-100');
+    const p = document.getElementById(panels[k]);
+    if(p) p.classList.toggle('hidden', k!==tab);
+  });
+  if(tab==='data') refreshSettingsStorageInfo();
+  if(tab==='general') refreshSettingsSoundState();
+  SFX.click();
+}
+function refreshSettingsSoundState(){
+  const el = document.getElementById('settingsSoundState');
+  if(el) el.textContent = SFX.enabled ? 'On — playful chimes & fanfares 🔊' : 'Off — silent mode 🔇';
+}
+function refreshSettingsStorageInfo(){
+  const el = document.getElementById('settingsStorageInfo');
+  if(!el || !state) return;
+  const nC = state.classrooms.length, nS = state.students.length, nH = state.pointsHistory.length;
+  let kb = 0;
+  try{ kb = Math.round(((localStorage.getItem(STORAGE_KEY)||'').length * 2) / 1024); }catch(e){}
+  el.innerHTML = '📦 <b>'+nC+'</b> classes • <b>'+nS+'</b> students • <b>'+nH+'</b> history events &nbsp;•&nbsp; ~'+kb+' KB in this browser';
+}
+function confirmResetAllData(){
+  askConfirm('Reset ALL data?', 'Every classroom, student, photo and log on this device will be permanently deleted.', resetAllData);
+}
+function resetAllData(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  state = mockData();
+  saveState();
+  closeSettings();
+  renderAll();
+  SFX.tada();
+  if(window.confetti) confetti({particleCount:100, spread:80, origin:{y:.6}});
+  toast('All data cleared — start fresh! ✨');
+}
+function refreshCrumbs(){
+  const c = activeClassroom();
+  const cc = document.getElementById('crumbClass'); if(cc) cc.textContent = c ? c.name : 'No classroom';
+}
+
+/* ---------- Toast + Banner ---------- */
+function toast(msg, type){
+  const box = document.getElementById('toastBox');
+  const el = document.createElement('div');
+  const isErr = type==='error';
+  el.className = 'toast-in glass-strong rounded-2xl shadow-pop px-4 py-3 flex items-center gap-3 border w-full ' + (isErr ? 'border-rose-200' : 'border-indigo-100');
+  el.innerHTML = '<div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 '+(isErr?'bg-rose-500 text-white':'bg-indigo-600 text-white')+'"><i data-lucide="'+(isErr?'alert-circle':'check')+'" class="w-4 h-4"></i></div><p class="text-[13px] font-extrabold text-slate-700 leading-snug">'+esc(msg)+'</p>';
+  box.appendChild(el);
+  lucide.createIcons();
+  setTimeout(()=>{ el.style.transition='all .35s'; el.style.opacity='0'; el.style.transform='translateY(10px)'; setTimeout(()=>el.remove(),350); }, 2600);
+}
+function showBanner(student, delta, behavior){
+  const b = document.getElementById('successBanner');
+  const inner = document.getElementById('successBannerInner');
+  const icon = document.getElementById('successBannerIcon');
+  const title = document.getElementById('successBannerTitle');
+  const sub = document.getElementById('successBannerSub');
+  const pos = delta > 0;
+  icon.className = 'w-10 h-10 rounded-full text-white flex items-center justify-center font-black text-xl ' + (pos?'bg-emerald-500':'bg-rose-500');
+  icon.textContent = (pos?'+':'') + delta;
+  inner.classList.remove('border-emerald-200','border-rose-200');
+  inner.classList.add(pos?'border-emerald-200':'border-rose-200');
+  title.textContent = pos ? 'Awesome! 🎉' : 'Noted';
+  sub.textContent = student.firstName + ' ' + (pos?'earned '+delta:'lost '+Math.abs(delta)) + " for '" + behavior + "'";
+  b.classList.remove('hidden');
+  inner.classList.remove('banner-anim'); void inner.offsetWidth; inner.classList.add('banner-anim');
+  clearTimeout(showBanner._t);
+  showBanner._t = setTimeout(()=>b.classList.add('hidden'), 2250);
+}
+
+/* ---------- Avatar HTML ---------- */
+function avatarHTML(s, sizeCls){
+  sizeCls = sizeCls || 'w-16 h-16 text-2xl';
+  if(s.photo){
+    return '<div class="'+sizeCls+' rounded-full overflow-hidden border-4 border-white shadow-md shrink-0 bg-slate-100"><img src="'+s.photo+'" alt="'+esc(s.firstName)+'" class="w-full h-full object-cover" /></div>';
+  }
+  return '<div class="'+sizeCls+' shrink-0 relative flex items-center justify-center">'+chubbySVG(monsterSeedFor(s))+'</div>';
+}
+function monsterTileHTML(s, imgCls){
+  if(s.photo){
+    return '<img src="'+s.photo+'" alt="'+esc(s.firstName)+'" class="rounded-2xl object-cover border-2 border-slate-100 shadow-sm '+(imgCls||'w-20 h-20')+'" />';
+  }
+  return '<div class="'+(imgCls||'w-20 h-20')+'">'+chubbySVG(monsterSeedFor(s))+'</div>';
+}
+function pointsPill(p){
+  let cls = 'bg-slate-100 text-slate-500';
+  if(p>0) cls = 'bg-emerald-100 text-emerald-700';
+  if(p<0) cls = 'bg-rose-100 text-rose-600';
+  return '<span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-black '+cls+'"><i data-lucide="star" class="w-3.5 h-3.5"></i>'+p+' pts</span>';
+}
+
+/* =========================================================
+   RENDER
+========================================================= */
+function renderAll(){
+  renderClassroomList();
+  renderHeader();
+  renderGrid();
+  renderHistory();
+  renderReports();
+  updateTimerUI();
+  refreshCrumbs();
+  renderDojoPills();
+  const sBtn = document.getElementById('dojoTabStudents'), gBtn = document.getElementById('dojoTabGroups');
+  if(sBtn) sBtn.classList.toggle('on', classTab==='students');
+  if(gBtn) gBtn.classList.toggle('on', classTab==='groups');
+  const sw = document.getElementById('dojoStudentsWrap'), gw = document.getElementById('dojoGroupsWrap');
+  if(sw) sw.classList.toggle('hidden', classTab!=='students');
+  if(gw) gw.classList.toggle('hidden', classTab!=='groups');
+  const em = document.getElementById('emptyMonster'); if(em) em.innerHTML = chubbySVG(999);
+  if(window.lucide) lucide.createIcons();
+}
+
+function renderClassroomList(){
+  const list = document.getElementById('classroomList');
+  document.getElementById('classCountBadge').textContent = state.classrooms.length;
+  if(!state.classrooms.length){
+    list.innerHTML = '<div class="text-center py-8 text-sm font-bold text-slate-400">No classrooms yet.<br/>Create one to begin ✨</div>';
+  } else {
+    list.innerHTML = state.classrooms.map(c=>{
+      const kids = state.students.filter(s=>s.classroomId===c.id);
+      const pts = kids.reduce((a,s)=>a+(s.points||0),0);
+      const active = c.id===state.selectedClassroom;
+      return '<button onclick="selectClassroom(\''+c.id+'\')" class="sidebar-link w-full text-left rounded-2xl p-3 flex items-center gap-3 transition-all hover:bg-white '+(active?'active':'bg-white/60 border border-white shadow-sm')+'">'
+        + '<div class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shrink-0 '+(active?'bg-white/20':'bg-indigo-50')+'">'+esc(c.emoji||'📚')+'</div>'
+        + '<div class="flex-1 min-w-0"><p class="font-extrabold text-[14px] truncate leading-tight">'+esc(c.name)+'</p>'
+        + '<p class="sub text-[12px] font-bold '+(active?'text-indigo-100':'text-slate-400')+'">'+kids.length+' students • '+pts+' pts</p></div>'
+        + '<div class="flex flex-col gap-1 shrink-0" onclick="event.stopPropagation()">'
+        + '<button title="Edit class" onclick="openClassroomModal(\''+c.id+'\')" class="w-7 h-7 rounded-lg flex items-center justify-center '+(active?'bg-white/20 text-white hover:bg-white/30':'bg-slate-100 text-slate-400 hover:text-indigo-600')+'"><i data-lucide="pencil" class="w-3.5 h-3.5 pointer-events-none"></i></button>'
+        + '</div></button>';
+    }).join('');
+  }
+  // mobile pills
+  const pills = document.getElementById('classroomPillsMobile');
+  pills.innerHTML = state.classrooms.map(c=>{
+    const active = c.id===state.selectedClassroom;
+    return '<button onclick="selectClassroom(\''+c.id+'\')" class="shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-extrabold border-2 transition-all '+(active?'bg-indigo-600 border-indigo-600 text-white shadow':'bg-white border-slate-200 text-slate-600')+'">'+esc(c.emoji||'📚')+' '+esc(c.name.length>16?c.name.slice(0,16)+'…':c.name)+'</button>';
+  }).join('') + '<button onclick="openClassroomModal()" class="shrink-0 rounded-full px-3.5 py-2 text-[12px] font-extrabold border-2 border-dashed border-indigo-300 text-indigo-600">+ New</button>';
+}
+
+function renderHeader(){
+  const c = activeClassroom();
+  const kids = activeStudents();
+  const pts = classPoints();
+  const pos = state.pointsHistory.filter(h=>h.classroomId===state.selectedClassroom && h.type==='positive').length;
+  const neg = state.pointsHistory.filter(h=>h.classroomId===state.selectedClassroom && h.type==='needs-work').length;
+  const top = [...kids].sort((a,b)=>(b.points||0)-(a.points||0))[0];
+  const name = c ? c.name : 'No Classroom';
+  const meta = c ? kids.length + ' students • ' + pts + ' total pts' : 'Create a class to begin';
+  document.getElementById('activeClassName').textContent = name;
+  document.getElementById('activeClassNameMobile').textContent = name;
+  document.getElementById('activeClassEmoji').textContent = c ? (c.emoji||'📚') : '📚';
+  document.getElementById('activeClassMeta').textContent = c ? kids.length+' students' : '—';
+  document.getElementById('activeClassMetaMobile').textContent = meta;
+  document.getElementById('todayLabel').textContent = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
+  const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('statTotalPoints', pts); set('statTotalPointsM', pts);
+  set('statPositive', pos); set('statPositiveM', pos);
+  set('statNeedsWork', neg); set('statNeedsWorkM', neg);
+  set('statTopStudent', top ? top.firstName+' '+top.lastName+' ('+top.points+')' : '—');
+  set('reportsClassName', name);
+  const hc = classHistory().length;
+  set('historyCountBadge', hc);
+  const dot = document.getElementById('historyDotMobile');
+  if(dot) dot.classList.toggle('hidden', hc===0);
+}
+
+function dojoBadge(p){
+  const cls = p>0 ? '' : p<0 ? 'neg' : 'zero';
+  return '<div class="dojo-pts '+cls+'" id="pill-'+'X'+'">'+p+'</div>';
+}
+function renderGrid(){
+  const grid = document.getElementById('studentGrid');
+  const empty = document.getElementById('emptyGrid');
+  const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  const sort = document.getElementById('sortSelect').value;
+  let kids = activeStudents();
+  if(q) kids = kids.filter(s=>(s.firstName+' '+s.lastName).toLowerCase().includes(q));
+  if(sort==='name') kids.sort((a,b)=>(a.firstName+' '+a.lastName).localeCompare(b.firstName+' '+b.lastName));
+  if(sort==='pointsDesc') kids.sort((a,b)=>(b.points||0)-(a.points||0));
+  if(sort==='pointsAsc') kids.sort((a,b)=>(a.points||0)-(b.points||0));
+  const hasKids = activeStudents().length>0;
+  const hasClass = state.classrooms.length>0;
+  empty.classList.toggle('hidden', kids.length>0 || !hasKids ? kids.length>0 : true);
+  if(!hasKids){
+    grid.innerHTML='';
+    const em=document.getElementById('emptyMonster'); if(em) em.innerHTML = chubbySVG(123456);
+    // Empty state CTA depends on whether any classroom exists yet
+    const title = empty.querySelector('h3'), sub = empty.querySelector('p'), btn = empty.querySelector('button');
+    if(!hasClass){
+      if(title) title.textContent = 'Create your first class';
+      if(sub) sub.textContent = 'Name your class, then add monsters to it! 🚀';
+      if(btn){ btn.textContent = '+ New Classroom'; btn.setAttribute('onclick','openClassroomModal()'); }
+    } else {
+      if(title) title.textContent = 'No monsters yet';
+      if(sub) sub.textContent = 'Add your first superstar to fill the class!';
+      if(btn){ btn.textContent = '+ Add Student'; btn.setAttribute('onclick','openStudentModal()'); }
+    }
+    if(window.lucide) lucide.createIcons(); renderDojoPills(); return;
+  }
+  if(!kids.length){ grid.innerHTML = '<div class="col-span-full text-center py-10 font-bold text-slate-400">No monsters match “'+esc(q)+'”. Try another search 🔍</div>'; if(window.lucide) lucide.createIcons(); return; }
+  const tiles = kids.map(s=>{
+    const p = s.points||0;
+    const badge = p>0 ? '' : p<0 ? 'neg' : 'zero';
+    const monster = s.photo ? '<img src="'+s.photo+'" class="w-[76px] h-[76px] rounded-2xl object-cover border-2 border-slate-100" alt=""/>' : '<div class="w-[84px] h-[84px]">'+chubbySVG(monsterSeedFor(s))+'</div>';
+    return '<div id="card-'+s.id+'" onclick="openAwardModal(\''+s.id+'\')" class="dojo-tile group">'
+      + '<div class="dojo-pts '+badge+'" id="pill-'+s.id+'">'+p+'</div>'
+      + '<button title="Edit" onclick="event.stopPropagation(); openStudentModal(\''+s.id+'\')" class="absolute top-2 left-2 w-7 h-7 rounded-lg bg-slate-100/90 text-slate-400 hover:bg-indigo-100 hover:text-indigo-600 items-center justify-center hidden group-hover:flex z-10"><i data-lucide="pencil" class="w-3.5 h-3.5 pointer-events-none"></i></button>'
+      + monster
+      + '<div class="dojo-name">'+esc(s.firstName)+(s.lastName?' '+esc(s.lastName):'')+'</div>'
+      + '<div class="flex gap-1.5 mt-2 w-full px-1">'
+      + '<button title="+1" onclick="event.stopPropagation(); quickAwardTo(\''+s.id+'\',1)" class="flex-1 h-8 rounded-xl bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-600 font-black text-sm transition-all active:scale-95">+1</button>'
+      + '<button title="-1" onclick="event.stopPropagation(); quickAwardTo(\''+s.id+'\',-1)" class="flex-1 h-8 rounded-xl bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-500 font-black text-sm transition-all active:scale-95">−1</button>'
+      + '</div></div>';
+  }).join('');
+  // Everyone tile (like "Class" in screenshot) + Add tile
+  const total = classPoints();
+  const everyone = '<div onclick="awardEveryone(event)" title="Award the whole class — Shift+Click = instant, no confirm" class="dojo-tile everyone-tile" style="background:linear-gradient(180deg,#F8FAFC,#EEF2FF);">'
+    + '<div class="dojo-pts" style="background:#4F46E5">'+total+'</div>'
+    + '<div class="flex -space-x-3">'
+    + '<div class="w-10 h-10">'+chubbySVG(11)+'</div><div class="w-10 h-10">'+chubbySVG(77)+'</div><div class="w-10 h-10">'+chubbySVG(199)+'</div>'
+    + '</div><div class="dojo-name">Everyone</div>'
+    + '<div class="text-[11px] font-bold text-indigo-500">Tap +1 • ⇧-click = instant ⚡</div></div>';
+  const add = '<div onclick="openStudentModal()" class="dojo-tile dojo-add">'
+    + '<div class="flex-1 flex items-center justify-center"><span class="text-5xl font-light">+</span></div>'
+    + '<div class="dojo-name" style="color:#0EA5E9">Add</div></div>';
+  grid.innerHTML = everyone + tiles + add;
+  renderDojoPills();
+  if(window.lucide) lucide.createIcons();
+}
+function quickAwardTo(id, delta){
+  selectedStudentId = id;
+  applyPoints(id, delta, delta>0?'Quick Praise':'Quick Correction', delta>0?'positive':'needs-work');
+}
+function awardEveryone(ev){
+  const kids = activeStudents();
+  if(!kids.length) return;
+  if(ev && ev.shiftKey){ doAwardEveryone(true); return; }
+  askConfirm('Award whole class +1?', 'Every monster in this class gets +1 for great work. (Tip: hold ⇧ Shift and click for instant, no popup.)', ()=>doAwardEveryone(false));
+  SFX.pop();
+}
+function doAwardEveryone(instant){
+  const kids = activeStudents();
+  if(!kids.length) return;
+  kids.forEach(s=>{ s.points=(s.points||0)+1; });
+  state.pointsHistory.push({ id: uid(), studentId:'system', classroomId: state.selectedClassroom, studentName:'Everyone', type:'positive', behavior: instant ? 'Whole-class praise (instant ⚡)' : 'Whole-class praise', delta: kids.length, timestamp: Date.now() });
+  saveState(); renderAll(); SFX.success();
+  if(window.confetti) confetti({particleCount: instant?160:120, spread:95, origin:{y:.6}});
+  toast(instant ? 'Whole class +1 instantly! ⚡🎉' : 'Whole class +1! 🎉');
+  // staggered wave of color animations across all tiles
+  const tiles = Array.from(document.querySelectorAll('[id^="card-"]'));
+  tiles.forEach((tile, i)=>{
+    setTimeout(()=>{
+      tile.classList.remove('celebrate','flash-pos'); void tile.offsetWidth;
+      tile.classList.add('flash-pos');
+      const badge = tile.querySelector('.dojo-pts');
+      if(badge){ badge.classList.remove('badge-pop'); void badge.offsetWidth; badge.classList.add('badge-pop'); }
+      spawnFloater(tile, '+1', true);
+      setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 750);
+    }, i * 55);
+  });
+}
+function spawnFloater(tile, text, pos){
+  try{
+    const f = document.createElement('div');
+    f.className = 'float-plus ' + (pos ? 'pos' : 'neg');
+    f.textContent = text;
+    tile.appendChild(f);
+    setTimeout(()=>f.remove(), 1050);
+  }catch(e){}
+}
+function setClassTab(t){
+  classTab = t;
+  const sBtn = document.getElementById('dojoTabStudents'), gBtn = document.getElementById('dojoTabGroups');
+  if(sBtn) sBtn.classList.toggle('on', t==='students');
+  if(gBtn) gBtn.classList.toggle('on', t==='groups');
+  document.getElementById('dojoStudentsWrap').classList.toggle('hidden', t!=='students');
+  document.getElementById('dojoGroupsWrap').classList.toggle('hidden', t!=='groups');
+  setActiveNav(t==='groups' ? 'toolkit' : 'students');
+  SFX.click();
+  if(t==='groups' && !document.getElementById('groupResultsTop').innerHTML) makeGroupsTop();
+}
+function makeGroupsTop(){
+  const inp = document.getElementById('groupSizeInputTop');
+  const main = document.getElementById('groupSizeInput');
+  if(inp && main) main.value = inp.value;
+  makeGroups();
+  const src = document.getElementById('groupResults').innerHTML;
+  document.getElementById('groupResultsTop').innerHTML = src || '<p class="text-sm font-bold text-slate-400 col-span-full text-center py-6">No groups yet — hit Shuffle! 🎲</p>';
+  if(window.lucide) lucide.createIcons();
+}
+function cycleClassroom(){
+  if(!state.classrooms.length) return;
+  let i = state.classrooms.findIndex(c=>c.id===state.selectedClassroom);
+  i = (i+1) % state.classrooms.length;
+  selectClassroom(state.classrooms[i].id);
+}
+function renderDojoPills(){
+  const box = document.getElementById('dojoClassPills');
+  if(!box) return;
+  const dn = document.getElementById('dojoClassName');
+  const c = activeClassroom();
+  if(dn) dn.textContent = c ? c.name : 'No Class';
+  box.innerHTML = state.classrooms.map(x=>{
+    const n = state.students.filter(s=>s.classroomId===x.id).length;
+    const on = x.id===state.selectedClassroom;
+    return '<button onclick="selectClassroom(\''+x.id+'\')" class="shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-extrabold border-2 transition-all '+(on?'bg-indigo-600 border-indigo-600 text-white shadow':'bg-white border-slate-200 text-slate-600 hover:border-indigo-300')+'">'+esc(x.emoji||'📚')+' '+esc(x.name)+' <span class="'+(on?'text-indigo-200':'text-slate-400')+'">('+n+')</span></button>';
+  }).join('') + '<button onclick="openClassroomModal()" class="shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-extrabold border-2 border-dashed border-indigo-300 text-indigo-600">+ New class</button>';
+}
+
+function historyIcon(t){ return t==='positive' ? 'thumbs-up' : 'thumbs-down'; }
+function historyRow(h){
+  const pos = h.type==='positive';
+  return '<div class="flex items-start gap-3 bg-white rounded-2xl p-3 border border-slate-100 shadow-sm">'
+    + '<div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 '+(pos?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-500')+'"><i data-lucide="'+historyIcon(h.type)+'" class="w-4 h-4"></i></div>'
+    + '<div class="flex-1 min-w-0"><p class="text-[13px] font-extrabold leading-snug">'+esc(h.studentName)+' <span class="'+(pos?'text-emerald-600':'text-rose-500')+'">'+(h.delta>0?'+':'')+h.delta+'</span> <span class="font-bold text-slate-400">for</span> “'+esc(h.behavior)+'”</p>'
+    + '<p class="text-[11px] font-bold text-slate-400 mt-0.5 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>'+fmtTime(h.timestamp)+'</p></div></div>';
+}
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  let h = classHistory();
+  if(historyFilter!=='all') h = h.filter(x=>x.type===historyFilter);
+  // chips
+  document.getElementById('hfAll').className = 'flex-1 text-[12px] font-extrabold rounded-xl border-2 py-2 transition-all ' + (historyFilter==='all'?'chip-active border-indigo-600':'border-slate-200 text-slate-500');
+  document.getElementById('hfPos').className = 'flex-1 text-[12px] font-extrabold rounded-xl border-2 py-2 transition-all ' + (historyFilter==='positive'?'chip-active border-indigo-600':'border-slate-200 text-slate-500');
+  document.getElementById('hfNeg').className = 'flex-1 text-[12px] font-extrabold rounded-xl border-2 py-2 transition-all ' + (historyFilter==='needs-work'?'chip-active border-indigo-600':'border-slate-200 text-slate-500');
+  if(!h.length){
+    list.innerHTML = '<div class="text-center py-12"><div class="text-5xl">📜</div><p class="font-extrabold mt-3">No activity yet</p><p class="text-[13px] font-bold text-slate-400">Award your first point to see magic here ✨</p></div>';
+  } else {
+    list.innerHTML = h.slice(0,120).map(historyRow).join('');
+  }
+  if(window.lucide) lucide.createIcons();
+}
+
+function renderReports(){
+  const lb = document.getElementById('leaderboard');
+  const rh = document.getElementById('reportsHistory');
+  const kids = [...activeStudents()].sort((a,b)=>(b.points||0)-(a.points||0));
+  if(!kids.length){
+    lb.innerHTML = '<div class="text-center py-8 font-bold text-slate-400">No students in this class yet.</div>';
+    rh.innerHTML = '<div class="text-center py-8 font-bold text-slate-400">Nothing to report yet.</div>';
+    return;
+  }
+  const max = Math.max(1, ...kids.map(k=>Math.max(0,k.points||0)));
+  const medals = ['🥇','🥈','🥉'];
+  lb.innerHTML = kids.map((s,i)=>{
+    const pct = Math.max(4, Math.round(((Math.max(0,s.points||0))/max)*100));
+    const bar = (s.points||0) < 0 ? 'linear-gradient(90deg,#F43F5E,#FB7185)' : 'linear-gradient(90deg,#4F46E5,#0EA5E9)';
+    return '<div class="flex items-center gap-3 bg-white rounded-2xl p-3 border border-slate-100">'
+      + '<div class="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center font-black text-lg shrink-0">'+(medals[i]||('<span class="text-sm text-slate-400">'+(i+1)+'</span>'))+'</div>'
+      + (s.photo
+          ? '<img src="'+s.photo+'" class="w-11 h-11 rounded-2xl object-cover border-2 border-white shadow shrink-0" alt=""/>'
+          : '<div class="w-11 h-11 shrink-0">'+chubbySVG(monsterSeedFor(s))+'</div>')
+      + '<div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2"><p class="font-extrabold text-[14px] truncate">'+esc(s.firstName)+' '+esc(s.lastName)+'</p><span class="font-black text-[14px] '+(s.points>0?'text-emerald-600':s.points<0?'text-rose-500':'text-slate-400')+'">'+s.points+' pts</span></div>'
+      + '<div class="h-2.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden"><div class="h-full rounded-full bar-fill" style="width:'+pct+'%;background:'+bar+'"></div></div></div></div>';
+  }).join('');
+  const h = classHistory();
+  rh.innerHTML = h.length ? h.slice(0,150).map(historyRow).join('') : '<div class="text-center py-8 font-bold text-slate-400">No activity yet.</div>';
+  if(window.lucide) lucide.createIcons();
+}
+
+/* =========================================================
+   VIEW SWITCHING
+========================================================= */
+let currentView = 'classroom';
+function switchView(v){
+  currentView = v;
+  const isClass = v==='classroom';
+  document.getElementById('view-classroom').classList.toggle('hidden', !isClass);
+  document.getElementById('view-reports').classList.toggle('hidden', isClass);
+  const on = 'px-4 py-2 rounded-xl text-[13px] font-extrabold bg-indigo-600 text-white shadow flex items-center gap-2 transition-all';
+  const off = 'px-4 py-2 rounded-xl text-[13px] font-extrabold text-slate-500 hover:text-indigo-700 flex items-center gap-2 transition-all';
+  const tc = document.getElementById('tabClassroom'); if(tc) tc.className = isClass?on:off;
+  const tr = document.getElementById('tabReports'); if(tr) tr.className = !isClass?on:off;
+  document.getElementById('tabClassroomM').className = 'px-3 py-2 rounded-xl text-[12px] font-extrabold ' + (isClass?'bg-indigo-600 text-white':'text-slate-500 bg-white border border-slate-200');
+  document.getElementById('tabReportsM').className = 'px-3 py-2 rounded-xl text-[12px] font-extrabold ' + (!isClass?'bg-indigo-600 text-white':'text-slate-500 bg-white border border-slate-200');
+  SFX.click();
+  setActiveNav(isClass ? 'students' : 'reports');
+  if(!isClass) renderReports();
+  if(window.lucide) lucide.createIcons();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------- Classroom select ---------- */
+function selectClassroom(id){
+  state.selectedClassroom = id;
+  saveState(); renderAll(); playClick();
+}
+
+/* =========================================================
+   MODAL PLUMBING
+========================================================= */
+function showModal(id){ const m=document.getElementById(id); m.classList.remove('modal-hidden'); m.classList.add('modal-visible'); SFX.open(); }
+function hideModal(id){ const m=document.getElementById(id); if(m && m.classList.contains('modal-visible')) SFX.close(); m.classList.add('modal-hidden'); m.classList.remove('modal-visible'); }
+
+/* =========================================================
+   AWARD POINTS
+========================================================= */
+function openAwardModal(studentId, tab){
+  const s = state.students.find(x=>x.id===studentId);
+  if(!s) return;
+  selectedStudentId = studentId;
+  setAwardTab(tab || 'positive');
+  document.getElementById('awardStudentName').textContent = s.firstName + ' ' + s.lastName;
+  const av = document.getElementById('awardAvatar');
+  av.style.background = '#fff';
+  av.style.padding = s.photo ? '0' : '6px';
+  av.innerHTML = s.photo
+    ? '<img src="'+s.photo+'" class="w-full h-full object-cover rounded-full" />'
+    : chubbySVG(monsterSeedFor(s), 'w-full h-full');
+  refreshAwardPoints();
+  showModal('awardModal');
+  if(window.lucide) lucide.createIcons();
+}
+function closeAwardModal(){ hideModal('awardModal'); selectedStudentId=null; }
+function refreshAwardPoints(){
+  const s = state.students.find(x=>x.id===selectedStudentId);
+  if(!s) return;
+  const el = document.getElementById('awardStudentPoints');
+  el.textContent = s.points + ' pts';
+  el.classList.remove('points-bump'); void el.offsetWidth; el.classList.add('points-bump');
+}
+function setAwardTab(t){
+  awardTab = t;
+  const pos = t==='positive';
+  document.getElementById('awardTabPos').className = 'tab-btn rounded-xl py-2.5 text-sm font-extrabold flex items-center justify-center gap-2 ' + (pos?'bg-white shadow text-emerald-600':'text-slate-500');
+  document.getElementById('awardTabNeg').className = 'tab-btn rounded-xl py-2.5 text-sm font-extrabold flex items-center justify-center gap-2 ' + (!pos?'bg-white shadow text-rose-500':'text-slate-500');
+  document.getElementById('awardHeader').className = 'p-5 text-white relative overflow-hidden transition-all ' + (pos?'bg-gradient-to-r from-emerald-500 to-teal-500':'bg-gradient-to-r from-rose-500 to-orange-400');
+  const list = pos ? POSITIVE_BEHAVIORS : NEEDS_WORK_BEHAVIORS;
+  document.getElementById('awardBehaviors').innerHTML = list.map((b,i)=>{
+    return '<button onclick="awardBehavior('+i+')" class="group text-left rounded-2xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 '+(pos?'border-emerald-100 hover:border-emerald-400 bg-emerald-50/50 hover:bg-emerald-500':'border-rose-100 hover:border-rose-400 bg-rose-50/50 hover:bg-rose-500')+'">'
+      + '<div class="flex items-center gap-2.5">'
+      + '<div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 '+(pos?'bg-emerald-500 text-white group-hover:bg-white group-hover:text-emerald-600':'bg-rose-500 text-white group-hover:bg-white group-hover:text-rose-600')+' transition-all"><i data-lucide="'+b.icon+'" class="w-5 h-5"></i></div>'
+      + '<div class="min-w-0"><p class="font-extrabold text-[13px] leading-tight '+(pos?'text-emerald-900 group-hover:text-white':'text-rose-900 group-hover:text-white')+'">'+b.label+'</p>'
+      + '<p class="text-[12px] font-black '+(pos?'text-emerald-500 group-hover:text-emerald-100':'text-rose-400 group-hover:text-rose-100')+'">'+(b.points>0?'+'+b.points:b.points)+'</p></div>'
+      + '</div></button>';
+  }).join('');
+  if(window.lucide) lucide.createIcons();
+}
+function awardBehavior(i){
+  const list = awardTab==='positive' ? POSITIVE_BEHAVIORS : NEEDS_WORK_BEHAVIORS;
+  const b = list[i];
+  if(!b) return;
+  applyPoints(selectedStudentId, b.points, b.label, awardTab);
+}
+function quickAward(delta){
+  applyPoints(selectedStudentId, delta, delta>0?'Quick Praise':'Quick Correction', delta>0?'positive':'needs-work');
+}
+function applyPoints(studentId, delta, behavior, type){
+  const s = state.students.find(x=>x.id===studentId);
+  if(!s) return;
+  s.points = (s.points||0) + delta;
+  state.pointsHistory.push({ id: uid(), studentId: s.id, classroomId: s.classroomId, studentName: s.firstName+' '+s.lastName, type, behavior, delta, timestamp: Date.now() });
+  saveState();
+  // live dojo badge bump + color animation
+  const pill = document.getElementById('pill-'+s.id);
+  if(pill){ pill.textContent = s.points; pill.classList.remove('neg','zero','points-bump','badge-pop'); if(s.points<0) pill.classList.add('neg'); if(s.points===0) pill.classList.add('zero'); void pill.offsetWidth; pill.classList.add('badge-pop'); }
+  const card = document.getElementById('card-'+s.id);
+  renderHeader(); renderHistory(); renderReports(); renderDojoPills();
+  // re-grab card after renders that don't touch grid (grid isn't re-rendered here, so same node)
+  const tile = document.getElementById('card-'+s.id) || card;
+  refreshAwardPoints();
+  if(delta>0){ if(delta>=2){ SFX.coin(); setTimeout(()=>SFX.success(),140); } else { SFX.success(); } if(window.confetti) confetti({particleCount: delta>=2?110:70, spread:75, origin:{y:.6}, colors:['#4F46E5','#0EA5E9','#10B981','#FBBF24']});
+    if(tile){ tile.classList.remove('flash-pos','celebrate','shake','flash-neg'); void tile.offsetWidth; tile.classList.add('flash-pos'); spawnFloater(tile, '+'+delta, true); setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 750); } }
+  else if(delta<0){ SFX.error();
+    if(tile){ tile.classList.remove('shake','flash-neg','flash-pos','celebrate'); void tile.offsetWidth; tile.classList.add('flash-neg'); spawnFloater(tile, ''+delta, false); setTimeout(()=>tile.classList.remove('flash-neg'), 700); } }
+  else { SFX.pop(); }
+  showBanner(s, delta, behavior);
+  setTimeout(closeAwardModal, 420);
+}
+
+/* ---------- Reset points ---------- */
+function confirmResetPoints(){
+  const kids = activeStudents();
+  if(!kids.length){ toast('No students to reset in this class.'); return; }
+  askConfirm('Reset all points?', 'All '+kids.length+' students in this class will go back to 0 points.', ()=>{
+    kids.forEach(s=>s.points=0);
+    state.pointsHistory.push({ id:uid(), studentId:'system', classroomId:state.selectedClassroom, studentName:'Whole class', type:'positive', behavior:'Points reset — fresh start ✨', delta:0, timestamp:Date.now() });
+    saveState(); renderAll(); toast('Fresh start! All points reset to 0. ✨'); playClick();
+  });
+}
+
+/* =========================================================
+   STUDENT CRUD + PHOTO UPLOAD (compressed Base64)
+========================================================= */
+function openStudentModal(studentId){
+  // close award first if open
+  hideModal('awardModal');
+  editingStudentId = studentId || null;
+  stagedPhoto = null;
+  const isEdit = !!studentId;
+  const s = isEdit ? state.students.find(x=>x.id===studentId) : null;
+  stagedMonsterSeed = s ? monsterSeedFor(s) : randomMonsterSeed();
+  stagedMonsterOptions = [stagedMonsterSeed];
+  while(stagedMonsterOptions.length < 8){
+    const r = randomMonsterSeed();
+    if(!stagedMonsterOptions.includes(r)) stagedMonsterOptions.push(r);
+  }
+  if(s && s.photo) stagedPhoto = s.photo;
+  document.getElementById('studentModalTitle').innerHTML = isEdit
+    ? '<i data-lucide="pencil" class="w-5 h-5"></i> Edit Student'
+    : '<i data-lucide="user-plus" class="w-5 h-5"></i> Add Student';
+  document.getElementById('firstNameInput').value = s ? s.firstName : '';
+  document.getElementById('lastNameInput').value = s ? s.lastName : '';
+  document.getElementById('saveStudentLabel').textContent = isEdit ? 'Save Changes' : 'Add Student';
+  document.getElementById('deleteStudentBtn').classList.toggle('hidden', !isEdit);
+  document.getElementById('photoInput').value = '';
+  document.getElementById('photoHint').classList.add('hidden');
+  renderMonsterPicker(); renderPhotoPreview();
+  showModal('studentModal');
+  setTimeout(()=>document.getElementById('firstNameInput').focus(), 250);
+  if(window.lucide) lucide.createIcons();
+}
+function closeStudentModal(){ hideModal('studentModal'); editingStudentId=null; stagedPhoto=null; }
+function renderMonsterPicker(){
+  const box = document.getElementById('monsterPicker');
+  if(!box) return;
+  box.innerHTML = stagedMonsterOptions.map(seed=>{
+    const active = seed===stagedMonsterSeed;
+    return '<button onclick="pickStagedMonster('+seed+')" class="rounded-2xl border-[3px] p-1 transition-all active:scale-90 '+(active?'border-indigo-600 bg-indigo-50 scale-105 shadow-md':'border-slate-100 bg-slate-50 hover:border-indigo-200')+'"><div class="w-full aspect-square">'+chubbySVG(seed)+'</div></button>';
+  }).join('');
+}
+function pickStagedMonster(seed){ stagedMonsterSeed = seed >>> 0; renderMonsterPicker(); renderPhotoPreview(); SFX.pop(); }
+function shuffleStagedMonster(){
+  stagedMonsterSeed = randomMonsterSeed();
+  stagedMonsterOptions[0] = stagedMonsterSeed;
+  renderMonsterPicker(); renderPhotoPreview(); SFX.whoosh();
+}
+function renderPhotoPreview(){
+  const box = document.getElementById('photoPreview');
+  const rm = document.getElementById('removePhotoBtn');
+  if(stagedPhoto){
+    box.style.background = '#F1F5F9';
+    box.innerHTML = '<img src="'+stagedPhoto+'" class="w-full h-full object-cover" />';
+    rm.classList.remove('hidden'); rm.classList.add('flex');
+  } else {
+    box.style.background = '#F8FAFC';
+    box.innerHTML = '<div class="w-full h-full p-1">'+chubbySVG(stagedMonsterSeed)+'</div>';
+    rm.classList.add('hidden'); rm.classList.remove('flex');
+  }
+}
+document.addEventListener('input', e=>{
+  if(e.target && (e.target.id==='firstNameInput'||e.target.id==='lastNameInput') && !stagedPhoto) renderPhotoPreview();
+});
+function handlePhotoSelect(ev){
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ toast('Please choose an image file.', 'error'); return; }
+  if(file.size > 8*1024*1024){ toast('Image is very large (>8MB). Try a smaller photo.', 'error'); return; }
+  compressImage(file, 256, 0.82).then(dataUrl=>{
+    const kb = Math.round((dataUrl.length*3/4)/1024);
+    if(dataUrl.length > 700*1024){
+      const hint = document.getElementById('photoHint');
+      hint.textContent = '⚠️ Compressed to ~'+kb+'KB — still large. Try a smaller photo to protect storage.';
+      hint.classList.remove('hidden');
+    } else {
+      document.getElementById('photoHint').classList.add('hidden');
+    }
+    stagedPhoto = dataUrl;
+    renderPhotoPreview();
+    toast('Photo ready! Hit save to keep it. 📸');
+  }).catch(()=>toast('Could not read that image.', 'error'));
+}
+/* Compress via canvas so Base64 fits localStorage 5MB */
+function compressImage(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        const scale = Math.min(1, maxDim / Math.max(w,h));
+        w = Math.round(w*scale); h = Math.round(h*scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img, 0, 0, w, h);
+        // cover-crop to square for tidy avatars
+        const side = Math.min(w,h);
+        const sq = document.createElement('canvas'); sq.width = sq.height = Math.min(256, side);
+        const sctx = sq.getContext('2d');
+        sctx.drawImage(canvas, (w-side)/2, (h-side)/2, side, side, 0, 0, sq.width, sq.height);
+        resolve(sq.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function removeStagedPhoto(){
+  stagedPhoto = null;
+  document.getElementById('photoInput').value = '';
+  document.getElementById('photoHint').classList.add('hidden');
+  renderPhotoPreview();
+}
+function saveStudent(){
+  const fn = document.getElementById('firstNameInput').value.trim();
+  const ln = document.getElementById('lastNameInput').value.trim();
+  if(!fn){ toast('Please enter a first name.', 'error'); document.getElementById('firstNameInput').focus(); return; }
+  if(!state.selectedClassroom){ toast('Create a classroom first.', 'error'); return; }
+  if(editingStudentId){
+    const s = state.students.find(x=>x.id===editingStudentId);
+    if(s){ s.firstName = fn; s.lastName = ln.length?ln:s.lastName; s.monsterSeed = stagedMonsterSeed >>> 0; s.photo = stagedPhoto;
+      // keep history names fresh
+      state.pointsHistory.forEach(h=>{ if(h.studentId===s.id) h.studentName = s.firstName+' '+s.lastName; });
+    }
+    toast(fn + ' updated! ✨');
+  } else {
+    state.students.push({ id: uid(), classroomId: state.selectedClassroom, firstName: fn, lastName: ln || '', points: 0, photo: stagedPhoto, colorIndex: 0, monster: MONSTERS[Math.floor(Math.random()*MONSTERS.length)], monsterSeed: stagedMonsterSeed >>> 0 });
+    toast('Welcome to the class, ' + fn + '! 🎉');
+    if(window.confetti) confetti({particleCount:45, spread:60, origin:{y:.7}});
+  }
+  saveState(); closeStudentModal(); renderAll(); playClick();
+}
+function deleteStudent(){
+  if(!editingStudentId) return;
+  const s = state.students.find(x=>x.id===editingStudentId);
+  askConfirm('Remove '+ (s?s.firstName:'student') + '?', 'Their points and avatar will be removed from this class.', ()=>{
+    state.students = state.students.filter(x=>x.id!==editingStudentId);
+    saveState(); closeStudentModal(); closeAwardModal(); renderAll(); toast('Student removed.');
+  });
+}
+
+/* =========================================================
+   CLASSROOM CRUD
+========================================================= */
+function openClassroomModal(classId){
+  editingClassId = classId || null;
+  const c = classId ? state.classrooms.find(x=>x.id===classId) : null;
+  stagedEmoji = c ? (c.emoji||'🚀') : CLASS_EMOJIS[Math.floor(Math.random()*CLASS_EMOJIS.length)];
+  document.getElementById('classroomModalTitle').innerHTML = c ? '<i data-lucide="pencil" class="w-5 h-5"></i> Edit Classroom' : '<i data-lucide="school" class="w-5 h-5"></i> New Classroom';
+  document.getElementById('classNameInput').value = c ? c.name : '';
+  document.getElementById('deleteClassBtn').classList.toggle('hidden', !c);
+  renderEmojiPicker();
+  showModal('classroomModal');
+  setTimeout(()=>document.getElementById('classNameInput').focus(), 250);
+  if(window.lucide) lucide.createIcons();
+}
+function closeClassroomModal(){ hideModal('classroomModal'); editingClassId=null; }
+function renderEmojiPicker(){
+  document.getElementById('emojiPicker').innerHTML = CLASS_EMOJIS.map(e=>{
+    return '<button onclick="stagedEmoji=\''+e+'\'; renderEmojiPicker();" class="h-10 rounded-xl text-xl border-2 transition-all active:scale-90 '+(stagedEmoji===e?'border-indigo-600 bg-indigo-50 scale-105':'border-slate-100 bg-slate-50 hover:border-indigo-200')+'">'+e+'</button>';
+  }).join('');
+}
+function saveClassroom(){
+  const name = document.getElementById('classNameInput').value.trim();
+  if(!name){ toast('Please name your classroom.', 'error'); return; }
+  if(editingClassId){
+    const c = state.classrooms.find(x=>x.id===editingClassId);
+    if(c){ c.name = name; c.emoji = stagedEmoji; }
+    toast('Classroom updated! ✨');
+  } else {
+    const c = { id: uid(), name, emoji: stagedEmoji, createdAt: Date.now() };
+    state.classrooms.push(c);
+    state.selectedClassroom = c.id;
+    toast('Classroom “'+name+'” created! 🎉');
+  }
+  saveState(); closeClassroomModal(); renderAll(); playClick();
+}
+function deleteClassroom(){
+  if(!editingClassId) return;
+  const kids = state.students.filter(s=>s.classroomId===editingClassId).length;
+  askConfirm('Delete this classroom?', 'This removes the class, its '+kids+' students and their history.', ()=>{
+    state.classrooms = state.classrooms.filter(c=>c.id!==editingClassId);
+    state.students = state.students.filter(s=>s.classroomId!==editingClassId);
+    state.pointsHistory = state.pointsHistory.filter(h=>h.classroomId!==editingClassId);
+    if(state.selectedClassroom===editingClassId) state.selectedClassroom = state.classrooms[0]?.id || null;
+    saveState(); closeClassroomModal(); renderAll(); toast('Classroom deleted.');
+  });
+}
+
+/* =========================================================
+   HISTORY PANEL + FILTER
+========================================================= */
+function toggleHistory(open){
+  const panel = document.getElementById('historyPanel');
+  const ov = document.getElementById('historyOverlay');
+  if(open){ panel.classList.remove('translate-x-full'); ov.classList.remove('modal-hidden'); ov.classList.add('modal-visible'); renderHistory(); SFX.open(); }
+  else { const wasOpen = !panel.classList.contains('translate-x-full'); panel.classList.add('translate-x-full'); ov.classList.add('modal-hidden'); ov.classList.remove('modal-visible'); if(wasOpen) SFX.close(); }
+}
+function setHistoryFilter(f){ historyFilter=f; renderHistory(); playClick(); }
+
+/* =========================================================
+   TOOLKIT — RANDOM PICKER
+========================================================= */
+function openRandomPicker(){
+  const kids = activeStudents();
+  if(!kids.length){ toast('Add students first to use the picker.', 'error'); SFX.error(); return; }
+  document.getElementById('pickerName').textContent = 'Ready?';
+  document.getElementById('pickerSub').textContent = 'Picking from ' + kids.length + ' stars';
+  document.getElementById('pickerAvatar').innerHTML = '🎲';
+  document.getElementById('pickerAvatar').style.background = '';
+  SFX.drum();
+  showModal('pickerOverlay');
+  if(window.lucide) lucide.createIcons();
+  spinPicker();
+}
+function closeRandomPicker(){ hideModal('pickerOverlay'); pickerSpinning=false; }
+function spinPicker(){
+  const kids = activeStudents();
+  if(!kids.length) return;
+  if(pickerSpinning) return;
+  pickerSpinning = true;
+  const nameEl = document.getElementById('pickerName');
+  const avEl = document.getElementById('pickerAvatar');
+  const subEl = document.getElementById('pickerSub');
+  document.getElementById('pickerSpinBtn').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Picking...';
+  lucide.createIcons();
+  let ticks = 0;
+  const total = 22 + Math.floor(Math.random()*8);
+  const iv = setInterval(()=>{
+    const s = kids[Math.floor(Math.random()*kids.length)];
+    nameEl.textContent = s.firstName + ' ' + s.lastName;
+    avEl.style.background = '#fff';
+    if(s.photo){ avEl.innerHTML = '<img src="'+s.photo+'" class="w-full h-full object-cover rounded-full"/>'; }
+    else { avEl.innerHTML = chubbySVG(monsterSeedFor(s), 'w-full h-full'); }
+    playTick();
+    ticks++;
+    if(ticks >= total){
+      clearInterval(iv);
+      const winner = kids[Math.floor(Math.random()*kids.length)];
+      nameEl.textContent = winner.firstName + ' ' + winner.lastName + ' ⭐';
+      subEl.textContent = winner.points + ' pts • Give them a big cheer!';
+      avEl.style.background = '#fff';
+      if(winner.photo){ avEl.innerHTML = '<img src="'+winner.photo+'" class="w-full h-full object-cover rounded-full"/>'; }
+      else { avEl.innerHTML = chubbySVG(monsterSeedFor(winner), 'w-full h-full'); }
+      avEl.classList.remove('pop-in'); void avEl.offsetWidth; avEl.classList.add('pop-in');
+      document.getElementById('pickerPreview').innerHTML = 'Last picked: <span class="text-indigo-700">'+esc(winner.firstName)+' '+esc(winner.lastName)+'</span> ⭐';
+      playFanfare();
+      if(window.confetti) confetti({particleCount:130, spread:100, origin:{y:.6}});
+      document.getElementById('pickerSpinBtn').innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Pick Again!';
+      lucide.createIcons();
+      pickerSpinning = false;
+    }
+  }, 90);
+}
+
+/* =========================================================
+   TOOLKIT — TIMER
+========================================================= */
+function setTimerMode(m){
+  timerMode = m;
+  pauseTimer();
+  document.getElementById('modeCountdownBtn').className = 'px-2.5 py-1.5 rounded-lg ' + (m==='countdown'?'bg-white shadow text-indigo-700':'text-slate-500');
+  document.getElementById('modeStopwatchBtn').className = 'px-2.5 py-1.5 rounded-lg ' + (m==='stopwatch'?'bg-white shadow text-indigo-700':'text-slate-500');
+  timerReset();
+}
+function setTimerPreset(sec){
+  if(timerMode!=='countdown') setTimerMode('countdown');
+  pauseTimer(); timerTotal = sec; timerLeft = sec; updateTimerUI(); playClick();
+}
+function timerToggle(){
+  if(timerRunning){ pauseTimer(); SFX.click(); }
+  else {
+    if(timerMode==='countdown' && timerLeft<=0) timerLeft = timerTotal;
+    timerRunning = true;
+    SFX.pop();
+    document.getElementById('timerStartBtn').innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause';
+    document.getElementById('timerStateLabel').textContent = 'Running';
+    lucide.createIcons();
+    timerInt = setInterval(()=>{
+      if(timerMode==='countdown'){
+        timerLeft -= 1;
+        if(timerLeft<=5 && timerLeft>0) playTick();
+        if(timerLeft<=0){ timerLeft=0; updateTimerUI(); timerDone(); return; }
+      } else {
+        timerElapsed += 1;
+      }
+      updateTimerUI();
+    }, 1000);
+  }
+  lucide.createIcons();
+}
+function pauseTimer(){
+  timerRunning = false;
+  clearInterval(timerInt);
+  document.getElementById('timerStartBtn').innerHTML = '<i data-lucide="play" class="w-3.5 h-3.5"></i> Start';
+  const lbl = document.getElementById('timerStateLabel');
+  if(lbl && lbl.textContent==='Running') lbl.textContent = 'Paused';
+  if(window.lucide) lucide.createIcons();
+}
+function timerReset(){
+  pauseTimer();
+  timerLeft = timerTotal; timerElapsed = 0;
+  document.getElementById('timerStateLabel').textContent = 'Ready';
+  updateTimerUI();
+}
+function timerDone(){
+  pauseTimer();
+  document.getElementById('timerStateLabel').textContent = 'Done!';
+  SFX.tada();
+  if(window.confetti) confetti({particleCount:120, spread:90, origin:{y:.7}});
+  toast("Time's up! ⏰ Great focus, class!");
+}
+function updateTimerUI(){
+  const C = 263.9;
+  const ring = document.getElementById('timerRing');
+  const disp = document.getElementById('timerDisplay');
+  if(!ring || !disp) return;
+  if(timerMode==='countdown'){
+    disp.textContent = fmtClock(timerLeft);
+    const frac = timerTotal>0 ? timerLeft/timerTotal : 0;
+    ring.style.strokeDashoffset = String(C*(1-frac));
+    ring.style.stroke = timerLeft<=10 ? '#F43F5E' : '#4F46E5';
+  } else {
+    disp.textContent = fmtClock(timerElapsed);
+    const frac = (timerElapsed%60)/60;
+    ring.style.strokeDashoffset = String(C*(1-frac));
+    ring.style.stroke = '#0EA5E9';
+  }
+}
+
+/* =========================================================
+   TOOLKIT — GROUP MAKER
+========================================================= */
+function shuffle(a){ const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
+function makeGroups(){
+  const box = document.getElementById('groupResults');
+  const top = document.getElementById('groupSizeInputTop');
+  const main = document.getElementById('groupSizeInput');
+  // sync the two inputs (Dojo Groups tab + Toolkit card)
+  if(top && document.activeElement!==main && top.value) { if(main) main.value = top.value; }
+  const kids = activeStudents();
+  let size = parseInt((main && main.value) || (top && top.value) || '2', 10);
+  if(!kids.length){ if(box) box.innerHTML = '<p class="text-[12px] font-bold text-slate-400 text-center py-2">Add students first.</p>'; const gt=document.getElementById('groupResultsTop'); if(gt) gt.innerHTML='<p class="text-sm font-bold text-slate-400 col-span-full text-center py-6">Add monsters first 🧸</p>'; return; }
+  if(!size || size<2){ toast('Group size must be at least 2.', 'error'); SFX.error(); return; }
+  if(size>kids.length){ toast('Group size is bigger than the class ('+kids.length+').', 'error'); SFX.error(); return; }
+  const shuffled = shuffle(kids);
+  const groups = [];
+  for(let i=0;i<shuffled.length;i+=size) groups.push(shuffled.slice(i,i+size));
+  // balance leftover single group of 1
+  if(groups.length>1 && groups[groups.length-1].length===1){
+    const lone = groups.pop()[0];
+    groups[groups.length-1].push(lone);
+  }
+  const palette = [['#EEF2FF','#4F46E5'],['#ECFEFF','#0EA5E9'],['#ECFDF5','#10B981'],['#FFFBEB','#D97706'],['#FFF1F2','#F43F5E'],['#F5F3FF','#8B5CF6']];
+  box.innerHTML = groups.map((g,gi)=>{
+    const p = palette[gi % palette.length];
+    return '<div class="rounded-2xl p-2.5 border pop-in" style="background:'+p[0]+';border-color:transparent">'
+      + '<p class="text-[11px] font-black uppercase tracking-wider" style="color:'+p[1]+'">Group '+(gi+1)+' • '+g.length+'</p>'
+      + '<div class="flex flex-wrap gap-1.5 mt-1.5">' + g.map(s=>'<span class="bg-white rounded-full pl-1 pr-2.5 py-1 text-[11px] font-extrabold text-slate-700 shadow-sm flex items-center gap-1.5">'
+        + (s.photo?'<img src="'+s.photo+'" class="w-5 h-5 rounded-xl object-cover"/>':'<span class="w-5 h-5 inline-block">'+chubbySVG(monsterSeedFor(s),'w-5 h-5')+'</span>')
+        + esc(s.firstName)+'</span>').join('') + '</div></div>';
+  }).join('');
+  // mirror into Dojo Groups tab
+  const gt = document.getElementById('groupResultsTop');
+  if(gt){
+    gt.innerHTML = groups.map((g,gi)=>{
+      const monsters = g.map(s=> s.photo ? '<img src="'+s.photo+'" class="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow"/>' : '<div class="w-12 h-12">'+chubbySVG(monsterSeedFor(s))+'</div>').join('');
+      const names = g.map(s=>esc(s.firstName)).join(', ');
+      return '<div class="bg-white rounded-2xl p-3 border border-slate-100 pop-in"><p class="text-[11px] font-black uppercase tracking-wider text-indigo-600">Group '+(gi+1)+'</p><div class="flex items-center gap-1.5 mt-2">'+monsters+'</div><p class="text-[12px] font-extrabold text-slate-600 mt-2">'+names+'</p></div>';
+    }).join('');
+  }
+  SFX.whoosh();
+  setTimeout(()=>SFX.pop(), 180);
+  toast(groups.length + ' groups created! 🤝');
+}
+
+/* =========================================================
+   CONFIRM + EXPORT + MISC
+========================================================= */
+function askConfirm(title, text, fn){
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmText').textContent = text;
+  confirmAction = fn;
+  showModal('confirmModal');
+}
+function closeConfirm(){ hideModal('confirmModal'); confirmAction=null; }
+function doConfirm(){ hideModal('confirmModal'); if(confirmAction){ const f=confirmAction; confirmAction=null; f(); } }
+function exportCSV(){
+  const kids = activeStudents();
+  const c = activeClassroom();
+  if(!kids.length){ toast('Nothing to export.', 'error'); SFX.error(); return; }
+  let csv = 'First Name,Last Name,Points,Classroom\n';
+  kids.forEach(s=>{ csv += '"'+s.firstName.replace(/"/g,'""')+'","'+(s.lastName||'').replace(/"/g,'""')+'",'+s.points+',"'+(c?c.name:'').replace(/"/g,'""')+'"\n'; });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'starclass-' + (c?c.name.replace(/[^a-z0-9]+/gi,'-'):'class') + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  SFX.coin();
+  toast('Report downloaded as CSV 📥');
+}
+// keyboard shortcuts + navigation
+document.addEventListener('keydown', e=>{
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
+  if(e.key==='Escape'){ closeAwardModal(); closeStudentModal(); closeClassroomModal(); closeRandomPicker(); closeConfirm(); closeShortcuts(); closeSettings(); toggleHistory(false); return; }
+  if(typing){
+    if(e.key==='Enter' && document.getElementById('studentModal').classList.contains('modal-visible')) saveStudent();
+    if(e.key==='Escape') document.activeElement.blur();
+    return;
+  }
+  if(e.key==='/'){ e.preventDefault(); switchView('classroom'); setTimeout(()=>document.getElementById('searchInput')?.focus(), 60); }
+  else if(e.key==='?'||e.key==='h'&&e.shiftKey){ openShortcuts(); }
+  else if(e.key==='1'){ goSection('students'); }
+  else if(e.key==='2'){ goSection('toolkit'); }
+  else if(e.key==='3'){ switchView('reports'); }
+  else if(e.key==='ArrowRight'){ nextClassroom(); }
+  else if(e.key==='ArrowLeft'){ prevClassroom(); }
+  else if(e.key==='n'||e.key==='N'){ openStudentModal(); }
+  else if(e.key==='h'||e.key==='H'){ toggleHistory(true); }
+  else if(e.key==='d'||e.key==='D'){ toggleTheme(); }
+  else if(e.key==='m'||e.key==='M'){ toggleSound(); refreshSettingsSoundState(); }
+  else if(e.key==='s'||e.key==='S'){ openSettings('general'); }
+  else if(e.key==='['){ toggleSidebar(); }
+});
+// back-to-top visibility
+window.addEventListener('scroll', ()=>{
+  const b = document.getElementById('backToTop');
+  if(b) b.classList.toggle('show', window.scrollY > 500);
+}, {passive:true});
+
+/* ---------- Boot ---------- */
+loadState();
+refreshThemeUI();
+refreshSoundUI();
+renderAll();
+setActiveNav('students');
+// unlock audio on first interaction (mobile autoplay policy)
+window.addEventListener('pointerdown', ()=>SFX.ensure(), {once:true});
+</script>
+</body>
+</html>
