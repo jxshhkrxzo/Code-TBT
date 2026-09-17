@@ -1404,7 +1404,7 @@ const SFX = {
 SFX.load();
 let audioCtx = null; // legacy alias (SFX owns the context now)
 function tone(freq, t0, dur, type, vol){ SFX.tone(freq, t0, dur, type, vol); }
-/* ---------- Praise voice clips for +1 (random every time) ---------- */
+/* ---------- Praise voice clips for +1 (random every time) + Clapping Sound ---------- */
 const PRAISE_SOUNDS = ['Amazing.mp3', 'Great Job.mp3', 'Well Done.mp3'];
 const praiseAudio = PRAISE_SOUNDS.map(src => {
   try {
@@ -1414,18 +1414,76 @@ const praiseAudio = PRAISE_SOUNDS.map(src => {
     return a;
   } catch(e){ return null; }
 });
+/* Dedicated clap clip — plays on every point-plus. Single shared element so
+   spam clicks restart it instead of stacking/overlapping. */
+let clapAudio = null;
+try {
+  clapAudio = new Audio('Clapping Sound.mp3');
+  clapAudio.preload = 'auto';
+  clapAudio.load();
+} catch(e){ clapAudio = null; }
+/* Stop every point sound (all praise voices + clap). Spam-safe: pause + rewind
+   so the next play() always starts over with zero overlap. */
+function stopPointSounds(){
+  try{
+    praiseAudio.forEach(a=>{ if(!a) return; try{ a.pause(); a.currentTime = 0; }catch(e){} });
+  }catch(e){}
+  try{
+    if(clapAudio){ try{ clapAudio.pause(); clapAudio.currentTime = 0; }catch(e){} }
+  }catch(e){}
+}
 function playRandomPraise(){
   if(!SFX.enabled) return true; // muted — caller should skip fallback synth too
   try{
     SFX.ensure(); // unlock audio on first user gesture
     const pool = praiseAudio.filter(Boolean);
     if(!pool.length) return false;
+    stopPointSounds(); // kill any still-playing praise/clap so spam restarts clean
     const idx = Math.floor(Math.random() * pool.length);
     const a = pool[idx];
-    try{ a.pause(); a.currentTime = 0; }catch(e){}
     const p = a.play();
     if(p && p.catch) p.catch(()=>{ try{ SFX.celebrate(false); }catch(e){} });
     return true;
+  }catch(e){ return false; }
+}
+/* Play just the clap clip with stop-and-restart (no overlap on spam). */
+function playClapSound(){
+  if(!SFX.enabled) return true;
+  try{
+    SFX.ensure();
+    if(!clapAudio) return false;
+    stopPointSounds();
+    const p = clapAudio.play();
+    if(p && p.catch) p.catch(()=>{});
+    return true;
+  }catch(e){ return false; }
+}
+/* Full +1 celebration: clap every time + a random praise voice on top.
+   One stop up-front, then both start together — rapid clicks stop both and
+   start both over, never stacking. Returns true if any clip played. */
+function playPositiveSound(){
+  if(!SFX.enabled) return true;
+  try{
+    SFX.ensure();
+    stopPointSounds();
+    let played = false;
+    try{
+      if(clapAudio){
+        const p1 = clapAudio.play();
+        if(p1 && p1.catch) p1.catch(()=>{});
+        played = true;
+      }
+    }catch(e){}
+    try{
+      const pool = praiseAudio.filter(Boolean);
+      if(pool.length){
+        const a = pool[Math.floor(Math.random() * pool.length)];
+        const p2 = a.play();
+        if(p2 && p2.catch) p2.catch(()=>{});
+        played = true;
+      }
+    }catch(e){}
+    return played;
   }catch(e){ return false; }
 }
 /* ---------- Light-but-festive confetti (lag-free) ---------- */
@@ -1455,16 +1513,16 @@ function bigCelebrationConfetti(big){
     }, 400);
   }catch(e){}
 }
-function playPositive(){ if(!playRandomPraise()) SFX.celebrate(false); bigCelebrationConfetti(false); }
+function playPositive(){ if(!playPositiveSound()) SFX.celebrate(false); bigCelebrationConfetti(false); }
 function playNegative(){ SFX.bad(); triggerMinusAlert(); }
 function playClick(){ SFX.click(); }
 function playTick(){ SFX.tick(); }
 function playFanfare(){ SFX.fanfare(); }
 function toggleSound(preview){
-  if(typeof preview==='boolean' && preview){ SFX.ensure(); if(!playRandomPraise()) SFX.celebrate(false); bigCelebrationConfetti(false); toast('🔊 Sounds are on! 👏🎉'); return; }
+  if(typeof preview==='boolean' && preview){ SFX.ensure(); if(!playPositiveSound()) SFX.celebrate(false); bigCelebrationConfetti(false); toast('🔊 Sounds are on! 👏🎉'); return; }
   SFX.enabled = !SFX.enabled; SFX.save(); refreshSoundUI();
-  if(SFX.enabled){ if(!playRandomPraise()) SFX.celebrate(false); bigCelebrationConfetti(false); toast('🔊 Sound effects on 👏'); }
-  else { toast('🔇 Sound effects off'); }
+  if(SFX.enabled){ if(!playPositiveSound()) SFX.celebrate(false); bigCelebrationConfetti(false); toast('🔊 Sound effects on 👏'); }
+  else { try{ stopPointSounds(); }catch(e){} toast('🔇 Sound effects off'); }
   if(window.lucide) lucide.createIcons();
 }
 function refreshSoundUI(){
@@ -1854,7 +1912,7 @@ function doAwardEveryone(instant){
   if(!kids.length) return;
   kids.forEach(s=>{ s.points=(s.points||0)+1; });
   state.pointsHistory.push({ id: uid(), studentId:'system', classroomId: state.selectedClassroom, studentName:'Everyone', type:'positive', behavior: instant ? 'Whole-class praise (instant ⚡)' : 'Whole-class praise', delta: kids.length, timestamp: Date.now() });
-  saveState(); renderAll(); if(!playRandomPraise()) SFX.celebrate(true);
+  saveState(); renderAll(); if(!playPositiveSound()) SFX.celebrate(true);
   bigCelebrationConfetti(true);
   toast(instant ? 'Whole class +1 instantly! ⚡🎉👏' : 'Whole class +1! 🎉👏 Well done!');
   // staggered wave of color animations across all tiles
@@ -2172,9 +2230,9 @@ function applyPoints(studentId, delta, behavior, type){
   // re-grab card after renders that don't touch grid (grid isn't re-rendered here, so same node)
   const tile = document.getElementById('card-'+s.id) || card;
   refreshAwardPoints();
-  if(delta>0){ if(!playRandomPraise()) SFX.celebrate(delta>=2); bigCelebrationConfetti(delta>=2);
+  if(delta>0){ if(!playPositiveSound()) SFX.celebrate(delta>=2); bigCelebrationConfetti(delta>=2);
     if(tile){ tile.classList.remove('flash-pos','celebrate','shake','flash-neg'); void tile.offsetWidth; tile.classList.add('flash-pos'); spawnFloater(tile, '+'+delta, true); setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 750); } }
-  else if(delta<0){ SFX.bad(); triggerMinusAlert();
+  else if(delta<0){ try{ stopPointSounds(); }catch(e){} SFX.bad(); triggerMinusAlert();
     if(tile){ tile.classList.remove('shake','flash-neg','flash-pos','celebrate'); void tile.offsetWidth; tile.classList.add('flash-neg','shake'); spawnFloater(tile, ''+delta, false); spawnSweat(tile); setTimeout(()=>tile.classList.remove('flash-neg','shake'), 800); } }
   else { SFX.pop(); }
   showBanner(s, delta, behavior);
