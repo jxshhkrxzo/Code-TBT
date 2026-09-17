@@ -115,6 +115,16 @@ tailwind.config = {
   .dojo-pts { position:absolute; top:8px; right:8px; min-width:30px; height:30px; padding:0 7px; border-radius:999px; background:linear-gradient(180deg,#8ADD5B,#5FBF2E); color:#fff; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(122,199,79,.45), 0 0 0 2px rgba(255,255,255,.7) inset; z-index:2; }
   .dojo-pts.neg { background:linear-gradient(180deg,#FB7185,#E11D48); box-shadow:0 3px 8px rgba(244,63,94,.4); }
   .dojo-pts.zero { background:#CBD5E1; box-shadow:none; }
+  .dojo-pts.gold { background:linear-gradient(180deg,#FDE68A,#F59E0B 55%,#B45309); box-shadow:0 3px 10px rgba(217,119,6,.55), 0 0 0 2px rgba(255,255,255,.8) inset, 0 0 12px rgba(251,191,36,.7); }
+  .dojo-pts.royal { background:linear-gradient(180deg,#8B5CF6,#6D28D9 55%,#4C1D95); box-shadow:0 3px 12px rgba(109,40,217,.6), 0 0 0 2px rgba(255,255,255,.8) inset, 0 0 14px rgba(139,92,246,.8); }
+  .dojo-pts.rainbow { background:linear-gradient(90deg,#EF4444,#F59E0B,#FACC15,#22C55E,#3B82F6,#8B5CF6,#EC4899,#EF4444); background-size:300% 100%; animation:rainbowShift 0.9s linear infinite; box-shadow:0 3px 12px rgba(236,72,153,.6), 0 0 0 2px rgba(255,255,255,.85) inset, 0 0 16px rgba(139,92,246,.8); }
+  @keyframes rainbowShift { to { background-position:300% 0; } }
+  .dojo-tile.rainbow-tile { border-color:#EC4899 !important; box-shadow:0 8px 30px rgba(236,72,153,.45), 0 0 18px rgba(139,92,246,.45); }
+  .dojo-tile.leader-tile { border-color:#F59E0B !important; }
+  .dojo-tile.royal-tile { border-color:#7C3AED !important; box-shadow:0 8px 26px rgba(124,58,237,.35); }
+  .avatar-wrap { position:relative; display:flex; justify-content:center; }
+  .crown-badge { position:absolute; top:-18px; left:50%; transform:translateX(-50%) rotate(-8deg); font-size:26px; line-height:1; z-index:3; pointer-events:none; animation:crownBob 1.6s ease-in-out infinite; filter:drop-shadow(0 3px 3px rgba(0,0,0,.3)); }
+  @keyframes crownBob { 0%,100%{ transform:translateX(-50%) rotate(-8deg) translateY(0);} 50%{ transform:translateX(-50%) rotate(-4deg) translateY(-3px);} }
   .dojo-name { margin-top:8px; font-weight:800; font-size:13.5px; color:#0C4A6E; text-align:center; line-height:1.2; }
   html.dark .dojo-name { color:#E2E8F0; }
   .dojo-add { border-style:dashed !important; border-color:#38BDF8 !important; color:#0284C7; background:linear-gradient(180deg,#F0F9FF,#E0F2FE) !important; }
@@ -145,6 +155,21 @@ tailwind.config = {
   .float-plus { position:absolute; left:50%; top:34px; z-index:5; font-weight:900; font-size:20px; pointer-events:none; animation: floatUp 1s ease-out forwards; text-shadow:0 2px 8px rgba(0,0,0,.25); }
   .float-plus.pos { color:#10B981; }
   .float-plus.neg { color:#F43F5E; }
+
+  /* ---------- Aggressive MINUS feedback ---------- */
+  @keyframes shakeHard { 0%,100%{transform:translateX(0) rotate(0)} 15%{transform:translateX(-10px) rotate(-1.5deg)} 30%{transform:translateX(9px) rotate(1.2deg)} 45%{transform:translateX(-7px) rotate(-1deg)} 60%{transform:translateX(6px) rotate(1deg)} 75%{transform:translateX(-4px)} 90%{transform:translateX(3px)} }
+  @keyframes glowNegHard { 0%{ box-shadow:0 0 0 0 rgba(220,38,38,0);} 25%{ box-shadow:0 0 0 10px rgba(220,38,38,.55), 0 14px 34px rgba(220,38,38,.45);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
+  .dojo-tile.flash-neg { animation: shakeHard .5s ease, glowNegHard .8s ease; border-color:#DC2626 !important; }
+  .dojo-tile.shake { animation: shakeHard .5s ease; }
+  /* sweat drop that drips off the character */
+  .sweat-drop { position:absolute; top:14px; right:38px; z-index:6; font-size:24px; line-height:1; pointer-events:none; animation: sweatFall 1.2s ease-in forwards; filter: drop-shadow(0 2px 3px rgba(2,132,199,.4)); }
+  @keyframes sweatFall { 0%{opacity:0; transform:translateY(-10px) scale(.5);} 18%{opacity:1; transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0; transform:translateY(30px) scale(1.15);} }
+  /* full-screen red outline flash */
+  #minusFlash { position:fixed; inset:0; z-index:200; pointer-events:none; opacity:0; border:8px solid #DC2626; box-shadow: inset 0 0 0 4px rgba(255,255,255,.35), inset 0 0 70px rgba(220,38,38,.65), 0 0 40px rgba(220,38,38,.5); border-radius:6px; }
+  #minusFlash.on { animation: redPulse .75s ease forwards; }
+  @keyframes redPulse { 0%{opacity:0;} 12%{opacity:1;} 70%{opacity:1;} 100%{opacity:0;} }
+  body.screen-shake { animation: screenShake .45s ease; }
+  @keyframes screenShake { 0%,100%{transform:translate(0)} 20%{transform:translate(-7px,2px)} 40%{transform:translate(6px,-2px)} 60%{transform:translate(-4px,1px)} 80%{transform:translate(3px,-1px)} }
 
   /* ---------- Navigation polish ---------- */
   html { scroll-behavior: smooth; }
@@ -207,6 +232,9 @@ tailwind.config = {
 </style>
 </head>
 <body class="text-slate-800 overflow-x-hidden">
+
+<!-- aggressive minus red screen outline -->
+<div id="minusFlash"></div>
 
 <!-- ambient blobs -->
 <div class="blob w-[440px] h-[440px] bg-sky-300 -top-24 -left-24"></div>
@@ -751,6 +779,9 @@ tailwind.config = {
       </div>
     </div>
     <div id="awardBehaviors" class="px-4 pb-2 grid grid-cols-2 gap-2.5 overflow-y-auto"></div>
+    <div class="px-4 pb-1">
+      <button onclick="openCustomBehaviorModal()" class="w-full rounded-2xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-600 font-extrabold text-[13px] py-2.5 flex items-center justify-center gap-2 transition-all active:scale-[.98]"><i data-lucide="plus" class="w-4 h-4"></i> Create custom</button>
+    </div>
     <div class="p-4 pt-2">
       <div class="bg-indigo-50 rounded-2xl p-3 flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0"><i data-lucide="zap" class="w-4 h-4"></i></div>
@@ -760,6 +791,46 @@ tailwind.config = {
         </div>
         <button onclick="quickAward(1)" class="w-11 h-11 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg shadow-md active:scale-90 transition-all">+1</button>
         <button onclick="quickAward(-1)" class="w-11 h-11 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-lg shadow-md active:scale-90 transition-all">−1</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CUSTOM BEHAVIOR MODAL ============ -->
+<div id="customBehaviorModal" class="fixed inset-0 z-[88] flex items-end sm:items-center justify-center sm:p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeCustomBehaviorModal()"></div>
+  <div class="modal-panel relative w-full sm:max-w-[380px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden">
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white">
+      <div class="flex items-center justify-between">
+        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5"></i> Create custom</h3>
+        <button onclick="closeCustomBehaviorModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+    <div class="p-5 space-y-4">
+      <div class="grid grid-cols-2 gap-1.5 bg-slate-100 rounded-2xl p-1.5">
+        <button id="customTypePos" onclick="setCustomType('positive')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-emerald-600 shadow transition-all flex items-center justify-center gap-1.5"><i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> Positive</button>
+        <button id="customTypeNeg" onclick="setCustomType('needs-work')" class="rounded-xl py-2 text-[12px] font-extrabold text-slate-500 transition-all flex items-center justify-center gap-1.5"><i data-lucide="thumbs-down" class="w-3.5 h-3.5"></i> Needs Work</button>
+      </div>
+      <div>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Name</label>
+        <input id="customBehaviorLabel" type="text" placeholder="e.g. Amazing Homework" maxlength="30" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all" />
+      </div>
+      <div>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Points (no limit — tap or type any number)</label>
+        <div class="mt-1 flex items-center gap-2">
+          <button onclick="stepCustomPoints(-1)" class="w-12 h-12 rounded-2xl bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-500 font-black text-xl transition-all active:scale-90">−</button>
+          <div id="customPointsPreview" class="flex-1 text-center bg-slate-50 border-2 border-slate-100 rounded-2xl py-2.5 font-black text-xl text-emerald-600">+2</div>
+          <button onclick="stepCustomPoints(1)" class="w-12 h-12 rounded-2xl bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-600 font-black text-xl transition-all active:scale-90">+</button>
+        </div>
+        <div class="mt-2 flex items-center gap-2">
+          <button onclick="stepCustomPoints(-10)" class="flex-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 font-extrabold text-[12px] py-2 transition-all active:scale-95">−10</button>
+          <button onclick="stepCustomPoints(10)" class="flex-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 font-extrabold text-[12px] py-2 transition-all active:scale-95">+10</button>
+        </div>
+        <input id="customBehaviorPoints" type="number" step="1" value="2" class="mt-2 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-2.5 text-sm font-bold outline-none transition-all text-center" oninput="syncCustomPointsFromInput()" />
+      </div>
+      <div class="flex gap-2">
+        <button onclick="closeCustomBehaviorModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all">Cancel</button>
+        <button onclick="saveCustomBehavior()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Save custom</button>
       </div>
     </div>
   </div>
@@ -1024,6 +1095,7 @@ const NEEDS_WORK_BEHAVIORS = [
 let state = null;
 let selectedStudentId = null;
 let awardTab = 'positive';
+let stagedCustomType = 'positive';
 let editingStudentId = null;
 let stagedPhoto = null; // base64 staged in student modal
 let stagedColor = 0; // legacy, kept for migration
@@ -1064,7 +1136,7 @@ function fmtClock(sec){
 /* ---------- Mock data ---------- */
 function mockData(){
   // Start blank — no demo classes or students. Teacher creates their own.
-  return { classrooms:[], students:[], pointsHistory:[], selectedClassroom: null };
+  return { classrooms:[], students:[], pointsHistory:[], selectedClassroom: null, customBehaviors: [] };
 }
 
 /* ---------- Persistence ---------- */
@@ -1084,6 +1156,7 @@ function loadState(){
     const parsed = JSON.parse(raw);
     if(!parsed.classrooms || !parsed.students || !parsed.pointsHistory){ state = mockData(); saveState(); return; }
     state = parsed;
+    if(!Array.isArray(state.customBehaviors)) state.customBehaviors = [];
     if(!state.classrooms.find(c=>c.id===state.selectedClassroom)){
       state.selectedClassroom = state.classrooms[0]?.id || null;
     }
@@ -1162,25 +1235,235 @@ const SFX = {
   success(){ this.tone(660,0,.12,'sine',.45); this.tone(880,.09,.16,'sine',.45); this.tone(1320,.18,.22,'triangle',.35); this.noise(.18,.15,.18); },
   coin(){ this.tone(988,0,.08,'square',.30); this.tone(1319,.08,.28,'square',.28); },
   error(){ this.tone(220,0,.2,'sawtooth',.32); this.tone(160,.1,.26,'sawtooth',.30); },
+  /* ----- Aggressive LOUD minus-point buzzer (game-show wrong answer) ----- */
+  bad(){
+    if(!this.enabled) return;
+    const ctx = this.ensure(); if(!ctx) return;
+    try{
+      // Harsh dissonant blast: two clashing low squares + descending buzz — MUCH louder (vol ~0.8)
+      this.tone(196, 0, .38, 'square', 0.80);
+      this.tone(185, 0, .38, 'sawtooth', 0.80);
+      this.tone(147, .05, .5, 'square', 0.90, 82);
+      this.tone(110, .05, .55, 'sawtooth', 0.85, 55);
+      this.tone(233, 0, .3, 'square', 0.60, 116);
+      this.tone(220, .32, .28, 'square', 0.75, 98);
+      this.noise(0, .35, 0.50);
+      this.noise(.3, .25, 0.40);
+      try{ if(navigator.vibrate) navigator.vibrate([120, 60, 120]); }catch(e){}
+    }catch(e){}
+  },
   pop(){ this.tone(300,0,.12,'sine',.45,900); },
   whoosh(){ this.noise(0,.22,.32); this.tone(300,0,.2,'sine',.25,900); },
   tick(){ this.tone(980,0,.05,'square',.22); },
   drum(){ this.tone(150,0,.12,'sine',.50,60); this.noise(0,.08,.30); },
   fanfare(){ [523,659,784,1046,1319].forEach((f,i)=>this.tone(f,i*.1,.22,'triangle',.40)); this.noise(.4,.3,.22); },
   tada(){ [523,523,523,659,784,1046].forEach((f,i)=>this.tone(f,i*.09,.16,'square',.28)); },
+  /* ----- Real hand-claps: short snappy transients, not noise wash ----- */
+  applause(dur){
+    if(!this.enabled) return;
+    const ctx = this.ensure(); if(!ctx) return;
+    try{
+      dur = dur || 1.8;
+      const now = ctx.currentTime;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.ratio.value = 6;
+      comp.connect(ctx.destination);
+      const singleHit = (t, vol, freq, pan)=>{
+        // Very short snap (18-30ms) with hard decay = the "crack" of a clap
+        const hitDur = 0.018 + Math.random()*0.012;
+        const len = Math.max(1, Math.floor(ctx.sampleRate * hitDur));
+        const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for(let j=0;j<len;j++){
+          const p = j/len;
+          d[j] = (Math.random()*2-1) * Math.pow(1-p, 2.5);
+        }
+        const src = ctx.createBufferSource(); src.buffer = buf;
+        const bp = ctx.createBiquadFilter(); bp.type='bandpass';
+        bp.frequency.value = freq; bp.Q.value = 1.8 + Math.random()*0.8;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(vol, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + hitDur + 0.02);
+        src.connect(bp); bp.connect(g);
+        try{
+          if(ctx.createStereoPanner){
+            const p = ctx.createStereoPanner(); p.pan.value = pan;
+            g.connect(p); p.connect(comp);
+          } else { g.connect(comp); }
+        }catch(e){ g.connect(comp); }
+        src.start(t);
+      };
+      const claps = 55;
+      for(let i=0;i<claps;i++){
+        const t0 = now + Math.pow(Math.random(), 0.65) * dur;
+        const baseFreq = 1700 + Math.random()*1400;
+        const baseVol = 0.25 + Math.random()*0.35;
+        const pan = Math.random()*1.6 - 0.8;
+        // A real clap is 2-3 ultra-fast slaps, not one smooth burst
+        singleHit(t0, baseVol, baseFreq, pan);
+        singleHit(t0 + 0.009 + Math.random()*0.006, baseVol*0.6, baseFreq*(0.9+Math.random()*0.2), pan);
+        if(Math.random() < 0.6) singleHit(t0 + 0.02 + Math.random()*0.008, baseVol*0.4, baseFreq*(0.85+Math.random()*0.3), pan);
+      }
+    }catch(e){}
+  },
+  /* ----- Clear "yay / woo" crowd cheer with vowel formants + whistles ----- */
+  cheer(dur){
+    if(!this.enabled) return;
+    const ctx = this.ensure(); if(!ctx) return;
+    try{
+      dur = dur || 2.0;
+      const now = ctx.currentTime;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -20; comp.ratio.value = 5;
+      comp.connect(ctx.destination);
+      // Soft crowd bed, kept quiet so the shouts stay clear and audible
+      const bedLen = Math.max(1, Math.floor(ctx.sampleRate * dur));
+      const bedBuf = ctx.createBuffer(1, bedLen, ctx.sampleRate);
+      const bd = bedBuf.getChannelData(0);
+      for(let i=0;i<bedLen;i++){
+        const p = i/bedLen;
+        const env = p<0.12 ? p/0.12 : p>0.75 ? (1-p)/0.25 : 1;
+        bd[i] = (Math.random()*2-1) * env * 0.5;
+      }
+      const bedSrc = ctx.createBufferSource(); bedSrc.buffer = bedBuf;
+      const bedF = ctx.createBiquadFilter(); bedF.type='bandpass'; bedF.frequency.value = 1000; bedF.Q.value = 0.6;
+      const bedG = ctx.createGain(); bedG.gain.value = 0.10;
+      bedSrc.connect(bedF); bedF.connect(bedG); bedG.connect(comp);
+      bedSrc.start(now + 0.05);
+      // Foreground shouts: distinct rising "yay!" / "woo!" voices with vowel color
+      const shouts = 11;
+      const vowels = [
+        { f: 850, Q: 2.2 },
+        { f: 1250, Q: 2.5 },
+        { f: 650, Q: 2.0 },
+        { f: 1050, Q: 2.4 },
+      ];
+      for(let i=0;i<shouts;i++){
+        const t0 = now + 0.05 + Math.random()*(dur*0.55);
+        const vd = 0.35 + Math.random()*0.35;
+        const vow = vowels[Math.floor(Math.random()*vowels.length)];
+        const rising = Math.random() < 0.7;
+        const f0 = 280 + Math.random()*220;
+        const f1 = rising ? f0*(1.5+Math.random()*0.4) : f0*(0.85+Math.random()*0.2);
+        const o = ctx.createOscillator(); o.type='sawtooth';
+        o.frequency.setValueAtTime(f0, t0);
+        o.frequency.exponentialRampToValueAtTime(Math.max(60, f1), t0 + vd);
+        const formant = ctx.createBiquadFilter(); formant.type='bandpass';
+        formant.frequency.setValueAtTime(vow.f, t0);
+        formant.frequency.exponentialRampToValueAtTime(vow.f*1.15, t0 + vd);
+        formant.Q.value = vow.Q;
+        const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value = 250;
+        const g = ctx.createGain();
+        const peak = 0.10 + Math.random()*0.06;
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(peak, t0 + 0.06);
+        g.gain.setValueAtTime(peak, t0 + vd*0.6);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + vd);
+        const vib = ctx.createOscillator(); vib.frequency.value = 5.5 + Math.random()*2.5;
+        const vibG = ctx.createGain(); vibG.gain.value = 18 + Math.random()*14;
+        vib.connect(vibG); vibG.connect(o.frequency);
+        o.connect(formant); formant.connect(hp); hp.connect(g);
+        try{
+          if(ctx.createStereoPanner){
+            const pn = ctx.createStereoPanner(); pn.pan.value = Math.random()*1.4 - 0.7;
+            g.connect(pn); pn.connect(comp);
+          } else { g.connect(comp); }
+        }catch(e){ g.connect(comp); }
+        o.start(t0); o.stop(t0 + vd + 0.05);
+        vib.start(t0); vib.stop(t0 + vd + 0.05);
+      }
+      // 2 bright stadium whistles on top for extra clarity
+      for(let i=0;i<2;i++){
+        const t0 = now + 0.2 + Math.random()*0.8;
+        const wd = 0.5 + Math.random()*0.3;
+        const o = ctx.createOscillator(); o.type='sine';
+        const f0 = 2100 + Math.random()*600;
+        o.frequency.setValueAtTime(f0, t0);
+        o.frequency.linearRampToValueAtTime(f0 + 300, t0 + wd);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.035, t0 + 0.08);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + wd);
+        const vib = ctx.createOscillator(); vib.frequency.value = 7;
+        const vibG = ctx.createGain(); vibG.gain.value = 80;
+        vib.connect(vibG); vibG.connect(o.frequency);
+        o.connect(g); g.connect(comp);
+        o.start(t0); o.stop(t0 + wd + 0.05);
+        vib.start(t0); vib.stop(t0 + wd + 0.05);
+      }
+    }catch(e){}
+  },
+  /* ----- Full add-point celebration: clapping only ----- */
+  celebrate(big){
+    if(!this.enabled) return;
+    this.applause(big ? 2.2 : 1.8);
+    this.tone(880,0.05,0.15,'triangle',0.18);
+    this.tone(1175,0.18,0.2,'triangle',0.16);
+  },
 };
 SFX.load();
 let audioCtx = null; // legacy alias (SFX owns the context now)
 function tone(freq, t0, dur, type, vol){ SFX.tone(freq, t0, dur, type, vol); }
-function playPositive(){ SFX.success(); }
-function playNegative(){ SFX.error(); }
+/* ---------- Praise voice clips for +1 (random every time) ---------- */
+const PRAISE_SOUNDS = ['Amazing.mp3', 'Great Job.mp3', 'Well Done.mp3'];
+const praiseAudio = PRAISE_SOUNDS.map(src => {
+  try {
+    const a = new Audio(src);
+    a.preload = 'auto';
+    a.load();
+    return a;
+  } catch(e){ return null; }
+});
+function playRandomPraise(){
+  if(!SFX.enabled) return true; // muted — caller should skip fallback synth too
+  try{
+    SFX.ensure(); // unlock audio on first user gesture
+    const pool = praiseAudio.filter(Boolean);
+    if(!pool.length) return false;
+    const idx = Math.floor(Math.random() * pool.length);
+    const a = pool[idx];
+    try{ a.pause(); a.currentTime = 0; }catch(e){}
+    const p = a.play();
+    if(p && p.catch) p.catch(()=>{ try{ SFX.celebrate(false); }catch(e){} });
+    return true;
+  }catch(e){ return false; }
+}
+/* ---------- Light-but-festive confetti (lag-free) ---------- */
+let lastConfettiAt = 0;
+function bigCelebrationConfetti(big){
+  if(!window.confetti) return;
+  try{
+    const now = Date.now();
+    // Anti-spam: rapid +1 clicks only get one tiny pop instead of stacking full shows
+    if(now - lastConfettiAt < 450){
+      window.confetti({ particleCount: 25, spread: 60, startVelocity: 28, scalar: 0.85, ticks: 120, gravity: 1.1, disableForReducedMotion: true, zIndex: 200, origin: { y: 0.6 } });
+      return;
+    }
+    lastConfettiAt = now;
+    const colors = ['#4F46E5','#0EA5E9','#10B981','#FBBF24','#F43F5E','#A855F7','#22D3EE'];
+    const base = { colors: colors, disableForReducedMotion: true, zIndex: 200, gravity: 1.1, ticks: 150 };
+    // Burst 1: main pop — still big, but ~50% fewer particles, smaller + shorter-lived
+    window.confetti(Object.assign({}, base, { particleCount: big?130:85, spread: 90, startVelocity: 38, scalar: 0.9, origin: { y: 0.6 } }));
+    // Burst 2: side cannons, single timeout
+    setTimeout(function(){
+      window.confetti(Object.assign({}, base, { particleCount: big?45:30, angle: 60, spread: 55, startVelocity: 32, scalar: 0.85, origin: { x: 0, y: 0.7 } }));
+      window.confetti(Object.assign({}, base, { particleCount: big?45:30, angle: 120, spread: 55, startVelocity: 32, scalar: 0.85, origin: { x: 1, y: 0.7 } }));
+    }, 180);
+    // Burst 3: final sprinkle (skipped on spam, lighter on normal)
+    setTimeout(function(){
+      window.confetti(Object.assign({}, base, { particleCount: big?70:45, spread: 110, startVelocity: 28, scalar: 0.8, origin: { y: 0.5 } }));
+    }, 400);
+  }catch(e){}
+}
+function playPositive(){ if(!playRandomPraise()) SFX.celebrate(false); bigCelebrationConfetti(false); }
+function playNegative(){ SFX.bad(); triggerMinusAlert(); }
 function playClick(){ SFX.click(); }
 function playTick(){ SFX.tick(); }
 function playFanfare(){ SFX.fanfare(); }
 function toggleSound(preview){
-  if(typeof preview==='boolean' && preview){ SFX.ensure(); SFX.success(); toast('🔊 Sounds are on!'); return; }
+  if(typeof preview==='boolean' && preview){ SFX.ensure(); if(!playRandomPraise()) SFX.celebrate(false); bigCelebrationConfetti(false); toast('🔊 Sounds are on! 👏🎉'); return; }
   SFX.enabled = !SFX.enabled; SFX.save(); refreshSoundUI();
-  if(SFX.enabled){ SFX.success(); toast('🔊 Sound effects on'); }
+  if(SFX.enabled){ if(!playRandomPraise()) SFX.celebrate(false); bigCelebrationConfetti(false); toast('🔊 Sound effects on 👏'); }
   else { toast('🔇 Sound effects off'); }
   if(window.lucide) lucide.createIcons();
 }
@@ -1449,6 +1732,48 @@ function dojoBadge(p){
   const cls = p>0 ? '' : p<0 ? 'neg' : 'zero';
   return '<div class="dojo-pts '+cls+'" id="pill-'+'X'+'">'+p+'</div>';
 }
+/* ---------- Leader (gold) + Royal 20+ (deep purple + crown) + Rainbow 50+ ---------- */
+function classMaxPoints(){
+  const kids = activeStudents();
+  return kids.length ? Math.max.apply(null, kids.map(k=>k.points||0)) : 0;
+}
+function badgeClassFor(p, max){
+  if(p < 0) return 'neg';
+  if(p === 0) return 'zero';
+  if(p >= 50) return 'rainbow';
+  if(p >= 20) return 'royal';
+  if(p === max && p > 0) return 'gold';
+  return '';
+}
+/* Refresh every tile's badge + crown live (leadership can change for others too) */
+function refreshLeaderBadges(popId){
+  try{
+    const max = classMaxPoints();
+    activeStudents().forEach(st=>{
+      const p = st.points || 0;
+      const pill = document.getElementById('pill-' + st.id);
+      if(pill){
+        pill.textContent = p;
+        pill.classList.remove('neg','zero','gold','royal','rainbow','badge-pop');
+        const c = badgeClassFor(p, max);
+        if(c) pill.classList.add(c);
+        if(popId && st.id === popId){ void pill.offsetWidth; pill.classList.add('badge-pop'); }
+      }
+      const card = document.getElementById('card-' + st.id);
+      if(card){
+        card.classList.remove('leader-tile','royal-tile','rainbow-tile');
+        if(p >= 50) card.classList.add('rainbow-tile');
+        else if(p >= 20) card.classList.add('royal-tile');
+        else if(p === max && p > 0) card.classList.add('leader-tile');
+        let crown = card.querySelector('.crown-badge');
+        if(p >= 20 && !crown){
+          const wrap = card.querySelector('.avatar-wrap');
+          if(wrap){ crown = document.createElement('div'); crown.className = 'crown-badge'; crown.textContent = '👑'; wrap.prepend(crown); }
+        } else if(p < 20 && crown){ crown.remove(); }
+      }
+    });
+  }catch(e){}
+}
 function renderGrid(){
   const grid = document.getElementById('studentGrid');
   const empty = document.getElementById('emptyGrid');
@@ -1479,11 +1804,16 @@ function renderGrid(){
     if(window.lucide) lucide.createIcons(); renderDojoPills(); return;
   }
   if(!kids.length){ grid.innerHTML = '<div class="col-span-full text-center py-10 font-bold text-slate-400">No monsters match “'+esc(q)+'”. Try another search 🔍</div>'; if(window.lucide) lucide.createIcons(); return; }
+  const max = classMaxPoints();
   const tiles = kids.map(s=>{
     const p = s.points||0;
-    const badge = p>0 ? '' : p<0 ? 'neg' : 'zero';
-    const monster = s.photo ? '<img src="'+s.photo+'" class="w-[76px] h-[76px] rounded-2xl object-cover border-2 border-slate-100" alt=""/>' : '<div class="w-[84px] h-[84px]">'+chubbySVG(monsterSeedFor(s))+'</div>';
-    return '<div id="card-'+s.id+'" onclick="openAwardModal(\''+s.id+'\')" class="dojo-tile group">'
+    const badge = badgeClassFor(p, max);
+    const royal = p >= 20;
+    const tileCls = badge === 'rainbow' ? ' rainbow-tile' : (royal ? ' royal-tile' : (badge === 'gold' ? ' leader-tile' : ''));
+    const crown = royal ? '<div class="crown-badge">👑</div>' : '';
+    const monsterInner = s.photo ? '<img src="'+s.photo+'" class="w-[76px] h-[76px] rounded-2xl object-cover border-2 border-slate-100" alt=""/>' : '<div class="w-[84px] h-[84px]">'+chubbySVG(monsterSeedFor(s))+'</div>';
+    const monster = '<div class="avatar-wrap">' + crown + monsterInner + '</div>';
+    return '<div id="card-'+s.id+'" onclick="openAwardModal(\''+s.id+'\')" class="dojo-tile group'+tileCls+'">'
       + '<div class="dojo-pts '+badge+'" id="pill-'+s.id+'">'+p+'</div>'
       + '<button title="Edit" onclick="event.stopPropagation(); openStudentModal(\''+s.id+'\')" class="absolute top-2 left-2 w-7 h-7 rounded-lg bg-slate-100/90 text-slate-400 hover:bg-indigo-100 hover:text-indigo-600 items-center justify-center hidden group-hover:flex z-10"><i data-lucide="pencil" class="w-3.5 h-3.5 pointer-events-none"></i></button>'
       + monster
@@ -1524,9 +1854,9 @@ function doAwardEveryone(instant){
   if(!kids.length) return;
   kids.forEach(s=>{ s.points=(s.points||0)+1; });
   state.pointsHistory.push({ id: uid(), studentId:'system', classroomId: state.selectedClassroom, studentName:'Everyone', type:'positive', behavior: instant ? 'Whole-class praise (instant ⚡)' : 'Whole-class praise', delta: kids.length, timestamp: Date.now() });
-  saveState(); renderAll(); SFX.success();
-  if(window.confetti) confetti({particleCount: instant?160:120, spread:95, origin:{y:.6}});
-  toast(instant ? 'Whole class +1 instantly! ⚡🎉' : 'Whole class +1! 🎉');
+  saveState(); renderAll(); if(!playRandomPraise()) SFX.celebrate(true);
+  bigCelebrationConfetti(true);
+  toast(instant ? 'Whole class +1 instantly! ⚡🎉👏' : 'Whole class +1! 🎉👏 Well done!');
   // staggered wave of color animations across all tiles
   const tiles = Array.from(document.querySelectorAll('[id^="card-"]'));
   tiles.forEach((tile, i)=>{
@@ -1547,6 +1877,32 @@ function spawnFloater(tile, text, pos){
     f.textContent = text;
     tile.appendChild(f);
     setTimeout(()=>f.remove(), 1050);
+  }catch(e){}
+}
+/* ----- Aggressive minus: full-screen red outline + shake ----- */
+function triggerMinusAlert(){
+  try{
+    const flash = document.getElementById('minusFlash');
+    if(flash){
+      flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+      clearTimeout(triggerMinusAlert._t);
+      triggerMinusAlert._t = setTimeout(()=>flash.classList.remove('on'), 800);
+    }
+    document.body.classList.remove('screen-shake'); void document.body.offsetWidth;
+    document.body.classList.add('screen-shake');
+    setTimeout(()=>document.body.classList.remove('screen-shake'), 500);
+  }catch(e){}
+}
+/* ----- Little sweat drop on the character ----- */
+function spawnSweat(tile){
+  try{
+    if(!tile) return;
+    tile.querySelectorAll('.sweat-drop').forEach(el=>el.remove());
+    const d = document.createElement('div');
+    d.className = 'sweat-drop';
+    d.textContent = '💧';
+    tile.appendChild(d);
+    setTimeout(()=>d.remove(), 1250);
   }catch(e){}
 }
 function setClassTab(t){
@@ -1700,28 +2056,105 @@ function refreshAwardPoints(){
   el.textContent = s.points + ' pts';
   el.classList.remove('points-bump'); void el.offsetWidth; el.classList.add('points-bump');
 }
+function getBehaviorList(type){
+  const base = type==='positive' ? POSITIVE_BEHAVIORS : NEEDS_WORK_BEHAVIORS;
+  const customs = (state.customBehaviors||[]).filter(b=> type==='positive' ? b.points>0 : b.points<0);
+  return base.concat(customs);
+}
 function setAwardTab(t){
   awardTab = t;
   const pos = t==='positive';
   document.getElementById('awardTabPos').className = 'tab-btn rounded-xl py-2.5 text-sm font-extrabold flex items-center justify-center gap-2 ' + (pos?'bg-white shadow text-emerald-600':'text-slate-500');
   document.getElementById('awardTabNeg').className = 'tab-btn rounded-xl py-2.5 text-sm font-extrabold flex items-center justify-center gap-2 ' + (!pos?'bg-white shadow text-rose-500':'text-slate-500');
   document.getElementById('awardHeader').className = 'p-5 text-white relative overflow-hidden transition-all ' + (pos?'bg-gradient-to-r from-emerald-500 to-teal-500':'bg-gradient-to-r from-rose-500 to-orange-400');
-  const list = pos ? POSITIVE_BEHAVIORS : NEEDS_WORK_BEHAVIORS;
+  const list = getBehaviorList(t);
   document.getElementById('awardBehaviors').innerHTML = list.map((b,i)=>{
-    return '<button onclick="awardBehavior('+i+')" class="group text-left rounded-2xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 '+(pos?'border-emerald-100 hover:border-emerald-400 bg-emerald-50/50 hover:bg-emerald-500':'border-rose-100 hover:border-rose-400 bg-rose-50/50 hover:bg-rose-500')+'">'
+    const del = b.custom ? '<span onclick="deleteCustomBehavior(\''+b.id+'\',event)" title="Delete custom" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-lg bg-slate-900/10 hover:bg-rose-500 hover:text-white text-slate-400 flex items-center justify-center transition-all"><i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i></span>' : '';
+    return '<button onclick="awardBehavior('+i+')" class="group relative text-left rounded-2xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 '+(pos?'border-emerald-100 hover:border-emerald-400 bg-emerald-50/50 hover:bg-emerald-500':'border-rose-100 hover:border-rose-400 bg-rose-50/50 hover:bg-rose-500')+'">'
+      + del
       + '<div class="flex items-center gap-2.5">'
-      + '<div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 '+(pos?'bg-emerald-500 text-white group-hover:bg-white group-hover:text-emerald-600':'bg-rose-500 text-white group-hover:bg-white group-hover:text-rose-600')+' transition-all"><i data-lucide="'+b.icon+'" class="w-5 h-5"></i></div>'
-      + '<div class="min-w-0"><p class="font-extrabold text-[13px] leading-tight '+(pos?'text-emerald-900 group-hover:text-white':'text-rose-900 group-hover:text-white')+'">'+b.label+'</p>'
+      + '<div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 '+(pos?'bg-emerald-500 text-white group-hover:bg-white group-hover:text-emerald-600':'bg-rose-500 text-white group-hover:bg-white group-hover:text-rose-600')+' transition-all"><i data-lucide="'+esc(b.icon||(pos?'star':'alert-triangle'))+'" class="w-5 h-5"></i></div>'
+      + '<div class="min-w-0"><p class="font-extrabold text-[13px] leading-tight '+(pos?'text-emerald-900 group-hover:text-white':'text-rose-900 group-hover:text-white')+'">'+esc(b.label)+'</p>'
       + '<p class="text-[12px] font-black '+(pos?'text-emerald-500 group-hover:text-emerald-100':'text-rose-400 group-hover:text-rose-100')+'">'+(b.points>0?'+'+b.points:b.points)+'</p></div>'
       + '</div></button>';
   }).join('');
   if(window.lucide) lucide.createIcons();
 }
 function awardBehavior(i){
-  const list = awardTab==='positive' ? POSITIVE_BEHAVIORS : NEEDS_WORK_BEHAVIORS;
+  const list = getBehaviorList(awardTab);
   const b = list[i];
   if(!b) return;
   applyPoints(selectedStudentId, b.points, b.label, awardTab);
+}
+/* ---------- Custom behaviors (create your own point values) ---------- */
+function openCustomBehaviorModal(){
+  stagedCustomType = awardTab || 'positive';
+  document.getElementById('customBehaviorLabel').value = '';
+  document.getElementById('customBehaviorPoints').value = stagedCustomType==='positive' ? 2 : -2;
+  refreshCustomTypeUI();
+  showModal('customBehaviorModal');
+  setTimeout(()=>document.getElementById('customBehaviorLabel').focus(), 250);
+  if(window.lucide) lucide.createIcons();
+}
+function closeCustomBehaviorModal(){ hideModal('customBehaviorModal'); }
+function setCustomType(t){
+  stagedCustomType = t;
+  const cur = parseInt(document.getElementById('customBehaviorPoints').value, 10) || 0;
+  // auto-flip sign so type + points stay consistent
+  if(t==='positive' && cur <= 0) document.getElementById('customBehaviorPoints').value = Math.abs(cur) || 2;
+  if(t==='needs-work' && cur >= 0) document.getElementById('customBehaviorPoints').value = -(Math.abs(cur) || 2);
+  refreshCustomTypeUI();
+  SFX.click();
+}
+function stepCustomPoints(d){
+  let cur = parseInt(document.getElementById('customBehaviorPoints').value, 10) || 0;
+  cur += d;
+  if(cur === 0) cur = d > 0 ? 1 : -1;
+  document.getElementById('customBehaviorPoints').value = cur;
+  stagedCustomType = cur >= 0 ? 'positive' : 'needs-work';
+  refreshCustomTypeUI();
+  SFX.click();
+}
+function syncCustomPointsFromInput(){
+  let cur = parseInt(document.getElementById('customBehaviorPoints').value, 10) || 0;
+  if(cur !== 0) stagedCustomType = cur > 0 ? 'positive' : 'needs-work';
+  refreshCustomTypeUI();
+}
+function refreshCustomTypeUI(){
+  let cur = parseInt(document.getElementById('customBehaviorPoints').value, 10) || 0;
+  const pos = stagedCustomType === 'positive';
+  const pBtn = document.getElementById('customTypePos'), nBtn = document.getElementById('customTypeNeg');
+  if(pBtn) pBtn.className = 'rounded-xl py-2 text-[12px] font-extrabold transition-all flex items-center justify-center gap-1.5 ' + (pos?'bg-white text-emerald-600 shadow':'text-slate-500');
+  if(nBtn) nBtn.className = 'rounded-xl py-2 text-[12px] font-extrabold transition-all flex items-center justify-center gap-1.5 ' + (!pos?'bg-white text-rose-500 shadow':'text-slate-500');
+  const prev = document.getElementById('customPointsPreview');
+  if(prev){
+    prev.textContent = (cur>0?'+':'') + cur;
+    prev.className = 'flex-1 text-center border-2 rounded-2xl py-2.5 font-black text-xl ' + (cur>0?'bg-emerald-50 border-emerald-200 text-emerald-600':cur<0?'bg-rose-50 border-rose-200 text-rose-500':'bg-slate-50 border-slate-100 text-slate-400');
+  }
+}
+function saveCustomBehavior(){
+  const label = (document.getElementById('customBehaviorLabel').value || '').trim().slice(0, 30);
+  let pts = parseInt(document.getElementById('customBehaviorPoints').value, 10);
+  if(!label){ toast('Give your custom a name first ✏️', 'error'); SFX.error(); return; }
+  if(!pts || isNaN(pts)){ toast('Points can\'t be 0 — pick +1 or −1 or more', 'error'); SFX.error(); return; }
+  const type = pts > 0 ? 'positive' : 'needs-work';
+  if(!Array.isArray(state.customBehaviors)) state.customBehaviors = [];
+  state.customBehaviors.push({ id: uid(), label: label, points: pts, type: type, icon: pts > 0 ? 'star' : 'alert-triangle', custom: true });
+  saveState();
+  closeCustomBehaviorModal();
+  setAwardTab(type);
+  toast('Custom "' + label + ' (' + (pts>0?'+':'') + pts + ')" saved! ⭐');
+  SFX.pop();
+}
+function deleteCustomBehavior(id, ev){
+  if(ev){ ev.stopPropagation(); }
+  if(!Array.isArray(state.customBehaviors)) return;
+  const b = state.customBehaviors.find(x=>x.id===id);
+  state.customBehaviors = state.customBehaviors.filter(x=>x.id!==id);
+  saveState();
+  setAwardTab(awardTab);
+  toast(b ? 'Deleted "' + b.label + '" 🗑️' : 'Deleted custom 🗑️');
+  SFX.click();
 }
 function quickAward(delta){
   applyPoints(selectedStudentId, delta, delta>0?'Quick Praise':'Quick Correction', delta>0?'positive':'needs-work');
@@ -1732,18 +2165,17 @@ function applyPoints(studentId, delta, behavior, type){
   s.points = (s.points||0) + delta;
   state.pointsHistory.push({ id: uid(), studentId: s.id, classroomId: s.classroomId, studentName: s.firstName+' '+s.lastName, type, behavior, delta, timestamp: Date.now() });
   saveState();
-  // live dojo badge bump + color animation
-  const pill = document.getElementById('pill-'+s.id);
-  if(pill){ pill.textContent = s.points; pill.classList.remove('neg','zero','points-bump','badge-pop'); if(s.points<0) pill.classList.add('neg'); if(s.points===0) pill.classList.add('zero'); void pill.offsetWidth; pill.classList.add('badge-pop'); }
+  // live badge bump + gold/royal/crown refresh (leadership can change for others too)
+  refreshLeaderBadges(s.id);
   const card = document.getElementById('card-'+s.id);
   renderHeader(); renderHistory(); renderReports(); renderDojoPills();
   // re-grab card after renders that don't touch grid (grid isn't re-rendered here, so same node)
   const tile = document.getElementById('card-'+s.id) || card;
   refreshAwardPoints();
-  if(delta>0){ if(delta>=2){ SFX.coin(); setTimeout(()=>SFX.success(),140); } else { SFX.success(); } if(window.confetti) confetti({particleCount: delta>=2?110:70, spread:75, origin:{y:.6}, colors:['#4F46E5','#0EA5E9','#10B981','#FBBF24']});
+  if(delta>0){ if(!playRandomPraise()) SFX.celebrate(delta>=2); bigCelebrationConfetti(delta>=2);
     if(tile){ tile.classList.remove('flash-pos','celebrate','shake','flash-neg'); void tile.offsetWidth; tile.classList.add('flash-pos'); spawnFloater(tile, '+'+delta, true); setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 750); } }
-  else if(delta<0){ SFX.error();
-    if(tile){ tile.classList.remove('shake','flash-neg','flash-pos','celebrate'); void tile.offsetWidth; tile.classList.add('flash-neg'); spawnFloater(tile, ''+delta, false); setTimeout(()=>tile.classList.remove('flash-neg'), 700); } }
+  else if(delta<0){ SFX.bad(); triggerMinusAlert();
+    if(tile){ tile.classList.remove('shake','flash-neg','flash-pos','celebrate'); void tile.offsetWidth; tile.classList.add('flash-neg','shake'); spawnFloater(tile, ''+delta, false); spawnSweat(tile); setTimeout(()=>tile.classList.remove('flash-neg','shake'), 800); } }
   else { SFX.pop(); }
   showBanner(s, delta, behavior);
   setTimeout(closeAwardModal, 420);
