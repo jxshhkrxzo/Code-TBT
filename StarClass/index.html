@@ -15,7 +15,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
@@ -229,6 +229,13 @@ tailwind.config = {
   .to-\[\#0EA5E9\] { --tw-gradient-to:#38BDF8 !important; }
   .shadow-indigo-300, .shadow-indigo-200 { --tw-shadow-color: rgba(2,132,199,.35) !important; }
   #backToTop { background:linear-gradient(135deg,#0284C7,#0EA5E9) !important; box-shadow:0 12px 28px rgba(2,132,199,.45) !important; }
+
+  /* ---------- Language (EN/AR) — layout locked to LTR, sidebar stays left ---------- */
+  html[lang="ar"] body { font-family:'Cairo','Nunito',sans-serif; }
+  html[lang="ar"] .font-poppins { font-family:'Cairo','Poppins',sans-serif; }
+  .lang-btn { padding:6px 14px; border-radius:9px; font-size:12px; font-weight:900; color:#64748B; transition:all .2s; white-space:nowrap; }
+  .lang-btn.on { background:#fff; color:#0369A1; box-shadow:0 2px 8px rgba(2,132,199,.25); }
+  html.dark .lang-btn.on { background:#334155; color:#fff; }
 </style>
 </head>
 <body class="text-slate-800 overflow-x-hidden">
@@ -264,7 +271,7 @@ tailwind.config = {
         </div>
         <div class="flex-1">
           <h1 class="font-poppins font-800 font-extrabold text-[22px] leading-none tracking-tight text-slate-900">StarClass</h1>
-          <p class="text-[12px] font-bold text-indigo-500 tracking-wide uppercase mt-1">Joyful Classrooms</p>
+          <p class="text-[12px] font-bold text-indigo-500 tracking-wide uppercase mt-1" data-i18n="tagline">Joyful Classrooms</p>
         </div>
         <button onclick="toggleSidebar()" title="Hide sidebar ( [ )" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-400 flex items-center justify-center transition-all">
           <i data-lucide="panel-left-close" class="w-4 h-4"></i>
@@ -274,31 +281,36 @@ tailwind.config = {
       <!-- Main nav -->
       <div class="px-5">
         <div class="grid grid-cols-3 gap-1.5 bg-slate-100 rounded-2xl p-1.5">
-          <button id="navStudents" onclick="goSection('students')" class="nav-link nav-active rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="layout-grid" class="w-4 h-4"></i>Students</button>
-          <button id="navToolkit" onclick="goSection('toolkit')" class="nav-link rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="wand-2" class="w-4 h-4"></i>Toolkit</button>
-          <button id="navReportsSide" onclick="switchView('reports')" class="nav-link rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>Reports</button>
+          <button id="navStudents" onclick="goSection('students')" class="nav-link nav-active rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="layout-grid" class="w-4 h-4"></i><span data-i18n="nav_students">Students</span></button>
+          <button id="navToolkit" onclick="goSection('toolkit')" class="nav-link rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="wand-2" class="w-4 h-4"></i><span data-i18n="nav_toolkit">Toolkit</span></button>
+          <button id="navReportsSide" onclick="switchView('reports')" class="nav-link rounded-xl py-2 text-[12px] font-extrabold text-slate-500 flex flex-col items-center gap-1"><i data-lucide="bar-chart-3" class="w-4 h-4"></i><span data-i18n="nav_reports">Reports</span></button>
         </div>
       </div>
 
       <!-- Quick add buttons -->
       <div class="px-5 grid grid-cols-2 gap-2">
         <button onclick="openClassroomModal()" class="flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[13px] font-extrabold rounded-2xl py-2.5 transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-95">
-          <i data-lucide="plus" class="w-4 h-4"></i> Class
+          <i data-lucide="plus" class="w-4 h-4"></i> <span data-i18n="new_class">Class</span>
         </button>
         <button onclick="openStudentModal()" class="flex items-center justify-center gap-1.5 bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 text-[13px] font-extrabold rounded-2xl py-2.5 transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-95">
-          <i data-lucide="user-plus" class="w-4 h-4"></i> Student
+          <i data-lucide="user-plus" class="w-4 h-4"></i> <span data-i18n="new_student">Student</span>
         </button>
       </div>
 
       <!-- Classrooms -->
       <div class="px-5 mt-5 flex items-center justify-between">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-400">My Classrooms</h2>
+        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-400" data-i18n="my_classrooms">My Classrooms</h2>
         <span id="classCountBadge" class="text-[11px] font-extrabold bg-indigo-100 text-indigo-700 rounded-full px-2 py-0.5">0</span>
       </div>
       <div id="classroomList" class="px-3 mt-2 space-y-2 overflow-y-auto flex-1 pb-2"></div>
 
       <!-- Sidebar footer / toolkit mini -->
       <div class="p-4 space-y-2">
+        <div class="glass rounded-2xl p-1.5 flex items-center gap-1">
+          <i data-lucide="languages" class="w-4 h-4 text-slate-400 ml-2 shrink-0"></i>
+          <button id="langBtnEnSide" onclick="setLanguage('en')" class="lang-btn flex-1 text-center on">English</button>
+          <button id="langBtnArSide" onclick="setLanguage('ar')" class="lang-btn flex-1 text-center">العربية</button>
+        </div>
         <div class="flex gap-2">
           <button onclick="toggleTheme()" title="Toggle dark mode" class="flex-1 glass rounded-2xl py-2.5 text-[12px] font-extrabold text-slate-600 hover:text-indigo-700 flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5">
             <span id="themeIconSide"><i data-lucide="moon" class="w-4 h-4"></i></span><span id="themeLabelSide">Dark</span>
@@ -313,10 +325,10 @@ tailwind.config = {
         <div class="rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-sky-500 p-4 text-white relative overflow-hidden">
           <div class="absolute -right-6 -top-6 w-28 h-28 bg-white/15 rounded-full"></div>
           <div class="absolute -right-2 top-10 w-12 h-12 bg-yellow-300/30 rounded-full"></div>
-          <p class="font-extrabold text-[15px] flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Toolkit ready</p>
-          <p class="text-[12px] text-indigo-100 mt-1 font-semibold">Picker • Timer • Group Maker below</p>
+          <p class="font-extrabold text-[15px] flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> <span data-i18n="toolkit_ready">Toolkit ready</span></p>
+          <p class="text-[12px] text-indigo-100 mt-1 font-semibold" data-i18n="toolkit_sub">Picker • Timer • Group Maker below</p>
           <button onclick="scrollToToolkit()" class="mt-3 w-full bg-white text-indigo-700 font-extrabold text-[13px] rounded-xl py-2 hover:bg-indigo-50 transition-all active:scale-95 flex items-center justify-center gap-2">
-            <i data-lucide="wand-2" class="w-4 h-4"></i> Open Tools
+            <i data-lucide="wand-2" class="w-4 h-4"></i> <span data-i18n="open_tools">Open Tools</span>
           </button>
         </div>
       </div>
@@ -333,7 +345,7 @@ tailwind.config = {
           <i data-lucide="panel-left" class="w-4 h-4"></i>
         </button>
         <nav class="flex items-center gap-1.5 text-[13px] font-extrabold text-slate-500 min-w-0">
-          <button onclick="goSection('students')" class="hover:text-indigo-700 flex items-center gap-1.5 shrink-0"><i data-lucide="home" class="w-4 h-4"></i> Home</button>
+          <button onclick="goSection('students')" class="hover:text-indigo-700 flex items-center gap-1.5 shrink-0"><i data-lucide="home" class="w-4 h-4"></i> <span data-i18n="home">Home</span></button>
           <span class="crumb-sep">/</span>
           <span id="crumbClass" class="truncate max-w-[220px] text-slate-800">Classroom</span>
           <span class="crumb-sep">/</span>
@@ -341,9 +353,9 @@ tailwind.config = {
         </nav>
         <div class="flex-1"></div>
         <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-          <button id="topNavStudents" onclick="goSection('students')" class="nav-link nav-active px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5"></i>Students</button>
-          <button id="topNavToolkit" onclick="goSection('toolkit')" class="nav-link px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i>Toolkit</button>
-          <button id="topNavReports" onclick="switchView('reports')" class="nav-link px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>Reports</button>
+          <button id="topNavStudents" onclick="goSection('students')" class="nav-link nav-active px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5"></i><span data-i18n="nav_students">Students</span></button>
+          <button id="topNavToolkit" onclick="goSection('toolkit')" class="nav-link px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i><span data-i18n="nav_toolkit">Toolkit</span></button>
+          <button id="topNavReports" onclick="switchView('reports')" class="nav-link px-3 py-1.5 rounded-lg text-[12px] font-extrabold text-slate-500 flex items-center gap-1.5"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i><span data-i18n="nav_reports">Reports</span></button>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
           <div class="flex items-center bg-slate-100 rounded-xl p-1">
@@ -353,6 +365,11 @@ tailwind.config = {
           <button onclick="toggleTheme()" title="Light / dark mode (D)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 flex items-center justify-center transition-all"><span id="themeIconTop"><i data-lucide="moon" class="w-4 h-4"></i></span></button>
           <button onclick="toggleSound()" title="Sounds on/off (M)" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 flex items-center justify-center transition-all relative"><span id="soundIconTop"><i data-lucide="volume-2" class="w-4 h-4"></i></span></button>
           <button onclick="openSettings('general')" title="Settings" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-500 hover:text-indigo-700 hidden xl:flex items-center justify-center transition-all"><i data-lucide="settings-2" class="w-4 h-4"></i></button>
+          <!-- Language tab: EN / AR -->
+          <div class="flex items-center bg-slate-100 rounded-xl p-1" title="Language / اللغة">
+            <button id="langBtnEnTop" onclick="setLanguage('en')" class="lang-btn on">EN</button>
+            <button id="langBtnArTop" onclick="setLanguage('ar')" class="lang-btn">عربي</button>
+          </div>
         </div>
       </div>
     </div>
@@ -367,6 +384,7 @@ tailwind.config = {
           <h1 class="font-poppins font-extrabold text-xl tracking-tight">StarClass</h1>
         </div>
         <div class="flex items-center gap-2">
+          <button id="langBtnMobile" onclick="toggleLanguage()" title="Language / اللغة" class="h-10 px-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95 text-[12px] font-black text-slate-700">عربي</button>
           <button onclick="toggleTheme()" title="Dark mode" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95"><span id="themeIconMobile"><i data-lucide="moon" class="w-5 h-5 text-slate-700"></i></span></button>
           <button onclick="toggleSound()" title="Sounds" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm active:scale-95"><span id="soundIconMobile"><i data-lucide="volume-2" class="w-5 h-5 text-slate-700"></i></span></button>
           <button onclick="openStudentModal()" class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md active:scale-95"><i data-lucide="user-plus" class="w-5 h-5"></i></button>
@@ -400,15 +418,15 @@ tailwind.config = {
         <div class="flex items-center gap-2">
           <!-- View switch -->
           <div class="glass rounded-2xl p-1 flex gap-1 shadow-sm">
-            <button id="tabClassroom" onclick="switchView('classroom')" class="px-4 py-2 rounded-xl text-[13px] font-extrabold bg-indigo-600 text-white shadow flex items-center gap-2 transition-all"><i data-lucide="layout-grid" class="w-4 h-4"></i> Classroom</button>
-            <button id="tabReports" onclick="switchView('reports')" class="px-4 py-2 rounded-xl text-[13px] font-extrabold text-slate-500 hover:text-indigo-700 flex items-center gap-2 transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports</button>
+            <button id="tabClassroom" onclick="switchView('classroom')" class="px-4 py-2 rounded-xl text-[13px] font-extrabold bg-indigo-600 text-white shadow flex items-center gap-2 transition-all"><i data-lucide="layout-grid" class="w-4 h-4"></i> <span data-i18n="tab_classroom">Classroom</span></button>
+            <button id="tabReports" onclick="switchView('reports')" class="px-4 py-2 rounded-xl text-[13px] font-extrabold text-slate-500 hover:text-indigo-700 flex items-center gap-2 transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> <span data-i18n="tab_reports">Reports</span></button>
           </div>
           <button onclick="toggleHistory(true)" class="glass rounded-2xl px-4 py-2.5 text-[13px] font-extrabold text-slate-700 hover:text-indigo-700 shadow-sm flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-            <i data-lucide="history" class="w-4 h-4"></i> History
+            <i data-lucide="history" class="w-4 h-4"></i> <span data-i18n="history">History</span>
             <span id="historyCountBadge" class="bg-indigo-600 text-white text-[11px] rounded-full px-2 py-0.5 min-w-[24px] text-center">0</span>
           </button>
           <button onclick="confirmResetPoints()" class="rounded-2xl px-4 py-2.5 text-[13px] font-extrabold bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span data-i18n="reset">Reset</span>
           </button>
         </div>
       </div>
@@ -417,19 +435,19 @@ tailwind.config = {
       <div class="grid grid-cols-4 gap-3 mt-5">
         <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-sky-400 flex items-center justify-center text-white shrink-0"><i data-lucide="trophy" class="w-5 h-5"></i></div>
-          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Class Points</p><p id="statTotalPoints" class="font-poppins font-extrabold text-2xl leading-none">0</p></div>
+          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400" data-i18n="class_points">Class Points</p><p id="statTotalPoints" class="font-poppins font-extrabold text-2xl leading-none">0</p></div>
         </div>
         <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shrink-0"><i data-lucide="thumbs-up" class="w-5 h-5"></i></div>
-          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Positive</p><p id="statPositive" class="font-poppins font-extrabold text-2xl leading-none text-emerald-600">0</p></div>
+          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400" data-i18n="positive">Positive</p><p id="statPositive" class="font-poppins font-extrabold text-2xl leading-none text-emerald-600">0</p></div>
         </div>
         <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-400 to-orange-400 flex items-center justify-center text-white shrink-0"><i data-lucide="thumbs-down" class="w-5 h-5"></i></div>
-          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Needs Work</p><p id="statNeedsWork" class="font-poppins font-extrabold text-2xl leading-none text-rose-500">0</p></div>
+          <div><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400" data-i18n="needs_work">Needs Work</p><p id="statNeedsWork" class="font-poppins font-extrabold text-2xl leading-none text-rose-500">0</p></div>
         </div>
         <div class="glass rounded-2xl p-4 shadow-card flex items-center gap-3">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shrink-0"><i data-lucide="crown" class="w-5 h-5"></i></div>
-          <div class="min-w-0"><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Top Star</p><p id="statTopStudent" class="font-extrabold text-[15px] leading-tight truncate">—</p></div>
+          <div class="min-w-0"><p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400" data-i18n="top_star">Top Star</p><p id="statTopStudent" class="font-extrabold text-[15px] leading-tight truncate">—</p></div>
         </div>
       </div>
     </header>
@@ -442,14 +460,14 @@ tailwind.config = {
           <p id="activeClassMetaMobile" class="text-[12px] font-bold text-slate-500">0 students • 0 pts</p>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <button onclick="switchView('classroom')" id="tabClassroomM" class="px-3 py-2 rounded-xl text-[12px] font-extrabold bg-indigo-600 text-white">Class</button>
-          <button onclick="switchView('reports')" id="tabReportsM" class="px-3 py-2 rounded-xl text-[12px] font-extrabold text-slate-500 bg-white border border-slate-200">Reports</button>
+          <button onclick="switchView('classroom')" id="tabClassroomM" class="px-3 py-2 rounded-xl text-[12px] font-extrabold bg-indigo-600 text-white" data-i18n="tab_class">Class</button>
+          <button onclick="switchView('reports')" id="tabReportsM" class="px-3 py-2 rounded-xl text-[12px] font-extrabold text-slate-500 bg-white border border-slate-200" data-i18n="tab_reports">Reports</button>
         </div>
       </div>
       <div class="grid grid-cols-3 gap-2 mt-2">
-        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-indigo-50"><p class="text-[10px] font-extrabold uppercase text-slate-400">Points</p><p id="statTotalPointsM" class="font-extrabold text-lg text-indigo-700">0</p></div>
-        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-emerald-50"><p class="text-[10px] font-extrabold uppercase text-slate-400">Positive</p><p id="statPositiveM" class="font-extrabold text-lg text-emerald-600">0</p></div>
-        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-rose-50"><p class="text-[10px] font-extrabold uppercase text-slate-400">Needs Work</p><p id="statNeedsWorkM" class="font-extrabold text-lg text-rose-500">0</p></div>
+        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-indigo-50"><p class="text-[10px] font-extrabold uppercase text-slate-400" data-i18n="points">Points</p><p id="statTotalPointsM" class="font-extrabold text-lg text-indigo-700">0</p></div>
+        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-emerald-50"><p class="text-[10px] font-extrabold uppercase text-slate-400" data-i18n="positive">Positive</p><p id="statPositiveM" class="font-extrabold text-lg text-emerald-600">0</p></div>
+        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm border border-rose-50"><p class="text-[10px] font-extrabold uppercase text-slate-400" data-i18n="needs_work">Needs Work</p><p id="statNeedsWorkM" class="font-extrabold text-lg text-rose-500">0</p></div>
       </div>
     </div>
 
@@ -465,8 +483,8 @@ tailwind.config = {
             </button>
             <div class="mt-1.5 flex justify-center">
               <div class="dojo-toggle">
-                <button id="dojoTabStudents" onclick="setClassTab('students')" class="on">Students</button>
-                <button id="dojoTabGroups" onclick="setClassTab('groups')">Groups</button>
+                <button id="dojoTabStudents" onclick="setClassTab('students')" class="on" data-i18n="dojo_students">Students</button>
+                <button id="dojoTabGroups" onclick="setClassTab('groups')" data-i18n="dojo_groups">Groups</button>
               </div>
             </div>
           </div>
@@ -481,16 +499,16 @@ tailwind.config = {
       <div class="flex flex-wrap items-center gap-2 mb-3">
         <div class="relative flex-1 min-w-[160px]">
           <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input id="searchInput" oninput="renderGrid()" type="text" placeholder="Search monsters...  ( / )" class="w-full glass rounded-2xl pl-10 pr-4 py-2.5 text-sm font-bold placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm" />
+          <input id="searchInput" oninput="renderGrid()" type="text" data-i18n-placeholder="search_ph" placeholder="Search monsters...  ( / )" class="w-full glass rounded-2xl pl-10 pr-4 py-2.5 text-sm font-bold placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm" />
         </div>
         <div class="flex items-center gap-2">
           <select id="sortSelect" onchange="renderGrid()" class="glass rounded-2xl px-3 py-2.5 text-[13px] font-extrabold text-slate-600 outline-none shadow-sm cursor-pointer">
-            <option value="name">Sort: Name</option>
-            <option value="pointsDesc">Sort: Top points</option>
-            <option value="pointsAsc">Sort: Lowest points</option>
+            <option value="name" data-i18n="sort_name">Sort: Name</option>
+            <option value="pointsDesc" data-i18n="sort_top">Sort: Top points</option>
+            <option value="pointsAsc" data-i18n="sort_low">Sort: Lowest points</option>
           </select>
           <button onclick="openRandomPicker()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl px-4 py-2.5 text-[13px] font-extrabold items-center gap-2 shadow-md hover:-translate-y-0.5 transition-all active:scale-95 hidden sm:flex">
-            <i data-lucide="dices" class="w-4 h-4"></i> Pick Random
+            <i data-lucide="dices" class="w-4 h-4"></i> <span data-i18n="pick_random">Pick Random</span>
           </button>
         </div>
       </div>
@@ -511,14 +529,14 @@ tailwind.config = {
           <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-2">
               <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white"><i data-lucide="users" class="w-5 h-5"></i></div>
-              <div><h4 class="font-extrabold">Groups for today</h4><p class="text-[12px] font-bold text-slate-500">Shuffled from this class</p></div>
+              <div><h4 class="font-extrabold" data-i18n="groups_today">Groups for today</h4><p class="text-[12px] font-bold text-slate-500" data-i18n="shuffled_sub">Shuffled from this class</p></div>
             </div>
             <div class="flex-1"></div>
             <div class="flex items-center bg-white rounded-2xl border border-slate-200 px-3">
               <input id="groupSizeInputTop" type="number" min="2" max="10" value="2" class="w-14 px-1 py-2.5 text-sm font-extrabold outline-none bg-transparent text-center" />
-              <span class="text-[11px] font-bold text-slate-400">per group</span>
+              <span class="text-[11px] font-bold text-slate-400" data-i18n="per_group">per group</span>
             </div>
-            <button onclick="makeGroupsTop()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl px-5 py-2.5 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> Shuffle Groups</button>
+            <button onclick="makeGroupsTop()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl px-5 py-2.5 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> <span data-i18n="shuffle_groups">Shuffle Groups</span></button>
           </div>
           <div id="groupResultsTop" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-4"></div>
         </div>
@@ -530,7 +548,7 @@ tailwind.config = {
       <div id="toolkit" class="mt-8 mb-6">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-sky-500 flex items-center justify-center text-white"><i data-lucide="wand-2" class="w-4 h-4"></i></div>
-          <h3 class="font-poppins font-extrabold text-lg">Classroom Toolkit</h3>
+          <h3 class="font-poppins font-extrabold text-lg" data-i18n="toolkit_title">Classroom Toolkit</h3>
           <div class="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-4">
@@ -540,10 +558,10 @@ tailwind.config = {
             <div class="absolute -top-8 -right-8 w-28 h-28 bg-amber-200/50 rounded-full blur-xl"></div>
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-md"><i data-lucide="dices" class="w-6 h-6"></i></div>
-              <div><h4 class="font-extrabold">Random Picker</h4><p class="text-[12px] font-bold text-slate-500">Cold-call with fun</p></div>
+              <div><h4 class="font-extrabold" data-i18n="random_picker">Random Picker</h4><p class="text-[12px] font-bold text-slate-500" data-i18n="cold_call">Cold-call with fun</p></div>
             </div>
-            <div id="pickerPreview" class="mt-4 bg-white/70 border-2 border-dashed border-amber-200 rounded-2xl py-4 text-center font-extrabold text-slate-400 text-sm">Tap to pick a star ⭐</div>
-            <button onclick="openRandomPicker()" class="mt-3 w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-sm rounded-2xl py-2.5 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">Pick a Student</button>
+            <div id="pickerPreview" class="mt-4 bg-white/70 border-2 border-dashed border-amber-200 rounded-2xl py-4 text-center font-extrabold text-slate-400 text-sm" data-i18n="tap_pick">Tap to pick a star ⭐</div>
+            <button onclick="openRandomPicker()" class="mt-3 w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-sm rounded-2xl py-2.5 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95" data-i18n="pick_student">Pick a Student</button>
           </div>
 
           <!-- Timer card -->
@@ -552,7 +570,7 @@ tailwind.config = {
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center text-white shadow-md"><i data-lucide="timer" class="w-6 h-6"></i></div>
-                <div><h4 class="font-extrabold">Class Timer</h4><p class="text-[12px] font-bold text-slate-500">Focus & transitions</p></div>
+                <div><h4 class="font-extrabold" data-i18n="class_timer">Class Timer</h4><p class="text-[12px] font-bold text-slate-500" data-i18n="focus_sub">Focus & transitions</p></div>
               </div>
               <div class="flex bg-slate-100 rounded-xl p-0.5 text-[11px] font-extrabold">
                 <button id="modeCountdownBtn" onclick="setTimerMode('countdown')" class="px-2.5 py-1.5 rounded-lg bg-white shadow text-indigo-700">Count</button>
@@ -578,7 +596,7 @@ tailwind.config = {
                 </div>
                 <div class="flex gap-1.5 mt-1.5">
                   <button id="timerStartBtn" onclick="timerToggle()" class="flex-1 bg-indigo-600 text-white rounded-xl py-2 text-[12px] font-extrabold flex items-center justify-center gap-1 hover:bg-indigo-700 transition-all active:scale-95"><i data-lucide="play" class="w-3.5 h-3.5"></i> Start</button>
-                  <button onclick="timerReset()" class="flex-1 bg-slate-100 text-slate-600 rounded-xl py-2 text-[12px] font-extrabold flex items-center justify-center gap-1 hover:bg-slate-200 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset</button>
+                  <button onclick="timerReset()" class="flex-1 bg-slate-100 text-slate-600 rounded-xl py-2 text-[12px] font-extrabold flex items-center justify-center gap-1 hover:bg-slate-200 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span data-i18n="reset">Reset</span></button>
                 </div>
               </div>
             </div>
@@ -589,15 +607,15 @@ tailwind.config = {
             <div class="absolute -top-8 -right-8 w-28 h-28 bg-emerald-200/60 rounded-full blur-xl"></div>
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shadow-md"><i data-lucide="users" class="w-6 h-6"></i></div>
-              <div><h4 class="font-extrabold">Group Maker</h4><p class="text-[12px] font-bold text-slate-500">Shuffle into teams</p></div>
+              <div><h4 class="font-extrabold" data-i18n="group_maker">Group Maker</h4><p class="text-[12px] font-bold text-slate-500" data-i18n="shuffle_teams">Shuffle into teams</p></div>
             </div>
             <div class="flex gap-2 mt-4">
               <div class="flex items-center bg-white rounded-2xl border border-slate-200 px-3 flex-1">
                 <i data-lucide="users-round" class="w-4 h-4 text-slate-400"></i>
                 <input id="groupSizeInput" type="number" min="2" max="10" value="2" class="w-full px-2 py-2.5 text-sm font-extrabold outline-none bg-transparent" />
-                <span class="text-[11px] font-bold text-slate-400">/ group</span>
+                <span class="text-[11px] font-bold text-slate-400" data-i18n="per_group2">/ group</span>
               </div>
-              <button onclick="makeGroups()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl px-4 py-2.5 transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> Mix</button>
+              <button onclick="makeGroups()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm rounded-2xl px-4 py-2.5 transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95 flex items-center gap-1.5"><i data-lucide="shuffle" class="w-4 h-4"></i> <span data-i18n="mix">Mix</span></button>
             </div>
             <div id="groupResults" class="mt-3 space-y-2 max-h-[132px] overflow-y-auto"></div>
           </div>
@@ -612,35 +630,35 @@ tailwind.config = {
       <div class="glass rounded-3xl p-5 lg:p-7 shadow-card">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 class="font-poppins font-extrabold text-xl flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600"></i> Reports & Leaderboard</h3>
-            <p class="text-sm font-semibold text-slate-500">Live standings for <span id="reportsClassName" class="font-extrabold text-indigo-700"></span></p>
+            <h3 class="font-poppins font-extrabold text-xl flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600"></i> <span data-i18n="reports_title">Reports & Leaderboard</span></h3>
+            <p class="text-sm font-semibold text-slate-500"><span data-i18n="live_for">Live standings for</span> <span id="reportsClassName" class="font-extrabold text-indigo-700"></span></p>
           </div>
           <div class="flex gap-2">
-            <button onclick="exportCSV()" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-[13px] rounded-2xl px-4 py-2.5 flex items-center gap-2 transition-all hover:-translate-y-0.5"><i data-lucide="download" class="w-4 h-4"></i> Export CSV</button>
-            <button onclick="confirmResetPoints()" class="bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[13px] rounded-2xl px-4 py-2.5 flex items-center gap-2 transition-all hover:-translate-y-0.5 shadow-md shadow-rose-200"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset All Points</button>
+            <button onclick="exportCSV()" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-[13px] rounded-2xl px-4 py-2.5 flex items-center gap-2 transition-all hover:-translate-y-0.5"><i data-lucide="download" class="w-4 h-4"></i> <span data-i18n="export_csv">Export CSV</span></button>
+            <button onclick="confirmResetPoints()" class="bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[13px] rounded-2xl px-4 py-2.5 flex items-center gap-2 transition-all hover:-translate-y-0.5 shadow-md shadow-rose-200"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span data-i18n="reset_all_points">Reset All Points</span></button>
           </div>
         </div>
         <div id="leaderboard" class="mt-5 space-y-2.5"></div>
       </div>
       <div class="glass rounded-3xl p-5 lg:p-7 shadow-card mt-4 mb-8">
-        <h3 class="font-poppins font-extrabold text-xl flex items-center gap-2"><i data-lucide="scroll-text" class="w-5 h-5 text-indigo-600"></i> Full Activity Log</h3>
+        <h3 class="font-poppins font-extrabold text-xl flex items-center gap-2"><i data-lucide="scroll-text" class="w-5 h-5 text-indigo-600"></i> <span data-i18n="full_log">Full Activity Log</span></h3>
         <div id="reportsHistory" class="mt-4 space-y-2 max-h-[420px] overflow-y-auto pr-1"></div>
       </div>
     </main>
 
     <footer class="px-8 pb-6 text-center hidden lg:block">
-      <p class="text-[12px] font-bold text-slate-400">Made with <span class="text-rose-400">♥</span> for amazing teachers — StarClass keeps data safely in your browser.</p>
+      <p class="text-[12px] font-bold text-slate-400" data-i18n="footer">Made with ♥ for amazing teachers — StarClass keeps data safely in your browser.</p>
     </footer>
   </div>
 </div>
 
 <!-- Dojo dock nav (like screenshot: Classroom / Reports / Camera / History / More) -->
 <nav class="dojo-dock">
-  <button id="mNavHome" onclick="goSection('students')" class="dock-btn dock-active"><i data-lucide="users" class="w-6 h-6"></i><span>Classroom</span></button>
-  <button id="mNavReports" onclick="switchView('reports')" class="dock-btn"><i data-lucide="bar-chart-3" class="w-6 h-6"></i><span>Reports</span></button>
+  <button id="mNavHome" onclick="goSection('students')" class="dock-btn dock-active"><i data-lucide="users" class="w-6 h-6"></i><span data-i18n="dock_class">Classroom</span></button>
+  <button id="mNavReports" onclick="switchView('reports')" class="dock-btn"><i data-lucide="bar-chart-3" class="w-6 h-6"></i><span data-i18n="dock_reports">Reports</span></button>
   <button onclick="openRandomPicker()" title="Random picker" class="dock-fab"><i data-lucide="dices" class="w-7 h-7"></i></button>
-  <button onclick="toggleHistory(true)" class="dock-btn"><i data-lucide="history" class="w-6 h-6"></i><span>Messages</span></button>
-  <button onclick="openSettings('general')" class="dock-btn"><i data-lucide="settings-2" class="w-6 h-6"></i><span>More</span></button>
+  <button onclick="toggleHistory(true)" class="dock-btn"><i data-lucide="history" class="w-6 h-6"></i><span data-i18n="dock_messages">Messages</span></button>
+  <button onclick="openSettings('general')" class="dock-btn"><i data-lucide="settings-2" class="w-6 h-6"></i><span data-i18n="dock_more">More</span></button>
 </nav>
 <div class="h-28"></div>
 
@@ -654,23 +672,23 @@ tailwind.config = {
   <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeShortcuts()"></div>
   <div class="modal-panel relative w-full max-w-[400px] bg-white rounded-[28px] shadow-pop p-6">
     <div class="flex items-center justify-between">
-      <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="keyboard" class="w-5 h-5 text-indigo-600"></i> Shortcuts & Navigation</h3>
+      <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="keyboard" class="w-5 h-5 text-indigo-600"></i> <span data-i18n="shortcuts_title">Shortcuts & Navigation</span></h3>
       <button onclick="closeShortcuts()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <div class="mt-4 space-y-2.5 text-[13px] font-bold text-slate-600">
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Students / Toolkit / Reports</span><span class="flex gap-1"><kbd class="kbd">1</kbd><kbd class="kbd">2</kbd><kbd class="kbd">3</kbd></span></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Prev / next classroom</span><span class="flex gap-1"><kbd class="kbd">←</kbd><kbd class="kbd">→</kbd></span></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Search students</span><kbd class="kbd">/</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>New student</span><kbd class="kbd">N</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>History log</span><kbd class="kbd">H</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Dark mode</span><kbd class="kbd">D</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Mute / unmute sounds</span><kbd class="kbd">M</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Collapse sidebar</span><kbd class="kbd">[</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Close dialogs</span><kbd class="kbd">Esc</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_students">Students / Toolkit / Reports</span><span class="flex gap-1"><kbd class="kbd">1</kbd><kbd class="kbd">2</kbd><kbd class="kbd">3</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_prevnext">Prev / next classroom</span><span class="flex gap-1"><kbd class="kbd">←</kbd><kbd class="kbd">→</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_search">Search students</span><kbd class="kbd">/</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_newstudent">New student</span><kbd class="kbd">N</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_history">History log</span><kbd class="kbd">H</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_dark">Dark mode</span><kbd class="kbd">D</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_mute">Mute / unmute sounds</span><kbd class="kbd">M</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_collapse">Collapse sidebar</span><kbd class="kbd">[</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_close">Close dialogs</span><kbd class="kbd">Esc</kbd></div>
     </div>
     <div class="mt-4 bg-indigo-50 rounded-2xl p-3 flex items-center gap-3">
-      <button onclick="toggleSound(true)" class="flex-1 bg-white border border-indigo-100 rounded-xl py-2 text-[12px] font-extrabold text-indigo-700 flex items-center justify-center gap-1.5"><i data-lucide="volume-2" class="w-4 h-4"></i> Test sound</button>
-      <button onclick="toggleTheme()" class="flex-1 bg-indigo-600 rounded-xl py-2 text-[12px] font-extrabold text-white flex items-center justify-center gap-1.5"><i data-lucide="moon" class="w-4 h-4"></i> Toggle theme</button>
+      <button onclick="toggleSound(true)" class="flex-1 bg-white border border-indigo-100 rounded-xl py-2 text-[12px] font-extrabold text-indigo-700 flex items-center justify-center gap-1.5"><i data-lucide="volume-2" class="w-4 h-4"></i> <span data-i18n="test_sound">Test sound</span></button>
+      <button onclick="toggleTheme()" class="flex-1 bg-indigo-600 rounded-xl py-2 text-[12px] font-extrabold text-white flex items-center justify-center gap-1.5"><i data-lucide="moon" class="w-4 h-4"></i> <span data-i18n="toggle_theme">Toggle theme</span></button>
     </div>
   </div>
 </div>
@@ -681,54 +699,62 @@ tailwind.config = {
   <div class="modal-panel relative w-full sm:max-w-[440px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden max-h-[92vh] flex flex-col">
     <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white shrink-0">
       <div class="flex items-center justify-between">
-        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="settings-2" class="w-5 h-5"></i> Settings</h3>
+        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="settings-2" class="w-5 h-5"></i> <span data-i18n="settings">Settings</span></h3>
         <button onclick="closeSettings()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="grid grid-cols-3 gap-1.5 mt-4 bg-white/15 rounded-2xl p-1.5">
-        <button id="settingsTabGeneral" onclick="switchSettingsTab('general')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-indigo-700 shadow transition-all">General</button>
-        <button id="settingsTabData" onclick="switchSettingsTab('data')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all">Data</button>
-        <button id="settingsTabShortcuts" onclick="switchSettingsTab('shortcuts')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all">Shortcuts</button>
+        <button id="settingsTabGeneral" onclick="switchSettingsTab('general')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-indigo-700 shadow transition-all" data-i18n="general">General</button>
+        <button id="settingsTabData" onclick="switchSettingsTab('data')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all" data-i18n="data">Data</button>
+        <button id="settingsTabShortcuts" onclick="switchSettingsTab('shortcuts')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all" data-i18n="shortcuts">Shortcuts</button>
       </div>
     </div>
 
     <!-- General -->
     <div id="settingsPanelGeneral" class="p-5 space-y-3 overflow-y-auto">
       <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3.5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 font-black text-lg">ع</div>
+        <div class="flex-1"><p class="font-extrabold text-[14px]" data-i18n="language">Language</p><p class="text-[12px] font-bold text-slate-400">English / العربية</p></div>
+        <div class="flex items-center bg-white border-2 border-indigo-100 rounded-xl p-1">
+          <button id="langBtnEnSettings" onclick="setLanguage('en')" class="lang-btn on">EN</button>
+          <button id="langBtnArSettings" onclick="setLanguage('ar')" class="lang-btn">عربي</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3.5">
         <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0"><i data-lucide="moon" class="w-5 h-5"></i></div>
-        <div class="flex-1"><p class="font-extrabold text-[14px]">Appearance</p><p class="text-[12px] font-bold text-slate-400">Light or dark classroom</p></div>
-        <button onclick="toggleTheme()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[12px] font-extrabold rounded-xl px-4 py-2.5 transition-all active:scale-95">Toggle</button>
+        <div class="flex-1"><p class="font-extrabold text-[14px]" data-i18n="appearance">Appearance</p><p class="text-[12px] font-bold text-slate-400" data-i18n="appearance_sub">Light or dark classroom</p></div>
+        <button onclick="toggleTheme()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[12px] font-extrabold rounded-xl px-4 py-2.5 transition-all active:scale-95" data-i18n="toggle">Toggle</button>
       </div>
       <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3.5">
         <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0"><i data-lucide="volume-2" class="w-5 h-5"></i></div>
-        <div class="flex-1"><p class="font-extrabold text-[14px]">Sound effects</p><p class="text-[12px] font-bold text-slate-400" id="settingsSoundState">On</p></div>
-        <button onclick="toggleSound(); refreshSettingsSoundState();" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 text-[12px] font-extrabold rounded-xl px-4 py-2 transition-all active:scale-95">Toggle</button>
+        <div class="flex-1"><p class="font-extrabold text-[14px]" data-i18n="sound_fx">Sound effects</p><p class="text-[12px] font-bold text-slate-400" id="settingsSoundState">On</p></div>
+        <button onclick="toggleSound(); refreshSettingsSoundState();" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 text-[12px] font-extrabold rounded-xl px-4 py-2 transition-all active:scale-95" data-i18n="toggle">Toggle</button>
       </div>
-      <button onclick="toggleSound(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-[13px] rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="play" class="w-4 h-4"></i> Test sound</button>
-      <p class="text-[11px] font-bold text-slate-400 text-center">Theme & sound are saved automatically in this browser.</p>
+      <button onclick="toggleSound(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-[13px] rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="play" class="w-4 h-4"></i> <span data-i18n="test_sound">Test sound</span></button>
+      <p class="text-[11px] font-bold text-slate-400 text-center" data-i18n="saved_note">Theme & sound are saved automatically in this browser.</p>
     </div>
 
     <!-- Data -->
     <div id="settingsPanelData" class="hidden p-5 space-y-3 overflow-y-auto">
       <div class="bg-sky-50 border border-sky-100 rounded-2xl p-3.5 text-[13px] font-bold text-sky-900" id="settingsStorageInfo">—</div>
-      <button onclick="confirmResetPoints()" class="w-full bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset points (this class)</button>
+      <button onclick="confirmResetPoints()" class="w-full bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span data-i18n="reset_points_class">Reset points (this class)</span></button>
       <div class="border-2 border-dashed border-rose-200 rounded-2xl p-4">
-        <p class="font-extrabold text-[14px] text-rose-600 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Danger zone</p>
-        <p class="text-[12px] font-bold text-slate-500 mt-1">Deletes <b>all</b> classrooms, students, photos & history on this device and starts blank. This cannot be undone.</p>
-        <button onclick="confirmResetAllData()" class="mt-3 w-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-rose-200"><i data-lucide="trash-2" class="w-4 h-4"></i> Reset all data</button>
+        <p class="font-extrabold text-[14px] text-rose-600 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> <span data-i18n="danger">Danger zone</span></p>
+        <p class="text-[12px] font-bold text-slate-500 mt-1" data-i18n="danger_text">Deletes all classrooms, students, photos & history on this device and starts blank. This cannot be undone.</p>
+        <button onclick="confirmResetAllData()" class="mt-3 w-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-rose-200"><i data-lucide="trash-2" class="w-4 h-4"></i> <span data-i18n="reset_all_data">Reset all data</span></button>
       </div>
     </div>
 
     <!-- Shortcuts -->
     <div id="settingsPanelShortcuts" class="hidden p-5 space-y-2 overflow-y-auto text-[13px] font-bold text-slate-600">
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Students / Toolkit / Reports</span><span class="flex gap-1"><kbd class="kbd">1</kbd><kbd class="kbd">2</kbd><kbd class="kbd">3</kbd></span></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Prev / next classroom</span><span class="flex gap-1"><kbd class="kbd">←</kbd><kbd class="kbd">→</kbd></span></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Search students</span><kbd class="kbd">/</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>New student</span><kbd class="kbd">N</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>History log</span><kbd class="kbd">H</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Dark mode</span><kbd class="kbd">D</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Mute / unmute sounds</span><kbd class="kbd">M</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Settings</span><kbd class="kbd">S</kbd></div>
-      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span>Close dialogs</span><kbd class="kbd">Esc</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_students">Students / Toolkit / Reports</span><span class="flex gap-1"><kbd class="kbd">1</kbd><kbd class="kbd">2</kbd><kbd class="kbd">3</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_prevnext">Prev / next classroom</span><span class="flex gap-1"><kbd class="kbd">←</kbd><kbd class="kbd">→</kbd></span></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_search">Search students</span><kbd class="kbd">/</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_newstudent">New student</span><kbd class="kbd">N</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_history">History log</span><kbd class="kbd">H</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_dark">Dark mode</span><kbd class="kbd">D</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_mute">Mute / unmute sounds</span><kbd class="kbd">M</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_settings">Settings</span><kbd class="kbd">S</kbd></div>
+      <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5"><span data-i18n="sc_close">Close dialogs</span><kbd class="kbd">Esc</kbd></div>
     </div>
   </div>
 </div>
@@ -738,19 +764,19 @@ tailwind.config = {
 <aside id="historyPanel" class="fixed top-0 right-0 h-full w-full sm:w-[420px] z-[71] glass-strong shadow-pop flex flex-col transition-transform duration-300 translate-x-full rounded-l-[28px] overflow-hidden">
   <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white">
     <div class="flex items-center justify-between">
-      <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="history" class="w-5 h-5"></i> Activity Log</h3>
+      <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="history" class="w-5 h-5"></i> <span data-i18n="activity_log">Activity Log</span></h3>
       <button onclick="toggleHistory(false)" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all active:scale-95"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
-    <p class="text-indigo-100 text-[13px] font-semibold mt-1">Every star earned, live as it happens ✨</p>
+    <p class="text-indigo-100 text-[13px] font-semibold mt-1" data-i18n="every_star">Every star earned, live as it happens ✨</p>
   </div>
   <div class="p-4 flex gap-2 border-b border-slate-100">
-    <button onclick="setHistoryFilter('all')" id="hfAll" class="chip-active flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all">All</button>
-    <button onclick="setHistoryFilter('positive')" id="hfPos" class="flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all">Positive</button>
-    <button onclick="setHistoryFilter('needs-work')" id="hfNeg" class="flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all">Needs Work</button>
+    <button onclick="setHistoryFilter('all')" id="hfAll" class="chip-active flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all" data-i18n="all">All</button>
+    <button onclick="setHistoryFilter('positive')" id="hfPos" class="flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all" data-i18n="positive">Positive</button>
+    <button onclick="setHistoryFilter('needs-work')" id="hfNeg" class="flex-1 text-[12px] font-extrabold rounded-xl border-2 border-slate-200 py-2 text-slate-500 transition-all" data-i18n="needs_work">Needs Work</button>
   </div>
   <div id="historyList" class="flex-1 overflow-y-auto p-4 space-y-2.5"></div>
   <div class="p-4 border-t border-slate-100 bg-white/60">
-    <button onclick="confirmResetPoints()" class="w-full bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 text-rose-600 font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset All Points for this Class</button>
+    <button onclick="confirmResetPoints()" class="w-full bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 text-rose-600 font-extrabold text-sm rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> <span data-i18n="reset_all_points_class">Reset All Points for this Class</span></button>
   </div>
 </aside>
 
@@ -774,20 +800,20 @@ tailwind.config = {
     </div>
     <div class="p-3">
       <div class="bg-slate-100 rounded-2xl p-1 grid grid-cols-2 gap-1">
-        <button id="awardTabPos" onclick="setAwardTab('positive')" class="tab-btn rounded-xl py-2.5 text-sm font-extrabold bg-white shadow text-emerald-600 flex items-center justify-center gap-2"><i data-lucide="thumbs-up" class="w-4 h-4"></i> Positive</button>
-        <button id="awardTabNeg" onclick="setAwardTab('needs-work')" class="tab-btn rounded-xl py-2.5 text-sm font-extrabold text-slate-500 flex items-center justify-center gap-2"><i data-lucide="thumbs-down" class="w-4 h-4"></i> Needs Work</button>
+        <button id="awardTabPos" onclick="setAwardTab('positive')" class="tab-btn rounded-xl py-2.5 text-sm font-extrabold bg-white shadow text-emerald-600 flex items-center justify-center gap-2"><i data-lucide="thumbs-up" class="w-4 h-4"></i> <span data-i18n="positive">Positive</span></button>
+        <button id="awardTabNeg" onclick="setAwardTab('needs-work')" class="tab-btn rounded-xl py-2.5 text-sm font-extrabold text-slate-500 flex items-center justify-center gap-2"><i data-lucide="thumbs-down" class="w-4 h-4"></i> <span data-i18n="needs_work">Needs Work</span></button>
       </div>
     </div>
     <div id="awardBehaviors" class="px-4 pb-2 grid grid-cols-2 gap-2.5 overflow-y-auto"></div>
     <div class="px-4 pb-1">
-      <button onclick="openCustomBehaviorModal()" class="w-full rounded-2xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-600 font-extrabold text-[13px] py-2.5 flex items-center justify-center gap-2 transition-all active:scale-[.98]"><i data-lucide="plus" class="w-4 h-4"></i> Create custom</button>
+      <button onclick="openCustomBehaviorModal()" class="w-full rounded-2xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-600 font-extrabold text-[13px] py-2.5 flex items-center justify-center gap-2 transition-all active:scale-[.98]"><i data-lucide="plus" class="w-4 h-4"></i> <span data-i18n="create_custom">Create custom</span></button>
     </div>
     <div class="p-4 pt-2">
       <div class="bg-indigo-50 rounded-2xl p-3 flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0"><i data-lucide="zap" class="w-4 h-4"></i></div>
         <div class="flex-1">
-          <p class="text-[12px] font-extrabold text-indigo-900">Quick award</p>
-          <p class="text-[11px] font-bold text-indigo-500">Tap +1 / −1 for instant feedback</p>
+          <p class="text-[12px] font-extrabold text-indigo-900" data-i18n="quick_award">Quick award</p>
+          <p class="text-[11px] font-bold text-indigo-500" data-i18n="quick_award_sub">Tap +1 / −1 for instant feedback</p>
         </div>
         <button onclick="quickAward(1)" class="w-11 h-11 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg shadow-md active:scale-90 transition-all">+1</button>
         <button onclick="quickAward(-1)" class="w-11 h-11 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-lg shadow-md active:scale-90 transition-all">−1</button>
@@ -802,21 +828,21 @@ tailwind.config = {
   <div class="modal-panel relative w-full sm:max-w-[380px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden">
     <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white">
       <div class="flex items-center justify-between">
-        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5"></i> Create custom</h3>
+        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5"></i> <span data-i18n="custom_title">Create custom</span></h3>
         <button onclick="closeCustomBehaviorModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
     </div>
     <div class="p-5 space-y-4">
       <div class="grid grid-cols-2 gap-1.5 bg-slate-100 rounded-2xl p-1.5">
-        <button id="customTypePos" onclick="setCustomType('positive')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-emerald-600 shadow transition-all flex items-center justify-center gap-1.5"><i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> Positive</button>
-        <button id="customTypeNeg" onclick="setCustomType('needs-work')" class="rounded-xl py-2 text-[12px] font-extrabold text-slate-500 transition-all flex items-center justify-center gap-1.5"><i data-lucide="thumbs-down" class="w-3.5 h-3.5"></i> Needs Work</button>
+        <button id="customTypePos" onclick="setCustomType('positive')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-emerald-600 shadow transition-all flex items-center justify-center gap-1.5"><i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> <span data-i18n="positive">Positive</span></button>
+        <button id="customTypeNeg" onclick="setCustomType('needs-work')" class="rounded-xl py-2 text-[12px] font-extrabold text-slate-500 transition-all flex items-center justify-center gap-1.5"><i data-lucide="thumbs-down" class="w-3.5 h-3.5"></i> <span data-i18n="needs_work">Needs Work</span></button>
       </div>
       <div>
-        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Name</label>
-        <input id="customBehaviorLabel" type="text" placeholder="e.g. Amazing Homework" maxlength="30" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all" />
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="name_label">Name</label>
+        <input id="customBehaviorLabel" type="text" data-i18n-placeholder="name_ph" placeholder="e.g. Amazing Homework" maxlength="30" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all" />
       </div>
       <div>
-        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Points (no limit — tap or type any number)</label>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="points_label">Points (no limit — tap or type any number)</label>
         <div class="mt-1 flex items-center gap-2">
           <button onclick="stepCustomPoints(-1)" class="w-12 h-12 rounded-2xl bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-500 font-black text-xl transition-all active:scale-90">−</button>
           <div id="customPointsPreview" class="flex-1 text-center bg-slate-50 border-2 border-slate-100 rounded-2xl py-2.5 font-black text-xl text-emerald-600">+2</div>
@@ -829,8 +855,8 @@ tailwind.config = {
         <input id="customBehaviorPoints" type="number" step="1" value="2" class="mt-2 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-2.5 text-sm font-bold outline-none transition-all text-center" oninput="syncCustomPointsFromInput()" />
       </div>
       <div class="flex gap-2">
-        <button onclick="closeCustomBehaviorModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all">Cancel</button>
-        <button onclick="saveCustomBehavior()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Save custom</button>
+        <button onclick="closeCustomBehaviorModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all" data-i18n="cancel">Cancel</button>
+        <button onclick="saveCustomBehavior()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> <span data-i18n="save_custom">Save custom</span></button>
       </div>
     </div>
   </div>
@@ -851,41 +877,41 @@ tailwind.config = {
       <div class="flex items-center gap-4">
         <div id="photoPreview" class="w-20 h-20 rounded-full overflow-hidden bg-indigo-100 border-4 border-indigo-100 flex items-center justify-center text-2xl font-black text-indigo-600 shrink-0"></div>
         <div class="flex-1">
-          <p class="text-[13px] font-extrabold text-slate-700">Profile photo</p>
-          <p class="text-[11px] font-bold text-slate-400">Auto-compressed to fit safely</p>
+          <p class="text-[13px] font-extrabold text-slate-700" data-i18n="profile_photo">Profile photo</p>
+          <p class="text-[11px] font-bold text-slate-400" data-i18n="auto_compress">Auto-compressed to fit safely</p>
           <div class="flex gap-2 mt-2">
             <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white text-[12px] font-extrabold rounded-xl px-3 py-2 flex items-center gap-1.5 transition-all active:scale-95">
-              <i data-lucide="camera" class="w-3.5 h-3.5"></i> Upload
+              <i data-lucide="camera" class="w-3.5 h-3.5"></i> <span data-i18n="upload">Upload</span>
               <input id="photoInput" type="file" accept="image/*" class="hidden" onchange="handlePhotoSelect(event)" />
             </label>
-            <button id="removePhotoBtn" onclick="removeStagedPhoto()" class="hidden bg-rose-50 text-rose-600 border border-rose-200 text-[12px] font-extrabold rounded-xl px-3 py-2 items-center gap-1.5 hover:bg-rose-100 transition-all"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remove</button>
+            <button id="removePhotoBtn" onclick="removeStagedPhoto()" class="hidden bg-rose-50 text-rose-600 border border-rose-200 text-[12px] font-extrabold rounded-xl px-3 py-2 items-center gap-1.5 hover:bg-rose-100 transition-all"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span data-i18n="remove">Remove</span></button>
           </div>
           <p id="photoHint" class="text-[11px] font-bold text-amber-600 mt-1.5 hidden"></p>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">First name</label>
+          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="first_name">First name</label>
           <input id="firstNameInput" type="text" placeholder="Sophia" maxlength="20" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-2.5 text-sm font-bold outline-none transition-all" />
         </div>
         <div>
-          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Last name</label>
+          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="last_name">Last name</label>
           <input id="lastNameInput" type="text" placeholder="Carter" maxlength="20" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-2.5 text-sm font-bold outline-none transition-all" />
         </div>
       </div>
       <div>
         <div class="flex items-center justify-between">
-          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Chubby Monster (default avatar)</label>
-          <button onclick="shuffleStagedMonster()" class="text-[12px] font-extrabold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"><i data-lucide="dices" class="w-3.5 h-3.5"></i> Shuffle</button>
+          <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="monster_label">Chubby Monster (default avatar)</label>
+          <button onclick="shuffleStagedMonster()" class="text-[12px] font-extrabold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"><i data-lucide="dices" class="w-3.5 h-3.5"></i> <span data-i18n="shuffle">Shuffle</span></button>
         </div>
         <div id="monsterPicker" class="grid grid-cols-4 gap-2 mt-2"></div>
-        <p class="text-[11px] font-bold text-slate-400 mt-1.5">Tap a monster — each student gets a random one automatically.</p>
+        <p class="text-[11px] font-bold text-slate-400 mt-1.5" data-i18n="monster_hint">Tap a monster — each student gets a random one automatically.</p>
       </div>
       <div class="flex gap-2 pt-1">
-        <button onclick="closeStudentModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all">Cancel</button>
+        <button onclick="closeStudentModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all" data-i18n="cancel">Cancel</button>
         <button onclick="saveStudent()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> <span id="saveStudentLabel">Add Student</span></button>
       </div>
-      <button id="deleteStudentBtn" onclick="deleteStudent()" class="hidden w-full text-rose-500 hover:text-rose-700 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 transition-all flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete student</button>
+      <button id="deleteStudentBtn" onclick="deleteStudent()" class="hidden w-full text-rose-500 hover:text-rose-700 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 transition-all flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> <span data-i18n="delete_student">Delete student</span></button>
     </div>
   </div>
 </div>
@@ -902,18 +928,18 @@ tailwind.config = {
     </div>
     <div class="p-5 space-y-4">
       <div>
-        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Class name</label>
-        <input id="classNameInput" type="text" placeholder="e.g. Grade 4 — Sunflowers" maxlength="40" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all" />
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="class_name">Class name</label>
+        <input id="classNameInput" type="text" data-i18n-placeholder="class_name_ph" placeholder="e.g. Grade 4 — Sunflowers" maxlength="40" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all" />
       </div>
       <div>
-        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide">Class icon</label>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="class_icon">Class icon</label>
         <div id="emojiPicker" class="grid grid-cols-8 gap-2 mt-2"></div>
       </div>
       <div class="flex gap-2">
-        <button onclick="closeClassroomModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3">Cancel</button>
-        <button onclick="saveClassroom()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95">Create Class</button>
+        <button onclick="closeClassroomModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3" data-i18n="cancel">Cancel</button>
+        <button onclick="saveClassroom()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95" data-i18n="create_class">Create Class</button>
       </div>
-      <button id="deleteClassBtn" onclick="deleteClassroom()" class="hidden w-full text-rose-500 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete classroom</button>
+      <button id="deleteClassBtn" onclick="deleteClassroom()" class="hidden w-full text-rose-500 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> <span data-i18n="delete_classroom">Delete classroom</span></button>
     </div>
   </div>
 </div>
@@ -924,15 +950,15 @@ tailwind.config = {
   <div class="modal-panel relative w-full max-w-[420px] bg-white rounded-[32px] shadow-pop p-8 text-center overflow-hidden">
     <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-500"></div>
     <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="dices" class="w-7 h-7"></i></div>
-    <h3 class="font-poppins font-extrabold text-xl mt-3">Who's up next?</h3>
-    <p class="text-sm font-bold text-slate-400">Drumroll please... 🥁</p>
+    <h3 class="font-poppins font-extrabold text-xl mt-3" data-i18n="whos_up">Who's up next?</h3>
+    <p class="text-sm font-bold text-slate-400" data-i18n="drumroll">Drumroll please... 🥁</p>
     <div id="pickerStage" class="mt-5">
       <div id="pickerAvatar" class="w-28 h-28 mx-auto rounded-full bg-indigo-100 border-4 border-indigo-200 flex items-center justify-center text-5xl overflow-hidden picker-glow">🎲</div>
       <p id="pickerName" class="font-poppins font-extrabold text-2xl mt-4">Ready?</p>
       <p id="pickerSub" class="text-sm font-bold text-slate-400">Picking from your class</p>
     </div>
     <div class="flex gap-2 mt-6">
-      <button onclick="closeRandomPicker()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3">Close</button>
+      <button onclick="closeRandomPicker()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3" data-i18n="close">Close</button>
       <button id="pickerSpinBtn" onclick="spinPicker()" class="flex-[2] bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Pick Again!</button>
     </div>
   </div>
@@ -946,8 +972,8 @@ tailwind.config = {
     <h3 id="confirmTitle" class="font-poppins font-extrabold text-lg mt-3">Are you sure?</h3>
     <p id="confirmText" class="text-sm font-semibold text-slate-500 mt-1">This cannot be undone.</p>
     <div class="flex gap-2 mt-5">
-      <button onclick="closeConfirm()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-extrabold text-sm rounded-2xl py-3 text-slate-600">Cancel</button>
-      <button id="confirmYesBtn" onclick="doConfirm()" class="flex-1 bg-rose-500 hover:bg-rose-600 font-extrabold text-sm rounded-2xl py-3 text-white shadow-md">Yes, do it</button>
+      <button onclick="closeConfirm()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-extrabold text-sm rounded-2xl py-3 text-slate-600" data-i18n="cancel">Cancel</button>
+      <button id="confirmYesBtn" onclick="doConfirm()" class="flex-1 bg-rose-500 hover:bg-rose-600 font-extrabold text-sm rounded-2xl py-3 text-white shadow-md" data-i18n="yes_do_it">Yes, do it</button>
     </div>
   </div>
 </div>
@@ -1074,22 +1100,22 @@ function chubbySVG(seed, extraCls){
 function randomMonsterSeed(){ return (Math.random()*4294967295) >>> 0; }
 
 const POSITIVE_BEHAVIORS = [
-  { label:'Helping Others', points:1, icon:'heart-handshake' },
-  { label:'On Task', points:1, icon:'target' },
-  { label:'Participation', points:1, icon:'hand-metal' },
-  { label:'Kindness', points:1, icon:'heart' },
-  { label:'Great Teamwork', points:2, icon:'users' },
-  { label:'Perseverance', points:2, icon:'mountain' },
-  { label:'Creativity', points:2, icon:'palette' },
-  { label:'Leadership', points:3, icon:'crown' },
+  { label:'Helping Others', labelAr:'مساعدة الآخرين', points:1, icon:'heart-handshake' },
+  { label:'On Task', labelAr:'ملتزم بالمهمة', points:1, icon:'target' },
+  { label:'Participation', labelAr:'المشاركة', points:1, icon:'hand-metal' },
+  { label:'Kindness', labelAr:'اللطف', points:1, icon:'heart' },
+  { label:'Great Teamwork', labelAr:'عمل جماعي رائع', points:2, icon:'users' },
+  { label:'Perseverance', labelAr:'المثابرة', points:2, icon:'mountain' },
+  { label:'Creativity', labelAr:'الإبداع', points:2, icon:'palette' },
+  { label:'Leadership', labelAr:'القيادة', points:3, icon:'crown' },
 ];
 const NEEDS_WORK_BEHAVIORS = [
-  { label:'Off Task', points:-1, icon:'cloud-off' },
-  { label:'No Homework', points:-1, icon:'book-x' },
-  { label:'Talking Out of Turn', points:-1, icon:'message-circle-off' },
-  { label:'Disrupting Class', points:-1, icon:'volume-x' },
-  { label:'Unprepared', points:-1, icon:'backpack' },
-  { label:'Disrespect', points:-2, icon:'thumbs-down' },
+  { label:'Off Task', labelAr:'غير ملتزم', points:-1, icon:'cloud-off' },
+  { label:'No Homework', labelAr:'بدون واجب', points:-1, icon:'book-x' },
+  { label:'Talking Out of Turn', labelAr:'يتحدث بدون إذن', points:-1, icon:'message-circle-off' },
+  { label:'Disrupting Class', labelAr:'تشويش على الصف', points:-1, icon:'volume-x' },
+  { label:'Unprepared', labelAr:'غير مستعد', points:-1, icon:'backpack' },
+  { label:'Disrespect', labelAr:'عدم احترام', points:-2, icon:'thumbs-down' },
 ];
 
 let state = null;
@@ -1115,6 +1141,174 @@ let timerLeft = 300;
 let timerElapsed = 0;
 let timerRunning = false;
 let timerInt = null;
+
+/* =========================================================
+   i18n — English / Arabic (RTL). Persisted in localStorage.
+========================================================= */
+const LANG_KEY = 'starclass_lang';
+const I18N = {
+en: {
+  tagline:'Joyful Classrooms', nav_students:'Students', nav_toolkit:'Toolkit', nav_reports:'Reports',
+  new_class:'Class', new_student:'Student', my_classrooms:'My Classrooms',
+  theme_dark:'Dark', theme_light:'Light', sound_on:'Sound', sound_muted:'Muted',
+  toolkit_ready:'Toolkit ready', toolkit_sub:'Picker • Timer • Group Maker below', open_tools:'Open Tools',
+  home:'Home', classroom:'Classroom', students:'Students', toolkit:'Toolkit', reports:'Reports',
+  no_classroom:'No Classroom', create_begin:'Create a class to begin',
+  class_points:'Class Points', positive:'Positive', needs_work:'Needs Work', top_star:'Top Star',
+  tab_classroom:'Classroom', tab_reports:'Reports', history:'History', reset:'Reset',
+  tab_class:'Class', points:'Points',
+  dojo_students:'Students', dojo_groups:'Groups', search_ph:'Search monsters...  ( / )',
+  sort_name:'Sort: Name', sort_top:'Sort: Top points', sort_low:'Sort: Lowest points', pick_random:'Pick Random',
+  empty_no_monsters:'No monsters yet', empty_add_first:'Add your first superstar to fill the class!', add_student:'+ Add Student',
+  empty_create_class:'Create your first class', empty_create_sub:'Name your class, then add monsters to it! 🚀', new_classroom_btn:'+ New Classroom',
+  no_match:'No monsters match', try_search:'Try another search 🔍',
+  groups_today:'Groups for today', shuffled_sub:'Shuffled from this class', per_group:'per group', shuffle_groups:'Shuffle Groups',
+  toolkit_title:'Classroom Toolkit', random_picker:'Random Picker', cold_call:'Cold-call with fun',
+  tap_pick:'Tap to pick a star ⭐', pick_student:'Pick a Student',
+  class_timer:'Class Timer', focus_sub:'Focus & transitions', count:'Count', watch:'Watch',
+  start:'Start', pause:'Pause', ready:'Ready', running:'Running', paused:'Paused', done:'Done!',
+  group_maker:'Group Maker', shuffle_teams:'Shuffle into teams', per_group2:'/ group', mix:'Mix',
+  reports_title:'Reports & Leaderboard', live_for:'Live standings for', export_csv:'Export CSV',
+  reset_all_points:'Reset All Points', full_log:'Full Activity Log',
+  footer:'Made with ♥ for amazing teachers — StarClass keeps data safely in your browser.',
+  dock_class:'Classroom', dock_reports:'Reports', dock_messages:'Messages', dock_more:'More',
+  settings:'Settings', general:'General', data:'Data', shortcuts:'Shortcuts',
+  appearance:'Appearance', appearance_sub:'Light or dark classroom', toggle:'Toggle',
+  sound_fx:'Sound effects', test_sound:'Test sound', saved_note:'Theme & sound are saved automatically in this browser.',
+  language:'Language',
+  reset_points_class:'Reset points (this class)', danger:'Danger zone',
+  danger_text:'Deletes all classrooms, students, photos & history on this device and starts blank. This cannot be undone.',
+  reset_all_data:'Reset all data',
+  activity_log:'Activity Log', every_star:'Every star earned, live as it happens ✨', all:'All',
+  reset_all_points_class:'Reset All Points for this Class',
+  create_custom:'Create custom', quick_award:'Quick award', quick_award_sub:'Tap +1 / −1 for instant feedback',
+  custom_title:'Create custom', name_label:'Name', name_ph:'e.g. Amazing Homework',
+  points_label:'Points (no limit — tap or type any number)', cancel:'Cancel', save_custom:'Save custom',
+  add_student_title:'Add Student', edit_student_title:'Edit Student',
+  profile_photo:'Profile photo', auto_compress:'Auto-compressed to fit safely', upload:'Upload', remove:'Remove',
+  first_name:'First name', last_name:'Last name', monster_label:'Chubby Monster (default avatar)', shuffle:'Shuffle',
+  monster_hint:'Tap a monster — each student gets a random one automatically.',
+  save_changes:'Save Changes', delete_student:'Delete student',
+  new_classroom_title:'New Classroom', edit_classroom_title:'Edit Classroom',
+  class_name:'Class name', class_name_ph:'e.g. Grade 4 — Sunflowers', class_icon:'Class icon',
+  create_class:'Create Class', delete_classroom:'Delete classroom',
+  whos_up:"Who's up next?", drumroll:'Drumroll please... 🥁', ready_q:'Ready?', picking_from:'Picking from your class',
+  close:'Close', pick_again:'Pick Again!', picking:'Picking...',
+  are_you_sure:'Are you sure?', cannot_undo:'This cannot be undone.', yes_do_it:'Yes, do it',
+  shortcuts_title:'Shortcuts & Navigation',
+  sc_students:'Students / Toolkit / Reports', sc_prevnext:'Prev / next classroom', sc_search:'Search students',
+  sc_newstudent:'New student', sc_history:'History log', sc_dark:'Dark mode', sc_mute:'Mute / unmute sounds',
+  sc_settings:'Settings', sc_close:'Close dialogs', sc_collapse:'Collapse sidebar', toggle_theme:'Toggle theme',
+  everyone:'Everyone', everyone_sub:'Tap +1 • ⇧-click = instant ⚡', add_tile:'Add',
+  students_unit:'students', pts_unit:'pts', total_pts:'total pts',
+  no_class:'No Class', new_label:'+ New', new_class_label:'+ New class',
+},
+ar: {
+  tagline:'فصول دراسية ممتعة', nav_students:'الطلاب', nav_toolkit:'الأدوات', nav_reports:'التقارير',
+  new_class:'صف', new_student:'طالب', my_classrooms:'صفوفي الدراسية',
+  theme_dark:'داكن', theme_light:'فاتح', sound_on:'الصوت', sound_muted:'صامت',
+  toolkit_ready:'الأدوات جاهزة', toolkit_sub:'الاختيار • المؤقت • صانع المجموعات بالأسفل', open_tools:'فتح الأدوات',
+  home:'الرئيسية', classroom:'الفصل', students:'الطلاب', toolkit:'الأدوات', reports:'التقارير',
+  no_classroom:'لا يوجد فصل', create_begin:'أنشئ فصلاً للبدء',
+  class_points:'نقاط الصف', positive:'إيجابي', needs_work:'يحتاج تحسين', top_star:'النجم الأعلى',
+  tab_classroom:'الفصل', tab_reports:'التقارير', history:'السجل', reset:'تصفير',
+  tab_class:'الفصل', points:'النقاط',
+  dojo_students:'الطلاب', dojo_groups:'المجموعات', search_ph:'ابحث عن الوحوش...  ( / )',
+  sort_name:'ترتيب: الاسم', sort_top:'ترتيب: الأعلى نقاطًا', sort_low:'ترتيب: الأقل نقاطًا', pick_random:'اختيار عشوائي',
+  empty_no_monsters:'لا توجد وحوش بعد', empty_add_first:'أضف أول نجم لملء الصف!', add_student:'+ إضافة طالب',
+  empty_create_class:'أنشئ فصلك الأول', empty_create_sub:'سمِّ فصلك، ثم أضف الوحوش إليه! 🚀', new_classroom_btn:'+ فصل جديد',
+  no_match:'لا توجد وحوش تطابق', try_search:'جرّب بحثًا آخر 🔍',
+  groups_today:'مجموعات اليوم', shuffled_sub:'مخلوطة من هذا الصف', per_group:'لكل مجموعة', shuffle_groups:'خلط المجموعات',
+  toolkit_title:'أدوات الفصل', random_picker:'الاختيار العشوائي', cold_call:'اختيار ممتع للمشاركة',
+  tap_pick:'انقر لاختيار نجم ⭐', pick_student:'اختر طالبًا',
+  class_timer:'مؤقت الصف', focus_sub:'للتركيز والانتقالات', count:'تنازلي', watch:'تصاعدي',
+  start:'ابدأ', pause:'إيقاف مؤقت', ready:'جاهز', running:'يعمل', paused:'متوقف', done:'انتهى!',
+  group_maker:'صانع المجموعات', shuffle_teams:'اخلط لتكوين فرق', per_group2:'/ المجموعة', mix:'اخلط',
+  reports_title:'التقارير والترتيب', live_for:'الترتيب المباشر لـ', export_csv:'تصدير CSV',
+  reset_all_points:'تصفير كل النقاط', full_log:'سجل النشاط الكامل',
+  footer:'صُنع بـ ♥ لمعلمين رائعين — StarClass يحفظ بياناتك بأمان في متصفحك.',
+  dock_class:'الفصل', dock_reports:'التقارير', dock_messages:'الرسائل', dock_more:'المزيد',
+  settings:'الإعدادات', general:'عام', data:'البيانات', shortcuts:'الاختصارات',
+  appearance:'المظهر', appearance_sub:'فصل فاتح أو داكن', toggle:'تبديل',
+  sound_fx:'المؤثرات الصوتية', test_sound:'تجربة الصوت', saved_note:'يُحفظ المظهر والصوت تلقائيًا في هذا المتصفح.',
+  language:'اللغة',
+  reset_points_class:'تصفير النقاط (هذا الصف)', danger:'منطقة الخطر',
+  danger_text:'يحذف جميع الفصول والطلاب والصور والسجل على هذا الجهاز ويبدأ من جديد. لا يمكن التراجع.',
+  reset_all_data:'حذف جميع البيانات',
+  activity_log:'سجل النشاط', every_star:'كل نجمة تُكتسب، لحظة بلحظة ✨', all:'الكل',
+  reset_all_points_class:'تصفير كل النقاط لهذا الصف',
+  create_custom:'إنشاء مخصص', quick_award:'منح سريع', quick_award_sub:'انقر +1 / −1 لتعزيز فوري',
+  custom_title:'إنشاء مخصص', name_label:'الاسم', name_ph:'مثال: واجب مذهل',
+  points_label:'النقاط (بدون حد — انقر أو اكتب أي رقم)', cancel:'إلغاء', save_custom:'حفظ المخصص',
+  add_student_title:'إضافة طالب', edit_student_title:'تعديل الطالب',
+  profile_photo:'الصورة الشخصية', auto_compress:'تُضغط تلقائيًا لتناسب التخزين', upload:'رفع', remove:'إزالة',
+  first_name:'الاسم الأول', last_name:'اسم العائلة', monster_label:'الوحش الممتلئ (الصورة الافتراضية)', shuffle:'خلط',
+  monster_hint:'انقر وحشًا — كل طالب يحصل على وحش عشوائي تلقائيًا.',
+  save_changes:'حفظ التغييرات', delete_student:'حذف الطالب',
+  new_classroom_title:'فصل جديد', edit_classroom_title:'تعديل الفصل',
+  class_name:'اسم الفصل', class_name_ph:'مثال: الصف الرابع — عباد الشمس', class_icon:'أيقونة الفصل',
+  create_class:'إنشاء الفصل', delete_classroom:'حذف الفصل',
+  whos_up:'من التالي؟', drumroll:'قرع الطبول من فضلك... 🥁', ready_q:'جاهز؟', picking_from:'الاختيار من صفك',
+  close:'إغلاق', pick_again:'اختر مجددًا!', picking:'جارٍ الاختيار...',
+  are_you_sure:'هل أنت متأكد؟', cannot_undo:'لا يمكن التراجع عن هذا.', yes_do_it:'نعم، نفّذ',
+  shortcuts_title:'الاختصارات والتنقل',
+  sc_students:'الطلاب / الأدوات / التقارير', sc_prevnext:'الفصل السابق / التالي', sc_search:'البحث عن الطلاب',
+  sc_newstudent:'طالب جديد', sc_history:'سجل النشاط', sc_dark:'الوضع الداكن', sc_mute:'كتم / تشغيل الصوت',
+  sc_settings:'الإعدادات', sc_close:'إغلاق النوافذ', sc_collapse:'طي الشريط الجانبي', toggle_theme:'تبديل المظهر',
+  everyone:'الجميع', everyone_sub:'انقر +1 • ⇧-نقر = فوري ⚡', add_tile:'إضافة',
+  students_unit:'طالب', pts_unit:'نقطة', total_pts:'إجمالي النقاط',
+  no_class:'لا يوجد صف', new_label:'+ جديد', new_class_label:'+ فصل جديد',
+}
+};
+let currentLang = 'en';
+try{ const saved = localStorage.getItem(LANG_KEY); if(saved==='ar'||saved==='en') currentLang = saved; }catch(e){}
+function t(key){ try{ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key; }catch(e){ return key; } }
+function behaviorLabel(b){ if(!b) return ''; if(currentLang==='ar' && b.labelAr) return b.labelAr; return b.label || ''; }
+function toggleLanguage(){ setLanguage(currentLang==='ar' ? 'en' : 'ar'); }
+function setLanguage(lang){
+  if(lang!=='ar' && lang!=='en') lang = 'en';
+  currentLang = lang;
+  try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
+  applyLanguage();
+  try{ saveStateRefreshOnly(); }catch(e){}
+  renderAll();
+  if(window.lucide) lucide.createIcons();
+}
+function saveStateRefreshOnly(){ /* language is stored separately; no state write needed */ }
+function applyLanguage(){
+  const isAr = currentLang==='ar';
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = 'ltr'; /* layout locked: sidebar stays left in both languages */
+  document.title = isAr ? 'StarClass — إدارة صفية ممتعة' : 'StarClass — Joyful Classroom Management';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(!k) return;
+    const v = t(k);
+    if(v && v!==k) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const k = el.getAttribute('data-i18n-placeholder');
+    if(!k) return;
+    const v = t(k);
+    if(v && v!==k) el.setAttribute('placeholder', v);
+  });
+  const pairs = [['langBtnEnTop','en'],['langBtnArTop','ar'],['langBtnEnSide','en'],['langBtnArSide','ar'],['langBtnEnSettings','en'],['langBtnArSettings','ar']];
+  pairs.forEach(([id,lang])=>{ const e=document.getElementById(id); if(e) e.classList.toggle('on', currentLang===lang); });
+  const m = document.getElementById('langBtnMobile'); if(m) m.textContent = currentLang==='ar' ? 'EN' : 'عربي';
+  try{
+    refreshThemeUI(); refreshSoundUI(); refreshSettingsSoundState(); refreshCrumbs(); setActiveNav(currentView==='reports'?'reports':'students');
+    const sBtn = document.getElementById('timerStartBtn');
+    if(sBtn) sBtn.innerHTML = timerRunning ? '<i data-lucide="pause" class="w-3.5 h-3.5"></i> ' + esc(t('pause')) : '<i data-lucide="play" class="w-3.5 h-3.5"></i> ' + esc(t('start'));
+    const lbl = document.getElementById('timerStateLabel');
+    if(lbl){ const txt = lbl.textContent; if(txt==='Ready'||txt==='جاهز') lbl.textContent = t('ready'); else if(txt==='Running'||txt==='يعمل') lbl.textContent = t('running'); else if(txt==='Paused'||txt==='متوقف') lbl.textContent = t('paused'); else if(txt==='Done!'||txt==='انتهى!') lbl.textContent = t('done'); }
+    const mc = document.getElementById('modeCountdownBtn'); if(mc) mc.textContent = t('count');
+    const ms = document.getElementById('modeStopwatchBtn'); if(ms) ms.textContent = t('watch');
+    const psb = document.getElementById('pickerSpinBtn');
+    if(psb && !pickerSpinning) psb.innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> ' + esc(t('pick_again'));
+    try{ if(typeof setAwardTab==='function' && document.getElementById('awardBehaviors')) setAwardTab(typeof awardTab!=='undefined'?awardTab:'positive'); }catch(e){}
+    try{ if(typeof refreshCustomTypeUI==='function' && document.getElementById('customPointsPreview')) refreshCustomTypeUI(); }catch(e){}
+  }catch(e){}
+}
 
 /* ---------- Helpers ---------- */
 function uid(){ return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
@@ -1531,7 +1725,7 @@ function refreshSoundUI(){
   const htmlBig = '<i data-lucide="'+icon+'" class="w-5 h-5 text-slate-700"></i>';
   ['soundIconTop','soundIconSide'].forEach(id=>{ const e=document.getElementById(id); if(e) e.innerHTML = html; });
   const m = document.getElementById('soundIconMobile'); if(m) m.innerHTML = htmlBig;
-  const lbl = document.getElementById('soundLabelSide'); if(lbl) lbl.textContent = SFX.enabled ? 'Sound' : 'Muted';
+  const lbl = document.getElementById('soundLabelSide'); if(lbl) lbl.textContent = SFX.enabled ? t('sound_on') : t('sound_muted');
   if(window.lucide) lucide.createIcons();
 }
 
@@ -1554,7 +1748,7 @@ function refreshThemeUI(){
   const html = '<i data-lucide="'+icon+'" class="w-4 h-4"></i>';
   ['themeIconTop','themeIconSide'].forEach(id=>{ const e=document.getElementById(id); if(e) e.innerHTML = html; });
   const m = document.getElementById('themeIconMobile'); if(m) m.innerHTML = '<i data-lucide="'+icon+'" class="w-5 h-5 text-slate-700"></i>';
-  const lbl = document.getElementById('themeLabelSide'); if(lbl) lbl.textContent = dark ? 'Light' : 'Dark';
+  const lbl = document.getElementById('themeLabelSide'); if(lbl) lbl.textContent = dark ? t('theme_light') : t('theme_dark');
   try{ document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light'; }catch(e){}
   if(window.lucide) lucide.createIcons();
 }
@@ -1591,7 +1785,7 @@ function setActiveNav(which){
   document.querySelectorAll('.dock-btn').forEach(el=>el.classList.remove('dock-active'));
   if(which==='students'){ const e=document.getElementById('mNavHome'); if(e) e.classList.add('dock-active'); }
   if(which==='reports'){ const e=document.getElementById('mNavReports'); if(e) e.classList.add('dock-active'); }
-  const cv = document.getElementById('crumbView'); if(cv) cv.textContent = which==='toolkit' ? 'Toolkit' : which==='reports' ? 'Reports' : 'Students';
+  const cv = document.getElementById('crumbView'); if(cv) cv.textContent = which==='toolkit' ? t('toolkit') : which==='reports' ? t('reports') : t('students');
 }
 function prevClassroom(){ stepClassroom(-1); }
 function nextClassroom(){ stepClassroom(1); }
@@ -1631,7 +1825,7 @@ function switchSettingsTab(tab){
 }
 function refreshSettingsSoundState(){
   const el = document.getElementById('settingsSoundState');
-  if(el) el.textContent = SFX.enabled ? 'On — playful chimes & fanfares 🔊' : 'Off — silent mode 🔇';
+  if(el) el.textContent = SFX.enabled ? (currentLang==='ar' ? 'يعمل — نغمات مرحة 🔊' : 'On — playful chimes & fanfares 🔊') : (currentLang==='ar' ? 'متوقف — وضع صامت 🔇' : 'Off — silent mode 🔇');
 }
 function refreshSettingsStorageInfo(){
   const el = document.getElementById('settingsStorageInfo');
@@ -1642,7 +1836,7 @@ function refreshSettingsStorageInfo(){
   el.innerHTML = '📦 <b>'+nC+'</b> classes • <b>'+nS+'</b> students • <b>'+nH+'</b> history events &nbsp;•&nbsp; ~'+kb+' KB in this browser';
 }
 function confirmResetAllData(){
-  askConfirm('Reset ALL data?', 'Every classroom, student, photo and log on this device will be permanently deleted.', resetAllData);
+  askConfirm(currentLang==='ar' ? 'حذف جميع البيانات؟' : 'Reset ALL data?', currentLang==='ar' ? 'سيتم حذف كل الفصول والطلاب والصور والسجل نهائيًا من هذا الجهاز.' : 'Every classroom, student, photo and log on this device will be permanently deleted.', resetAllData);
 }
 function resetAllData(){
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
@@ -1656,7 +1850,7 @@ function resetAllData(){
 }
 function refreshCrumbs(){
   const c = activeClassroom();
-  const cc = document.getElementById('crumbClass'); if(cc) cc.textContent = c ? c.name : 'No classroom';
+  const cc = document.getElementById('crumbClass'); if(cc) cc.textContent = c ? c.name : t('no_classroom');
 }
 
 /* ---------- Toast + Banner ---------- */
@@ -1736,7 +1930,7 @@ function renderClassroomList(){
   const list = document.getElementById('classroomList');
   document.getElementById('classCountBadge').textContent = state.classrooms.length;
   if(!state.classrooms.length){
-    list.innerHTML = '<div class="text-center py-8 text-sm font-bold text-slate-400">No classrooms yet.<br/>Create one to begin ✨</div>';
+    list.innerHTML = '<div class="text-center py-8 text-sm font-bold text-slate-400">' + (currentLang==='ar' ? 'لا توجد فصول بعد.<br/>أنشئ فصلاً للبدء ✨' : 'No classrooms yet.<br/>Create one to begin ✨') + '</div>';
   } else {
     list.innerHTML = state.classrooms.map(c=>{
       const kids = state.students.filter(s=>s.classroomId===c.id);
@@ -1745,7 +1939,7 @@ function renderClassroomList(){
       return '<button onclick="selectClassroom(\''+c.id+'\')" class="sidebar-link w-full text-left rounded-2xl p-3 flex items-center gap-3 transition-all hover:bg-white '+(active?'active':'bg-white/60 border border-white shadow-sm')+'">'
         + '<div class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shrink-0 '+(active?'bg-white/20':'bg-indigo-50')+'">'+esc(c.emoji||'📚')+'</div>'
         + '<div class="flex-1 min-w-0"><p class="font-extrabold text-[14px] truncate leading-tight">'+esc(c.name)+'</p>'
-        + '<p class="sub text-[12px] font-bold '+(active?'text-indigo-100':'text-slate-400')+'">'+kids.length+' students • '+pts+' pts</p></div>'
+        + '<p class="sub text-[12px] font-bold '+(active?'text-indigo-100':'text-slate-400')+'">'+kids.length+' '+t('students_unit')+' • '+pts+' '+t('pts_unit')+'</p></div>'
         + '<div class="flex flex-col gap-1 shrink-0" onclick="event.stopPropagation()">'
         + '<button title="Edit class" onclick="openClassroomModal(\''+c.id+'\')" class="w-7 h-7 rounded-lg flex items-center justify-center '+(active?'bg-white/20 text-white hover:bg-white/30':'bg-slate-100 text-slate-400 hover:text-indigo-600')+'"><i data-lucide="pencil" class="w-3.5 h-3.5 pointer-events-none"></i></button>'
         + '</div></button>';
@@ -1756,7 +1950,7 @@ function renderClassroomList(){
   pills.innerHTML = state.classrooms.map(c=>{
     const active = c.id===state.selectedClassroom;
     return '<button onclick="selectClassroom(\''+c.id+'\')" class="shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-extrabold border-2 transition-all '+(active?'bg-indigo-600 border-indigo-600 text-white shadow':'bg-white border-slate-200 text-slate-600')+'">'+esc(c.emoji||'📚')+' '+esc(c.name.length>16?c.name.slice(0,16)+'…':c.name)+'</button>';
-  }).join('') + '<button onclick="openClassroomModal()" class="shrink-0 rounded-full px-3.5 py-2 text-[12px] font-extrabold border-2 border-dashed border-indigo-300 text-indigo-600">+ New</button>';
+  }).join('') + '<button onclick="openClassroomModal()" class="shrink-0 rounded-full px-3.5 py-2 text-[12px] font-extrabold border-2 border-dashed border-indigo-300 text-indigo-600">' + t('new_label') + '</button>';
 }
 
 function renderHeader(){
@@ -1766,14 +1960,14 @@ function renderHeader(){
   const pos = state.pointsHistory.filter(h=>h.classroomId===state.selectedClassroom && h.type==='positive').length;
   const neg = state.pointsHistory.filter(h=>h.classroomId===state.selectedClassroom && h.type==='needs-work').length;
   const top = [...kids].sort((a,b)=>(b.points||0)-(a.points||0))[0];
-  const name = c ? c.name : 'No Classroom';
-  const meta = c ? kids.length + ' students • ' + pts + ' total pts' : 'Create a class to begin';
+  const name = c ? c.name : t('no_classroom');
+  const meta = c ? kids.length + ' ' + t('students_unit') + ' • ' + pts + ' ' + t('total_pts') : t('create_begin');
   document.getElementById('activeClassName').textContent = name;
   document.getElementById('activeClassNameMobile').textContent = name;
   document.getElementById('activeClassEmoji').textContent = c ? (c.emoji||'📚') : '📚';
-  document.getElementById('activeClassMeta').textContent = c ? kids.length+' students' : '—';
+  document.getElementById('activeClassMeta').textContent = c ? kids.length+' '+t('students_unit') : '—';
   document.getElementById('activeClassMetaMobile').textContent = meta;
-  document.getElementById('todayLabel').textContent = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
+  document.getElementById('todayLabel').textContent = new Date().toLocaleDateString(currentLang==='ar'?'ar-EG':undefined,{weekday:'long', month:'short', day:'numeric'});
   const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
   set('statTotalPoints', pts); set('statTotalPointsM', pts);
   set('statPositive', pos); set('statPositiveM', pos);
@@ -1851,17 +2045,17 @@ function renderGrid(){
     // Empty state CTA depends on whether any classroom exists yet
     const title = empty.querySelector('h3'), sub = empty.querySelector('p'), btn = empty.querySelector('button');
     if(!hasClass){
-      if(title) title.textContent = 'Create your first class';
-      if(sub) sub.textContent = 'Name your class, then add monsters to it! 🚀';
-      if(btn){ btn.textContent = '+ New Classroom'; btn.setAttribute('onclick','openClassroomModal()'); }
+      if(title) title.textContent = t('empty_create_class');
+      if(sub) sub.textContent = t('empty_create_sub');
+      if(btn){ btn.textContent = t('new_classroom_btn'); btn.setAttribute('onclick','openClassroomModal()'); }
     } else {
-      if(title) title.textContent = 'No monsters yet';
-      if(sub) sub.textContent = 'Add your first superstar to fill the class!';
-      if(btn){ btn.textContent = '+ Add Student'; btn.setAttribute('onclick','openStudentModal()'); }
+      if(title) title.textContent = t('empty_no_monsters');
+      if(sub) sub.textContent = t('empty_add_first');
+      if(btn){ btn.textContent = t('add_student'); btn.setAttribute('onclick','openStudentModal()'); }
     }
     if(window.lucide) lucide.createIcons(); renderDojoPills(); return;
   }
-  if(!kids.length){ grid.innerHTML = '<div class="col-span-full text-center py-10 font-bold text-slate-400">No monsters match “'+esc(q)+'”. Try another search 🔍</div>'; if(window.lucide) lucide.createIcons(); return; }
+  if(!kids.length){ grid.innerHTML = '<div class="col-span-full text-center py-10 font-bold text-slate-400">' + t('no_match') + ' “'+esc(q)+'”. ' + t('try_search') + '</div>'; if(window.lucide) lucide.createIcons(); return; }
   const max = classMaxPoints();
   const tiles = kids.map(s=>{
     const p = s.points||0;
@@ -1887,24 +2081,24 @@ function renderGrid(){
     + '<div class="dojo-pts" style="background:#4F46E5">'+total+'</div>'
     + '<div class="flex -space-x-3">'
     + '<div class="w-10 h-10">'+chubbySVG(11)+'</div><div class="w-10 h-10">'+chubbySVG(77)+'</div><div class="w-10 h-10">'+chubbySVG(199)+'</div>'
-    + '</div><div class="dojo-name">Everyone</div>'
-    + '<div class="text-[11px] font-bold text-indigo-500">Tap +1 • ⇧-click = instant ⚡</div></div>';
+    + '</div><div class="dojo-name">'+t('everyone')+'</div>'
+    + '<div class="text-[11px] font-bold text-indigo-500">'+t('everyone_sub')+'</div></div>';
   const add = '<div onclick="openStudentModal()" class="dojo-tile dojo-add">'
     + '<div class="flex-1 flex items-center justify-center"><span class="text-5xl font-light">+</span></div>'
-    + '<div class="dojo-name" style="color:#0EA5E9">Add</div></div>';
+    + '<div class="dojo-name" style="color:#0EA5E9">'+t('add_tile')+'</div></div>';
   grid.innerHTML = everyone + tiles + add;
   renderDojoPills();
   if(window.lucide) lucide.createIcons();
 }
 function quickAwardTo(id, delta){
   selectedStudentId = id;
-  applyPoints(id, delta, delta>0?'Quick Praise':'Quick Correction', delta>0?'positive':'needs-work');
+  applyPoints(id, delta, delta>0?(currentLang==='ar'?'ثناء سريع':'Quick Praise'):(currentLang==='ar'?'تنبيه سريع':'Quick Correction'), delta>0?'positive':'needs-work');
 }
 function awardEveryone(ev){
   const kids = activeStudents();
   if(!kids.length) return;
   if(ev && ev.shiftKey){ doAwardEveryone(true); return; }
-  askConfirm('Award whole class +1?', 'Every monster in this class gets +1 for great work. (Tip: hold ⇧ Shift and click for instant, no popup.)', ()=>doAwardEveryone(false));
+  askConfirm(currentLang==='ar' ? 'منح الصف كله +1؟' : 'Award whole class +1?', currentLang==='ar' ? 'كل وحش في هذا الصف سيحصل على +1. (تلميح: اضغط ⇧ Shift وانقر للفوري بدون نافذة.)' : 'Every monster in this class gets +1 for great work. (Tip: hold ⇧ Shift and click for instant, no popup.)', ()=>doAwardEveryone(false));
   SFX.pop();
 }
 function doAwardEveryone(instant){
@@ -1994,12 +2188,12 @@ function renderDojoPills(){
   if(!box) return;
   const dn = document.getElementById('dojoClassName');
   const c = activeClassroom();
-  if(dn) dn.textContent = c ? c.name : 'No Class';
+  if(dn) dn.textContent = c ? c.name : t('no_class');
   box.innerHTML = state.classrooms.map(x=>{
     const n = state.students.filter(s=>s.classroomId===x.id).length;
     const on = x.id===state.selectedClassroom;
     return '<button onclick="selectClassroom(\''+x.id+'\')" class="shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-extrabold border-2 transition-all '+(on?'bg-indigo-600 border-indigo-600 text-white shadow':'bg-white border-slate-200 text-slate-600 hover:border-indigo-300')+'">'+esc(x.emoji||'📚')+' '+esc(x.name)+' <span class="'+(on?'text-indigo-200':'text-slate-400')+'">('+n+')</span></button>';
-  }).join('') + '<button onclick="openClassroomModal()" class="shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-extrabold border-2 border-dashed border-indigo-300 text-indigo-600">+ New class</button>';
+  }).join('') + '<button onclick="openClassroomModal()" class="shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-extrabold border-2 border-dashed border-indigo-300 text-indigo-600">' + t('new_class_label') + '</button>';
 }
 
 function historyIcon(t){ return t==='positive' ? 'thumbs-up' : 'thumbs-down'; }
@@ -2007,7 +2201,7 @@ function historyRow(h){
   const pos = h.type==='positive';
   return '<div class="flex items-start gap-3 bg-white rounded-2xl p-3 border border-slate-100 shadow-sm">'
     + '<div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 '+(pos?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-500')+'"><i data-lucide="'+historyIcon(h.type)+'" class="w-4 h-4"></i></div>'
-    + '<div class="flex-1 min-w-0"><p class="text-[13px] font-extrabold leading-snug">'+esc(h.studentName)+' <span class="'+(pos?'text-emerald-600':'text-rose-500')+'">'+(h.delta>0?'+':'')+h.delta+'</span> <span class="font-bold text-slate-400">for</span> “'+esc(h.behavior)+'”</p>'
+    + '<div class="flex-1 min-w-0"><p class="text-[13px] font-extrabold leading-snug">'+esc(h.studentName)+' <span class="'+(pos?'text-emerald-600':'text-rose-500')+'">'+(h.delta>0?'+':'')+h.delta+'</span> <span class="font-bold text-slate-400">' + (currentLang==='ar' ? 'لـ' : 'for') + '</span> “'+esc(h.behavior)+'”</p>'
     + '<p class="text-[11px] font-bold text-slate-400 mt-0.5 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>'+fmtTime(h.timestamp)+'</p></div></div>';
 }
 function renderHistory(){
@@ -2019,7 +2213,7 @@ function renderHistory(){
   document.getElementById('hfPos').className = 'flex-1 text-[12px] font-extrabold rounded-xl border-2 py-2 transition-all ' + (historyFilter==='positive'?'chip-active border-indigo-600':'border-slate-200 text-slate-500');
   document.getElementById('hfNeg').className = 'flex-1 text-[12px] font-extrabold rounded-xl border-2 py-2 transition-all ' + (historyFilter==='needs-work'?'chip-active border-indigo-600':'border-slate-200 text-slate-500');
   if(!h.length){
-    list.innerHTML = '<div class="text-center py-12"><div class="text-5xl">📜</div><p class="font-extrabold mt-3">No activity yet</p><p class="text-[13px] font-bold text-slate-400">Award your first point to see magic here ✨</p></div>';
+    list.innerHTML = '<div class="text-center py-12"><div class="text-5xl">📜</div><p class="font-extrabold mt-3">' + (currentLang==='ar' ? 'لا يوجد نشاط بعد' : 'No activity yet') + '</p><p class="text-[13px] font-bold text-slate-400">' + (currentLang==='ar' ? 'امنح أول نقطة لرؤية السحر هنا ✨' : 'Award your first point to see magic here ✨') + '</p></div>';
   } else {
     list.innerHTML = h.slice(0,120).map(historyRow).join('');
   }
@@ -2031,8 +2225,8 @@ function renderReports(){
   const rh = document.getElementById('reportsHistory');
   const kids = [...activeStudents()].sort((a,b)=>(b.points||0)-(a.points||0));
   if(!kids.length){
-    lb.innerHTML = '<div class="text-center py-8 font-bold text-slate-400">No students in this class yet.</div>';
-    rh.innerHTML = '<div class="text-center py-8 font-bold text-slate-400">Nothing to report yet.</div>';
+    lb.innerHTML = '<div class="text-center py-8 font-bold text-slate-400">' + (currentLang==='ar' ? 'لا يوجد طلاب في هذا الصف بعد.' : 'No students in this class yet.') + '</div>';
+    rh.innerHTML = '<div class="text-center py-8 font-bold text-slate-400">' + (currentLang==='ar' ? 'لا يوجد ما يُعرض بعد.' : 'Nothing to report yet.') + '</div>';
     return;
   }
   const max = Math.max(1, ...kids.map(k=>Math.max(0,k.points||0)));
@@ -2045,11 +2239,11 @@ function renderReports(){
       + (s.photo
           ? '<img src="'+s.photo+'" class="w-11 h-11 rounded-2xl object-cover border-2 border-white shadow shrink-0" alt=""/>'
           : '<div class="w-11 h-11 shrink-0">'+chubbySVG(monsterSeedFor(s))+'</div>')
-      + '<div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2"><p class="font-extrabold text-[14px] truncate">'+esc(s.firstName)+' '+esc(s.lastName)+'</p><span class="font-black text-[14px] '+(s.points>0?'text-emerald-600':s.points<0?'text-rose-500':'text-slate-400')+'">'+s.points+' pts</span></div>'
+      + '<div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2"><p class="font-extrabold text-[14px] truncate">'+esc(s.firstName)+' '+esc(s.lastName)+'</p><span class="font-black text-[14px] '+(s.points>0?'text-emerald-600':s.points<0?'text-rose-500':'text-slate-400')+'">'+s.points+' '+t('pts_unit')+'</span></div>'
       + '<div class="h-2.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden"><div class="h-full rounded-full bar-fill" style="width:'+pct+'%;background:'+bar+'"></div></div></div></div>';
   }).join('');
   const h = classHistory();
-  rh.innerHTML = h.length ? h.slice(0,150).map(historyRow).join('') : '<div class="text-center py-8 font-bold text-slate-400">No activity yet.</div>';
+  rh.innerHTML = h.length ? h.slice(0,150).map(historyRow).join('') : '<div class="text-center py-8 font-bold text-slate-400">' + (currentLang==='ar' ? 'لا يوجد نشاط بعد.' : 'No activity yet.') + '</div>';
   if(window.lucide) lucide.createIcons();
 }
 
@@ -2111,7 +2305,7 @@ function refreshAwardPoints(){
   const s = state.students.find(x=>x.id===selectedStudentId);
   if(!s) return;
   const el = document.getElementById('awardStudentPoints');
-  el.textContent = s.points + ' pts';
+  el.textContent = s.points + ' ' + t('pts_unit');
   el.classList.remove('points-bump'); void el.offsetWidth; el.classList.add('points-bump');
 }
 function getBehaviorList(type){
@@ -2132,7 +2326,7 @@ function setAwardTab(t){
       + del
       + '<div class="flex items-center gap-2.5">'
       + '<div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 '+(pos?'bg-emerald-500 text-white group-hover:bg-white group-hover:text-emerald-600':'bg-rose-500 text-white group-hover:bg-white group-hover:text-rose-600')+' transition-all"><i data-lucide="'+esc(b.icon||(pos?'star':'alert-triangle'))+'" class="w-5 h-5"></i></div>'
-      + '<div class="min-w-0"><p class="font-extrabold text-[13px] leading-tight '+(pos?'text-emerald-900 group-hover:text-white':'text-rose-900 group-hover:text-white')+'">'+esc(b.label)+'</p>'
+      + '<div class="min-w-0"><p class="font-extrabold text-[13px] leading-tight '+(pos?'text-emerald-900 group-hover:text-white':'text-rose-900 group-hover:text-white')+'">'+esc(behaviorLabel(b))+'</p>'
       + '<p class="text-[12px] font-black '+(pos?'text-emerald-500 group-hover:text-emerald-100':'text-rose-400 group-hover:text-rose-100')+'">'+(b.points>0?'+'+b.points:b.points)+'</p></div>'
       + '</div></button>';
   }).join('');
@@ -2142,7 +2336,7 @@ function awardBehavior(i){
   const list = getBehaviorList(awardTab);
   const b = list[i];
   if(!b) return;
-  applyPoints(selectedStudentId, b.points, b.label, awardTab);
+  applyPoints(selectedStudentId, b.points, behaviorLabel(b), awardTab);
 }
 /* ---------- Custom behaviors (create your own point values) ---------- */
 function openCustomBehaviorModal(){
@@ -2242,8 +2436,8 @@ function applyPoints(studentId, delta, behavior, type){
 /* ---------- Reset points ---------- */
 function confirmResetPoints(){
   const kids = activeStudents();
-  if(!kids.length){ toast('No students to reset in this class.'); return; }
-  askConfirm('Reset all points?', 'All '+kids.length+' students in this class will go back to 0 points.', ()=>{
+  if(!kids.length){ toast(currentLang==='ar' ? 'لا يوجد طلاب لتصفيرهم في هذا الصف.' : 'No students to reset in this class.'); return; }
+  askConfirm(currentLang==='ar' ? 'تصفير كل النقاط؟' : 'Reset all points?', currentLang==='ar' ? 'سيعود جميع الطلاب ('+kids.length+') إلى 0 نقطة.' : 'All '+kids.length+' students in this class will go back to 0 points.', ()=>{
     kids.forEach(s=>s.points=0);
     state.pointsHistory.push({ id:uid(), studentId:'system', classroomId:state.selectedClassroom, studentName:'Whole class', type:'positive', behavior:'Points reset — fresh start ✨', delta:0, timestamp:Date.now() });
     saveState(); renderAll(); toast('Fresh start! All points reset to 0. ✨'); playClick();
@@ -2268,11 +2462,11 @@ function openStudentModal(studentId){
   }
   if(s && s.photo) stagedPhoto = s.photo;
   document.getElementById('studentModalTitle').innerHTML = isEdit
-    ? '<i data-lucide="pencil" class="w-5 h-5"></i> Edit Student'
-    : '<i data-lucide="user-plus" class="w-5 h-5"></i> Add Student';
+    ? '<i data-lucide="pencil" class="w-5 h-5"></i> ' + t('edit_student_title')
+    : '<i data-lucide="user-plus" class="w-5 h-5"></i> ' + t('add_student_title');
   document.getElementById('firstNameInput').value = s ? s.firstName : '';
   document.getElementById('lastNameInput').value = s ? s.lastName : '';
-  document.getElementById('saveStudentLabel').textContent = isEdit ? 'Save Changes' : 'Add Student';
+  document.getElementById('saveStudentLabel').textContent = isEdit ? t('save_changes') : t('add_student_title');
   document.getElementById('deleteStudentBtn').classList.toggle('hidden', !isEdit);
   document.getElementById('photoInput').value = '';
   document.getElementById('photoHint').classList.add('hidden');
@@ -2388,7 +2582,7 @@ function saveStudent(){
 function deleteStudent(){
   if(!editingStudentId) return;
   const s = state.students.find(x=>x.id===editingStudentId);
-  askConfirm('Remove '+ (s?s.firstName:'student') + '?', 'Their points and avatar will be removed from this class.', ()=>{
+  askConfirm(currentLang==='ar' ? 'إزالة ' + (s?s.firstName:'الطالب') + '؟' : 'Remove '+ (s?s.firstName:'student') + '?', currentLang==='ar' ? 'ستُحذف نقاطه وصورته من هذا الصف.' : 'Their points and avatar will be removed from this class.', ()=>{
     state.students = state.students.filter(x=>x.id!==editingStudentId);
     saveState(); closeStudentModal(); closeAwardModal(); renderAll(); toast('Student removed.');
   });
@@ -2401,7 +2595,7 @@ function openClassroomModal(classId){
   editingClassId = classId || null;
   const c = classId ? state.classrooms.find(x=>x.id===classId) : null;
   stagedEmoji = c ? (c.emoji||'🚀') : CLASS_EMOJIS[Math.floor(Math.random()*CLASS_EMOJIS.length)];
-  document.getElementById('classroomModalTitle').innerHTML = c ? '<i data-lucide="pencil" class="w-5 h-5"></i> Edit Classroom' : '<i data-lucide="school" class="w-5 h-5"></i> New Classroom';
+  document.getElementById('classroomModalTitle').innerHTML = c ? '<i data-lucide="pencil" class="w-5 h-5"></i> ' + t('edit_classroom_title') : '<i data-lucide="school" class="w-5 h-5"></i> ' + t('new_classroom_title');
   document.getElementById('classNameInput').value = c ? c.name : '';
   document.getElementById('deleteClassBtn').classList.toggle('hidden', !c);
   renderEmojiPicker();
@@ -2433,7 +2627,7 @@ function saveClassroom(){
 function deleteClassroom(){
   if(!editingClassId) return;
   const kids = state.students.filter(s=>s.classroomId===editingClassId).length;
-  askConfirm('Delete this classroom?', 'This removes the class, its '+kids+' students and their history.', ()=>{
+  askConfirm(currentLang==='ar' ? 'حذف هذا الفصل؟' : 'Delete this classroom?', currentLang==='ar' ? 'سيحذف الفصل و'+kids+' طالبًا وسجلهم.' : 'This removes the class, its '+kids+' students and their history.', ()=>{
     state.classrooms = state.classrooms.filter(c=>c.id!==editingClassId);
     state.students = state.students.filter(s=>s.classroomId!==editingClassId);
     state.pointsHistory = state.pointsHistory.filter(h=>h.classroomId!==editingClassId);
@@ -2458,9 +2652,9 @@ function setHistoryFilter(f){ historyFilter=f; renderHistory(); playClick(); }
 ========================================================= */
 function openRandomPicker(){
   const kids = activeStudents();
-  if(!kids.length){ toast('Add students first to use the picker.', 'error'); SFX.error(); return; }
-  document.getElementById('pickerName').textContent = 'Ready?';
-  document.getElementById('pickerSub').textContent = 'Picking from ' + kids.length + ' stars';
+  if(!kids.length){ toast(currentLang==='ar' ? 'أضف طلابًا أولاً لاستخدام الاختيار.' : 'Add students first to use the picker.', 'error'); SFX.error(); return; }
+  document.getElementById('pickerName').textContent = t('ready_q');
+  document.getElementById('pickerSub').textContent = (currentLang==='ar' ? 'الاختيار من ' : 'Picking from ') + kids.length + (currentLang==='ar' ? ' نجم' : ' stars');
   document.getElementById('pickerAvatar').innerHTML = '🎲';
   document.getElementById('pickerAvatar').style.background = '';
   SFX.drum();
@@ -2477,7 +2671,7 @@ function spinPicker(){
   const nameEl = document.getElementById('pickerName');
   const avEl = document.getElementById('pickerAvatar');
   const subEl = document.getElementById('pickerSub');
-  document.getElementById('pickerSpinBtn').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Picking...';
+  document.getElementById('pickerSpinBtn').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ' + t('picking');
   lucide.createIcons();
   let ticks = 0;
   const total = 22 + Math.floor(Math.random()*8);
@@ -2493,15 +2687,15 @@ function spinPicker(){
       clearInterval(iv);
       const winner = kids[Math.floor(Math.random()*kids.length)];
       nameEl.textContent = winner.firstName + ' ' + winner.lastName + ' ⭐';
-      subEl.textContent = winner.points + ' pts • Give them a big cheer!';
+      subEl.textContent = winner.points + ' ' + t('pts_unit') + (currentLang==='ar' ? ' • شجعوهم بحرارة!' : ' • Give them a big cheer!');
       avEl.style.background = '#fff';
       if(winner.photo){ avEl.innerHTML = '<img src="'+winner.photo+'" class="w-full h-full object-cover rounded-full"/>'; }
       else { avEl.innerHTML = chubbySVG(monsterSeedFor(winner), 'w-full h-full'); }
       avEl.classList.remove('pop-in'); void avEl.offsetWidth; avEl.classList.add('pop-in');
-      document.getElementById('pickerPreview').innerHTML = 'Last picked: <span class="text-indigo-700">'+esc(winner.firstName)+' '+esc(winner.lastName)+'</span> ⭐';
+      document.getElementById('pickerPreview').innerHTML = (currentLang==='ar' ? 'آخر اختيار: ' : 'Last picked: ') + '<span class="text-indigo-700">'+esc(winner.firstName)+' '+esc(winner.lastName)+'</span> ⭐';
       playFanfare();
       if(window.confetti) confetti({particleCount:130, spread:100, origin:{y:.6}});
-      document.getElementById('pickerSpinBtn').innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> Pick Again!';
+      document.getElementById('pickerSpinBtn').innerHTML = '<i data-lucide="sparkles" class="w-4 h-4"></i> ' + t('pick_again');
       lucide.createIcons();
       pickerSpinning = false;
     }
@@ -2528,8 +2722,8 @@ function timerToggle(){
     if(timerMode==='countdown' && timerLeft<=0) timerLeft = timerTotal;
     timerRunning = true;
     SFX.pop();
-    document.getElementById('timerStartBtn').innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause';
-    document.getElementById('timerStateLabel').textContent = 'Running';
+    document.getElementById('timerStartBtn').innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5"></i> ' + t('pause');
+    document.getElementById('timerStateLabel').textContent = t('running');
     lucide.createIcons();
     timerInt = setInterval(()=>{
       if(timerMode==='countdown'){
@@ -2547,20 +2741,20 @@ function timerToggle(){
 function pauseTimer(){
   timerRunning = false;
   clearInterval(timerInt);
-  document.getElementById('timerStartBtn').innerHTML = '<i data-lucide="play" class="w-3.5 h-3.5"></i> Start';
+  document.getElementById('timerStartBtn').innerHTML = '<i data-lucide="play" class="w-3.5 h-3.5"></i> ' + t('start');
   const lbl = document.getElementById('timerStateLabel');
-  if(lbl && lbl.textContent==='Running') lbl.textContent = 'Paused';
+  if(lbl && (lbl.textContent==='Running'||lbl.textContent==='يعمل')) lbl.textContent = t('paused');
   if(window.lucide) lucide.createIcons();
 }
 function timerReset(){
   pauseTimer();
   timerLeft = timerTotal; timerElapsed = 0;
-  document.getElementById('timerStateLabel').textContent = 'Ready';
+  document.getElementById('timerStateLabel').textContent = t('ready');
   updateTimerUI();
 }
 function timerDone(){
   pauseTimer();
-  document.getElementById('timerStateLabel').textContent = 'Done!';
+  document.getElementById('timerStateLabel').textContent = t('done');
   SFX.tada();
   if(window.confetti) confetti({particleCount:120, spread:90, origin:{y:.7}});
   toast("Time's up! ⏰ Great focus, class!");
@@ -2686,6 +2880,7 @@ window.addEventListener('scroll', ()=>{
 
 /* ---------- Boot ---------- */
 loadState();
+applyLanguage();
 refreshThemeUI();
 refreshSoundUI();
 renderAll();
