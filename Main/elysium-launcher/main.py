@@ -28,6 +28,70 @@ TROUBLESHOOT = (
     "4. On school wifi, start web-proxy first:  npm start  (in web-proxy/)"
 )
 
+PASSWORD = "broimsafe56213"
+
+
+def request_password():
+    """Modal password gate. Returns only on success; exits instantly on failure/close."""
+    pw_root = tk.Tk()
+    pw_root.title("Elysium - Locked")
+    pw_root.geometry("380x270")
+    pw_root.resizable(False, False)
+    pw_root.configure(bg=CREAM)
+    # Center roughly on screen
+    try:
+        pw_root.update_idletasks()
+        x = (pw_root.winfo_screenwidth() // 2) - (380 // 2)
+        y = (pw_root.winfo_screenheight() // 2) - (270 // 2)
+        pw_root.geometry(f"380x270+{x}+{y}")
+    except Exception:
+        pass
+
+    outer = tk.Frame(pw_root, bg=GOLD, padx=2, pady=2)
+    outer.pack(fill="both", expand=True, padx=10, pady=10)
+    inner = tk.Frame(outer, bg=CREAM, padx=24, pady=18)
+    inner.pack(fill="both", expand=True)
+
+    tk.Label(inner, text="ELYSIUM", font=("Times New Roman", 22, "bold italic"),
+             fg="#2B2B2B", bg=CREAM).pack(pady=(0, 2))
+    tk.Label(inner, text="ENTER PASSWORD TO CONTINUE", font=("Arial", 8, "bold"),
+             fg=GOLD_DARK, bg=CREAM).pack(pady=(0, 12))
+
+    pw_var = tk.StringVar()
+    entry = tk.Entry(inner, textvariable=pw_var, font=("Arial", 12),
+                     bg=ENTRY_BG, relief="flat", highlightbackground="#E7DCC3",
+                     highlightthickness=1, show="*")
+    entry.pack(fill="x", ipady=8)
+    entry.focus_set()
+
+    show_var = tk.BooleanVar(value=False)
+
+    def toggle_show():
+        entry.config(show="" if show_var.get() else "*")
+
+    tk.Checkbutton(inner, text="Show password", variable=show_var,
+                   font=("Arial", 9), bg=CREAM, fg="#4A4A4A",
+                   activebackground=CREAM, command=toggle_show).pack(anchor="w", pady=(6, 10))
+
+    def on_submit(_event=None):
+        if pw_var.get() == PASSWORD:
+            pw_root.destroy()  # success -> let launcher open
+        else:
+            pw_root.destroy()  # wrong -> close instantly, no launcher
+            sys.exit(0)
+
+    def on_close():
+        pw_root.destroy()
+        sys.exit(0)
+
+    pw_root.protocol("WM_DELETE_WINDOW", on_close)
+    entry.bind("<Return>", on_submit)
+
+    tk.Button(inner, text="UNLOCK", font=("Arial", 11, "bold"),
+              bg=BTN_GOLD, fg="white", relief="flat", padx=20, pady=8,
+              command=on_submit).pack(fill="x")
+    pw_root.mainloop()
+
 
 class Elysium(tk.Tk):
     def __init__(self):
@@ -312,4 +376,5 @@ class Elysium(tk.Tk):
 
 
 if __name__ == "__main__":
+    request_password()
     Elysium().mainloop()
