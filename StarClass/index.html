@@ -1699,16 +1699,30 @@ const SFX = {
 SFX.load();
 let audioCtx = null; // legacy alias (SFX owns the context now)
 function tone(freq, t0, dur, type, vol){ SFX.tone(freq, t0, dur, type, vol); }
-/* ---------- Praise voice clips for +1 (random every time) + Clapping Sound ---------- */
-const PRAISE_SOUNDS = ['Amazing.mp3', 'Great Job.mp3', 'Well Done.mp3'];
-const praiseAudio = PRAISE_SOUNDS.map(src => {
-  try {
-    const a = new Audio(src);
-    a.preload = 'auto';
-    a.load();
-    return a;
-  } catch(e){ return null; }
-});
+/* ---------- Praise voice clips for +1 (random every time) + Clapping Sound ----------
+   Language-aware: English mode plays Amazing / Great Job / Well Done,
+   Arabic mode plays only احسنت / ممتاز. */
+const PRAISE_SOUNDS_EN = ['Amazing.mp3', 'Great Job.mp3', 'Well Done.mp3'];
+const PRAISE_SOUNDS_AR = ['احسنت.mp3', 'ممتاز.mp3'];
+function makePraisePool(list){
+  return list.map(src => {
+    try {
+      const a = new Audio(src);
+      a.preload = 'auto';
+      a.load();
+      return a;
+    } catch(e){ return null; }
+  });
+}
+const praiseAudioEn = makePraisePool(PRAISE_SOUNDS_EN);
+const praiseAudioAr = makePraisePool(PRAISE_SOUNDS_AR);
+const praiseAudio = praiseAudioEn; // legacy alias (English pool)
+function currentPraisePool(){
+  try{
+    if(typeof currentLang !== 'undefined' && currentLang === 'ar') return praiseAudioAr.filter(Boolean);
+  }catch(e){}
+  return praiseAudioEn.filter(Boolean);
+}
 /* Dedicated clap clip — plays on every point-plus. Single shared element so
    spam clicks restart it instead of stacking/overlapping. */
 let clapAudio = null;
@@ -1717,11 +1731,14 @@ try {
   clapAudio.preload = 'auto';
   clapAudio.load();
 } catch(e){ clapAudio = null; }
-/* Stop every point sound (all praise voices + clap). Spam-safe: pause + rewind
-   so the next play() always starts over with zero overlap. */
+/* Stop every point sound (all praise voices in BOTH languages + clap). Spam-safe:
+   pause + rewind so the next play() always starts over with zero overlap. */
 function stopPointSounds(){
   try{
-    praiseAudio.forEach(a=>{ if(!a) return; try{ a.pause(); a.currentTime = 0; }catch(e){} });
+    praiseAudioEn.forEach(a=>{ if(!a) return; try{ a.pause(); a.currentTime = 0; }catch(e){} });
+  }catch(e){}
+  try{
+    praiseAudioAr.forEach(a=>{ if(!a) return; try{ a.pause(); a.currentTime = 0; }catch(e){} });
   }catch(e){}
   try{
     if(clapAudio){ try{ clapAudio.pause(); clapAudio.currentTime = 0; }catch(e){} }
@@ -1731,7 +1748,7 @@ function playRandomPraise(){
   if(!SFX.enabled) return true; // muted — caller should skip fallback synth too
   try{
     SFX.ensure(); // unlock audio on first user gesture
-    const pool = praiseAudio.filter(Boolean);
+    const pool = currentPraisePool();
     if(!pool.length) return false;
     stopPointSounds(); // kill any still-playing praise/clap so spam restarts clean
     const idx = Math.floor(Math.random() * pool.length);
@@ -1754,6 +1771,8 @@ function playClapSound(){
   }catch(e){ return false; }
 }
 /* Full +1 celebration: clap every time + a random praise voice on top.
+   Language-aware: Arabic mode picks only from احسنت / ممتاز,
+   English mode picks only from Amazing / Great Job / Well Done.
    One stop up-front, then both start together — rapid clicks stop both and
    start both over, never stacking. Returns true if any clip played. */
 function playPositiveSound(){
@@ -1770,7 +1789,7 @@ function playPositiveSound(){
       }
     }catch(e){}
     try{
-      const pool = praiseAudio.filter(Boolean);
+      const pool = currentPraisePool();
       if(pool.length){
         const a = pool[Math.floor(Math.random() * pool.length)];
         const p2 = a.play();

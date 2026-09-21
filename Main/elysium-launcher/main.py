@@ -11,7 +11,7 @@ import subprocess
 import sys
 import threading
 import tkinter as tk
-from tkinter import filedialog, messagebox, scrolledtext, simpledialog
+from tkinter import filedialog, messagebox, scrolledtext, simpledialog, ttk
 from pathlib import Path
 
 from launcher_core import (
@@ -136,7 +136,7 @@ def instant_launch(username: str, version_id: str, java_path: str = "",
         raise RuntimeError("Missing dependency: run  pip install -r requirements.txt")
 
     if not is_version_ready(version_id):
-        raise RuntimeError(f"Version '{version_id}' is not downloaded yet - untick Instant for one full install.")
+        raise RuntimeError(f"Version '{version_id}' is not downloaded yet.")
 
     mc_dir = str(get_mc_dir())
     if game_dir is None:
@@ -166,7 +166,7 @@ def instant_launch(username: str, version_id: str, java_path: str = "",
     try:
         cmd = mll.command.get_minecraft_command(version_id, mc_dir, opts)
     except Exception as e:
-        raise RuntimeError(f"Could not build launch command for '{version_id}' ({e}). Untick Instant once to repair.")
+        raise RuntimeError(f"Could not build launch command for '{version_id}' ({e}).")
     if progress_cb:
         progress_cb(85, f"Starting {version_id}...")
     print("[elysium-instant] " + " ".join(cmd[:6]) + " ...")
@@ -246,7 +246,7 @@ class Elysium(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Elysium 2.0")
-        self.geometry("640x990")
+        self.geometry("640x930")
         self.resizable(False, False)
         self.configure(bg=CREAM)
 
@@ -272,21 +272,13 @@ class Elysium(tk.Tk):
         card.pack(fill="x")
 
         # ---- INSTANCE selector ----
-        tk.Label(card, text="INSTANCE  (pick one, plays instantly)", font=("Arial", 9, "bold"),
+        tk.Label(card, text="INSTANCE", font=("Arial", 9, "bold"),
                  fg=GOLD_DARK, bg="#FFFEF9", anchor="w").pack(fill="x")
-        irow = tk.Frame(card, bg=ENTRY_BG, highlightbackground="#E7DCC3", highlightthickness=1)
-        irow.pack(fill="x", pady=(4, 6))
         self.instance_var = tk.StringVar(value=_cur["name"])
-        self.instance_entry = tk.Entry(irow, textvariable=self.instance_var, font=("Arial", 11, "bold"),
-                                       bg=ENTRY_BG, relief="flat", state="readonly")
-        self.instance_entry.pack(side="left", fill="x", expand=True, ipadx=10, ipady=7)
-        tk.Button(irow, text="∨", font=("Arial", 11, "bold"), bg=BTN_GOLD, fg="white",
-                  relief="flat", padx=14, command=self.toggle_inst_list).pack(side="right", fill="y")
-        self.inst_list_frame = tk.Frame(card, bg="#FFFEF9")
-        self.inst_listbox = tk.Listbox(self.inst_list_frame, height=3, font=("Arial", 10),
-                                       bg="white", relief="solid", borderwidth=1)
-        self.inst_listbox.bind("<<ListboxSelect>>", self.on_inst_pick)
-        self.inst_visible = False
+        self.instance_combo = ttk.Combobox(card, textvariable=self.instance_var,
+                                           font=("Arial", 11, "bold"), state="readonly")
+        self.instance_combo.pack(fill="x", pady=(4, 6), ipady=4)
+        self.instance_combo.bind("<<ComboboxSelected>>", self.on_inst_pick)
 
         ibtns = tk.Frame(card, bg="#FFFEF9")
         ibtns.pack(fill="x", pady=(0, 8))
@@ -296,12 +288,9 @@ class Elysium(tk.Tk):
                   relief="flat", padx=10, pady=4, command=self.on_inst_save).pack(side="left", padx=(0, 6))
         tk.Button(ibtns, text="DEL", font=("Arial", 8, "bold"), bg="#F0EDE6", fg="#6B6B6B",
                   relief="flat", padx=10, pady=4, command=self.on_inst_delete).pack(side="left")
-        self.inst_info = tk.Label(card, text="", font=("Arial", 8), fg=MUTED,
-                                  bg="#FFFEF9", anchor="w")
-        self.inst_info.pack(fill="x", pady=(0, 8))
 
         # username
-        tk.Label(card, text="PROFILER HANDLE", font=("Arial", 9, "bold"),
+        tk.Label(card, text="Username", font=("Arial", 9, "bold"),
                  fg=GOLD_DARK, bg="#FFFEF9", anchor="w").pack(fill="x")
         self.name_var = tk.StringVar(value=_cur.get("username", "Steve"))
         tk.Entry(card, textvariable=self.name_var, font=("Arial", 11),
@@ -311,7 +300,7 @@ class Elysium(tk.Tk):
         # version header
         head = tk.Frame(card, bg="#FFFEF9")
         head.pack(fill="x")
-        tk.Label(head, text="SYSTEM RUNTIME VERSION", font=("Arial", 9, "bold"),
+        tk.Label(head, text="Version", font=("Arial", 9, "bold"),
                  fg=GOLD_DARK, bg="#FFFEF9").pack(side="left")
         self.count_lbl = tk.Label(head, text="", font=("Arial", 8),
                                   fg=MUTED, bg="#FFFEF9")
@@ -323,55 +312,43 @@ class Elysium(tk.Tk):
         search = tk.Entry(row1, textvariable=self.search_var, font=("Arial", 10),
                           bg="#FFFEF9", fg="#6B6B6B", relief="solid",
                           highlightbackground="#E7DCC3", highlightthickness=1)
-        search.insert(0, "Search  (e.g. 1.20, forge)")
-        search.bind("<FocusIn>", lambda e: search.delete(0, "end") if "Search" in search.get() else None)
+        search.insert(0, "Search")
+        search.bind("<FocusIn>", lambda e: search.delete(0, "end") if search.get().strip() == "Search" else None)
         search.bind("<KeyRelease>", lambda e: self.filter_versions())
         search.pack(side="left", fill="x", expand=True, ipady=6, padx=(0, 8))
         tk.Button(row1, text="REFRESH", font=("Arial", 9, "bold"), bg="#F0EDE6", fg="#8A8A8A",
                   relief="flat", padx=12, pady=6, command=self.on_refresh).pack(side="right")
 
         self.version_var = tk.StringVar(value=_cur.get("version", f"{MC_VERSION}-forge-{FORGE_VERSION}"))
-        drop = tk.Frame(card, bg=ENTRY_BG, highlightbackground="#E7DCC3", highlightthickness=1)
-        drop.pack(fill="x", pady=(0, 8))
-        self.version_entry = tk.Entry(drop, textvariable=self.version_var, font=("Arial", 11),
-                                      bg=ENTRY_BG, relief="flat", state="readonly")
-        self.version_entry.pack(side="left", fill="x", expand=True, ipadx=10, ipady=7)
-        tk.Button(drop, text="∨", font=("Arial", 11, "bold"), bg=BTN_GOLD, fg="white",
-                  relief="flat", padx=14, command=self.toggle_list).pack(side="right", fill="y")
-        self.listbox_frame = tk.Frame(card, bg="#FFFEF9")
-        self.listbox = tk.Listbox(self.listbox_frame, height=4, font=("Arial", 10),
-                                  bg="white", relief="solid", borderwidth=1)
-        self.listbox.bind("<<ListboxSelect>>", self.on_pick)
+        self.version_combo = ttk.Combobox(card, textvariable=self.version_var,
+                                          font=("Arial", 11), state="readonly")
+        self.version_combo.pack(fill="x", pady=(0, 8), ipady=4)
+        self.version_combo.bind("<<ComboboxSelected>>", self.on_pick)
         self.all_versions: list[str] = []
-        self.list_visible = False
         self.on_refresh(silent=True)
 
         self.forge_var = tk.BooleanVar(value=bool(_cur.get("use_forge", True)))
-        tk.Checkbutton(card, text=f"Install Forge {FORGE_FULL} if missing (recommended)",
+        tk.Checkbutton(card, text="Install Forge",
                        variable=self.forge_var, font=("Arial", 10),
-                       bg="#FFFEF9", fg="#4A4A4A", anchor="w").pack(fill="x", pady=(4, 0))
-        tk.Label(card, text="Untick for pure vanilla. Forge downloads route via school proxy if blocked.",
-                 font=("Arial", 8), fg=MUTED, bg="#FFFEF9", anchor="w").pack(fill="x", pady=(0, 6))
+                       bg="#FFFEF9", fg="#4A4A4A", anchor="w").pack(fill="x", pady=(4, 6))
 
         # ---- instant + RAM ----
         optrow = tk.Frame(card, bg="#FFFEF9")
         optrow.pack(fill="x", pady=(2, 0))
         self.fast_var = tk.BooleanVar(value=bool(_cur.get("fast", True)))
-        tk.Checkbutton(optrow, text="⚡ Instant launch (skip re-check, play in seconds)",
+        tk.Checkbutton(optrow, text="⚡ Instant launch",
                        variable=self.fast_var, font=("Arial", 10, "bold"),
                        bg="#FFFEF9", fg="#2B2B2B", anchor="w").pack(side="left")
         tk.Label(optrow, text="RAM", font=("Arial", 9, "bold"), fg=GOLD_DARK,
                  bg="#FFFEF9").pack(side="left", padx=(10, 4))
         self.ram_var = tk.StringVar(value=_cur.get("ram", DEFAULT_RAM))
         tk.OptionMenu(optrow, self.ram_var, *RAM_CHOICES).pack(side="left")
-        tk.Label(card, text="Instant = no downloads, straight into the game. Untick once if files are missing/corrupt.",
-                 font=("Arial", 8), fg=MUTED, bg="#FFFEF9", anchor="w").pack(fill="x", pady=(0, 8))
 
-        tk.Label(card, text="JAVA EXECUTABLE (optional)", font=("Arial", 9, "bold"),
+        tk.Label(card, text="Java", font=("Arial", 9, "bold"),
                  fg=GOLD_DARK, bg="#FFFEF9", anchor="w").pack(fill="x")
         row2 = tk.Frame(card, bg="#FFFEF9")
         row2.pack(fill="x", pady=(4, 0))
-        _j = _cur.get("java", "") or "Auto (bundled runtime / PATH)"
+        _j = _cur.get("java", "") or "Auto"
         self.java_var = tk.StringVar(value=_j)
         tk.Entry(row2, textvariable=self.java_var, font=("Arial", 10),
                  bg="#FFFEF9", relief="solid", highlightbackground="#E7DCC3",
@@ -383,7 +360,7 @@ class Elysium(tk.Tk):
         self._refresh_java_label()
 
         # status + progress
-        self.status_var = tk.StringVar(value="Pick an instance, hit PLAY. Instant = seconds.")
+        self.status_var = tk.StringVar(value="Ready.")
         tk.Label(body, textvariable=self.status_var, font=("Times New Roman", 11, "italic"),
                  fg="#2B2B2B", bg=CREAM, wraplength=520, justify="center").pack(pady=(10, 6))
         self.prog = tk.Canvas(body, height=6, bg="#EDE7D6", highlightthickness=0)
@@ -402,20 +379,33 @@ class Elysium(tk.Tk):
                   bg="#F0EDE6", fg="#6B6B6B", relief="flat", padx=14, pady=10,
                   command=self.on_folder).pack(side="left")
 
-        # log console
-        self.log = scrolledtext.ScrolledText(body, height=4, font=("Consolas", 8),
-                                             bg="#1E1E1E", fg="#D6D6D6", relief="flat")
-        self.log.pack(fill="x", pady=(8, 0))
-        self.log.insert("end", "Elysium log ready. Instant mode skips downloads.\n")
+        # log console - fancy, matches launcher theme
+        log_outer = tk.Frame(body, bg=GOLD, padx=1, pady=1)
+        log_outer.pack(fill="x", pady=(8, 0))
+        log_inner = tk.Frame(log_outer, bg="#FFFEF9")
+        log_inner.pack(fill="both", expand=True)
+        log_head = tk.Frame(log_inner, bg="#FFFEF9")
+        log_head.pack(fill="x", padx=10, pady=(6, 0))
+        tk.Label(log_head, text="● ● ●", font=("Arial", 8, "bold"),
+                 fg=GOLD, bg="#FFFEF9").pack(side="left")
+        tk.Label(log_head, text="CONSOLE", font=("Arial", 8, "bold"),
+                 fg=GOLD_DARK, bg="#FFFEF9").pack(side="left", padx=(8, 0))
+        tk.Button(log_head, text="CLEAR", font=("Arial", 7, "bold"),
+                  bg="#F0EDE6", fg="#8A8A8A", relief="flat", padx=8, pady=2,
+                  command=lambda: (self.log.configure(state="normal"),
+                                   self.log.delete(1.0, "end"),
+                                   self.log.configure(state="disabled"))).pack(side="right")
+        self.log = scrolledtext.ScrolledText(log_inner, height=7, font=("Arial", 9),
+                                             bg="#FFFEF9", fg="#4A4A4A", relief="flat",
+                                             highlightbackground="#E7DCC3", highlightthickness=1,
+                                             insertbackground="#4A4A4A",
+                                             selectbackground="#E7DCC3")
+        self.log.pack(fill="x", padx=10, pady=6)
+        self.log.tag_config("ok", foreground="#2E7D32")
+        self.log.tag_config("err", foreground="#C62828")
+        self.log.tag_config("dim", foreground="#9A958A")
+        self.log.insert("end", "Ready.\n")
         self.log.configure(state="disabled")
-
-        info = (f"Isolated: {get_mc_dir()}   •   "
-                f"Proxy: {'ON' if CFG.get('use_proxy_for_forge') else 'OFF'}")
-        tk.Label(body, text=info, font=("Arial", 7), fg=MUTED, bg=CREAM,
-                 wraplength=540, justify="center").pack(pady=(6, 0))
-        tk.Label(body, text="You must own Minecraft: Java Edition. Elysium never touches official .minecraft.",
-                 font=("Arial", 7, "italic"), fg=MUTED, bg=CREAM,
-                 wraplength=540, justify="center").pack()
 
         # init instance list + background warmup (non-blocking so UI opens fast)
         self.refresh_inst_listbox()
@@ -437,7 +427,7 @@ class Elysium(tk.Tk):
                 find_java("")
             except Exception:
                 pass
-            self.after(0, lambda: self._writelog("Ready. Shared files kept, instances isolated.\n"))
+            self.after(0, lambda: self._writelog("Ready.\n"))
         except Exception:
             pass
 
@@ -447,8 +437,19 @@ class Elysium(tk.Tk):
             f"School proxy {'reachable at ' + CFG.get('proxy_base','')[:40] + '...' if ok else 'NOT running - direct mode (start web-proxy/npm start for blocked Forge hosts)'}\n"))
 
     def _writelog(self, msg: str):
+        low = msg.lower()
+        if any(k in low for k in ("fail", "error", "not running", "missing")):
+            tag = "err"
+        elif any(k in low for k in ("ready", "launch", "⚡", "selected", "saved", "done")):
+            tag = "ok"
+        else:
+            tag = None
         self.log.configure(state="normal")
-        self.log.insert("end", msg if msg.endswith("\n") else msg + "\n")
+        text = msg if msg.endswith("\n") else msg + "\n"
+        if tag:
+            self.log.insert("end", text, tag)
+        else:
+            self.log.insert("end", text)
         self.log.see("end")
         self.log.configure(state="disabled")
 
@@ -475,31 +476,12 @@ class Elysium(tk.Tk):
         return None
 
     def refresh_inst_listbox(self):
-        self.inst_listbox.delete(0, "end")
-        for i in self.instances:
-            tag = "  ⚡" if i.get("fast", True) else ""
-            self.inst_listbox.insert("end", f"{i['name']}  [{i.get('version','?')}]{tag}")
-        folder_hint = str(get_mc_dir() / "instances")
-        self.inst_info.config(text=f"{len(self.instances)} instance(s)  •  saves in: {folder_hint}")
-
-    def toggle_inst_list(self):
-        if self.inst_visible:
-            self.inst_list_frame.pack_forget()
-        else:
-            self.inst_list_frame.pack(fill="x", pady=(0, 6))
-            self.inst_listbox.pack(fill="x")
-        self.inst_visible = not self.inst_visible
+        self.instance_combo["values"] = [i["name"] for i in self.instances]
 
     def on_inst_pick(self, _e):
-        sel = self.inst_listbox.curselection()
-        if not sel:
-            return
-        # entry shows "Name  [version]  ⚡" -> recover name
-        raw = self.inst_listbox.get(sel[0])
-        name = raw.split("  [")[0].strip()
-        if self.inst_visible:
-            self.toggle_inst_list()
-        self._apply_instance(name)
+        name = self.instance_var.get().strip()
+        if name:
+            self._apply_instance(name)
 
     def _apply_instance(self, name: str, silent=False):
         inst = self._find_instance(name)
@@ -508,7 +490,7 @@ class Elysium(tk.Tk):
         self.instance_var.set(inst["name"])
         self.name_var.set(inst.get("username", "Steve"))
         self.version_var.set(inst.get("version", MC_VERSION))
-        self.java_var.set(inst.get("java", "") or "Auto (bundled runtime / PATH)")
+        self.java_var.set(inst.get("java", "") or "Auto")
         self.forge_var.set(bool(inst.get("use_forge", True)))
         self.fast_var.set(bool(inst.get("fast", True)))
         rv = inst.get("ram", DEFAULT_RAM)
@@ -530,7 +512,7 @@ class Elysium(tk.Tk):
         inst["fast"] = bool(self.fast_var.get())
 
     def on_inst_new(self):
-        name = simpledialog.askstring("New instance", "Instance name (e.g. Modded, Speedrun, School):",
+        name = simpledialog.askstring("New instance", "Instance name:",
                                       parent=self)
         if not name or not name.strip():
             return
@@ -570,7 +552,7 @@ class Elysium(tk.Tk):
         if len(self.instances) <= 1:
             messagebox.showwarning("Keep one", "You need at least one instance.")
             return
-        if not messagebox.askyesno("Delete?", f"Delete instance '{name}'?\n(Game folder is kept, only the profile is removed.)"):
+        if not messagebox.askyesno("Delete?", f"Delete instance '{name}'?"):
             return
         self.instances = [i for i in self.instances if i["name"] != name]
         save_instances(self.instances, self.instances[0]["name"])
@@ -579,35 +561,22 @@ class Elysium(tk.Tk):
 
     # ----- versions -----
     def refresh_listbox(self, items):
-        self.listbox.delete(0, "end")
-        for v in items:
-            mark = "  ⚡ ready" if is_version_ready(v) else ""
-            self.listbox.insert("end", v + mark)
+        self.version_combo["values"] = list(items)
         self.count_lbl.config(text=f"{len(items)} of {len(self.all_versions)}")
 
     def filter_versions(self):
-        q = self.search_var.get().lower().replace("search", "").strip()
-        if not q or "e.g." in q:
+        q = self.search_var.get().lower().strip()
+        if q == "search":
+            q = ""
+        if not q:
             self.refresh_listbox(self.all_versions)
         else:
             self.refresh_listbox([v for v in self.all_versions if q in v.lower()])
 
-    def toggle_list(self):
-        if self.list_visible:
-            self.listbox_frame.pack_forget()
-        else:
-            self.listbox_frame.pack(fill="x", pady=(0, 8))
-            self.listbox.pack(fill="x")
-        self.list_visible = not self.list_visible
-
     def on_pick(self, _e):
-        sel = self.listbox.curselection()
-        if sel:
-            raw = self.listbox.get(sel[0]).replace("  ⚡ ready", "").strip()
-            self.version_var.set(raw)
-            if "forge" in raw.lower():
-                self.forge_var.set(True)
-            self.toggle_list()
+        raw = self.version_var.get().strip()
+        if raw and "forge" in raw.lower():
+            self.forge_var.set(True)
 
     def on_refresh(self, silent=False):
         try:
@@ -719,13 +688,12 @@ class Elysium(tk.Tk):
                 except Exception as ex:
                     msg = self._friendly_error(ex)
                     self.after(0, lambda: (self.set_progress(0, "Instant failed - see popup"),
-                                            messagebox.showerror("Instant launch failed", msg + "\n\nTip: untick Instant once to do a full install.")))
+                                            messagebox.showerror("Instant launch failed", msg)))
             threading.Thread(target=fast_worker, daemon=True).start()
             return
 
-        # FULL PATH (first time, or user unticked Instant): verifies + downloads, then fast next time
-        reason = "first install" if not is_version_ready(ver) else "full re-check requested"
-        self.set_progress(2, f"Full install ({reason})... next plays will be instant.")
+        # FULL PATH
+        self.set_progress(2, f"Installing {ver}...")
         def worker():
             try:
                 proc = launch(user, ver, java, do_forge,
@@ -735,7 +703,7 @@ class Elysium(tk.Tk):
                     get_instance_dir(inst_name)
                 except Exception:
                     pass
-                self.after(0, lambda: (self.set_progress(100, f"Launched {ver} as {user} (pid {proc.pid}) - next launch will be instant ⚡"),
+                self.after(0, lambda: (self.set_progress(100, f"Launched {ver} as {user} (pid {proc.pid})"),
                                         self.on_refresh(silent=True)))
             except Exception as ex:
                 msg = self._friendly_error(ex)

@@ -1,0 +1,32 @@
+{
+  "instances": [
+    {
+      "name": "Forge Main",
+      "version": "1.20.1-forge-47.2.0",
+      "username": "KraZo",
+      "java": "",
+      "use_forge": false,
+      "ram": "4G",
+      "fast": true
+    },
+    {
+      "name": "Vanilla Instant",
+      "version": "1.20.1",
+      "username": "Steve",
+      "java": "",
+      "use_forge": false,
+      "ram": "4G",
+      "fast": true
+    },
+    {
+      "name": "Vanilla Safe",
+      "version": "1.20.1",
+      "username": "Steve",
+      "java": "",
+      "use_forge": false,
+      "ram": "4G",
+      "fast": false
+    }
+  ],
+  "last": "Forge Main"
+}
