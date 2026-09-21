@@ -1,0 +1,4 @@
+Mods count: 1
+ 
+jar name                                 | mod id (isMCreator) | mixin configs
+fmlloader-1.20.1-47.4.10.jar (modloader) | forge               | 

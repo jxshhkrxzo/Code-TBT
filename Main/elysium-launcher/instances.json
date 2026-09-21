@@ -1,11 +1,31 @@
 {
   "instances": [
     {
+      "name": "excaliber",
+      "version": "1.20.1-forge-47.4.10",
+      "username": "El_KraZo",
+      "java": "",
+      "use_forge": true,
+      "ram": "16G",
+      "fast": true,
+      "gameDir": "C:\\Users\\DELL\\OneDrive - Ministry of Education and Higher Education\\Documents\\GitHub\\Code-TBT\\Main\\elysium-launcher\\.elysium\\instances\\excaliber"
+    },
+    {
+      "name": "Excaliber",
+      "version": "1.20.1-forge-47.4.10",
+      "username": "El_KraZo",
+      "java": "",
+      "use_forge": true,
+      "ram": "8G",
+      "fast": true,
+      "gameDir": "C:\\Users\\DELL\\OneDrive - Ministry of Education and Higher Education\\Documents\\GitHub\\Code-TBT\\Main\\elysium-launcher\\excaliber"
+    },
+    {
       "name": "Forge Main",
       "version": "1.20.1-forge-47.2.0",
       "username": "KraZo",
       "java": "",
-      "use_forge": false,
+      "use_forge": true,
       "ram": "4G",
       "fast": true
     },
@@ -28,5 +48,5 @@
       "fast": false
     }
   ],
-  "last": "Forge Main"
+  "last": "excaliber"
 }

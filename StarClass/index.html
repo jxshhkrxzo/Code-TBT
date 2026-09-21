@@ -142,35 +142,73 @@ tailwind.config = {
   .dojo-tile.everyone-tile::after { content:''; position:absolute; inset:-40%; background: conic-gradient(from 0deg, transparent 0 40%, rgba(56,189,248,.28) 50%, transparent 60% 100%); animation: everyoneSpin 3.2s linear infinite; pointer-events:none; }
   @keyframes everyoneSpin { to { transform: rotate(360deg); } }
 
-  /* ---------- Point color animations ---------- */
+  /* ---------- Point color animations (MEGA +1 celebration) ---------- */
   @keyframes tilePop { 0%{transform:scale(1)} 35%{transform:scale(1.07) rotate(-1.2deg)} 70%{transform:scale(.97)} 100%{transform:scale(1)} }
+  @keyframes megaPop { 0%{transform:scale(1) rotate(0)} 22%{transform:scale(1.14) rotate(1.6deg) translateY(-7px)} 48%{transform:scale(.94) rotate(-1.4deg) translateY(1px)} 70%{transform:scale(1.07) rotate(.8deg) translateY(-3px)} 100%{transform:scale(1) rotate(0)} }
   @keyframes glowPos { 0%{ box-shadow:0 0 0 0 rgba(16,185,129,0);} 35%{ box-shadow:0 0 0 7px rgba(16,185,129,.45), 0 14px 30px rgba(16,185,129,.35);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
+  @keyframes goldGlow { 0%{ box-shadow:0 0 0 0 rgba(251,191,36,0);} 28%{ box-shadow:0 0 0 12px rgba(251,191,36,.55), 0 0 34px rgba(16,185,129,.65), 0 20px 44px rgba(251,191,36,.45);} 60%{ box-shadow:0 0 0 5px rgba(16,185,129,.35), 0 0 22px rgba(251,191,36,.4);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
   @keyframes glowNeg { 0%{ box-shadow:0 0 0 0 rgba(244,63,94,0);} 35%{ box-shadow:0 0 0 7px rgba(244,63,94,.40), 0 14px 30px rgba(244,63,94,.30);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
-  @keyframes badgePop { 0%{transform:scale(1)} 40%{transform:scale(1.45) rotate(6deg)} 100%{transform:scale(1)} }
+  @keyframes badgePop { 0%{transform:scale(1) rotate(0)} 30%{transform:scale(1.7) rotate(10deg)} 60%{transform:scale(.9) rotate(-6deg)} 100%{transform:scale(1) rotate(0)} }
   @keyframes floatUp { 0%{opacity:0; transform:translate(-50%,6px) scale(.7);} 15%{opacity:1;} 100%{opacity:0; transform:translate(-50%,-52px) scale(1.25);} }
+  @keyframes floatUpMega { 0%{opacity:0; transform:translate(-50%,12px) scale(.5) rotate(-8deg);} 14%{opacity:1; transform:translate(-50%,-2px) scale(1.35) rotate(3deg);} 38%{transform:translate(-50%,-30px) scale(1.18) rotate(-2deg);} 100%{opacity:0; transform:translate(-50%,-84px) scale(1.4) rotate(4deg);} }
   @keyframes waveGlow { 0%,100%{ filter:saturate(1);} 50%{ filter:saturate(1.6) brightness(1.06);} }
-  .dojo-tile.celebrate { animation: tilePop .5s cubic-bezier(.34,1.56,.64,1), waveGlow .5s ease; }
-  .dojo-tile.flash-pos { animation: tilePop .5s cubic-bezier(.34,1.56,.64,1), glowPos .7s ease; border-color:#34D399 !important; }
+  @keyframes avatarJump { 0%{transform:translateY(0) scale(1) rotate(0)} 30%{transform:translateY(-15px) scale(1.18) rotate(-5deg)} 58%{transform:translateY(1px) scale(.94) rotate(4deg)} 80%{transform:translateY(-5px) scale(1.06) rotate(-2deg)} 100%{transform:translateY(0) scale(1) rotate(0)} }
+  @keyframes shockExpand { 0%{opacity:.95; transform:translate(-50%,-50%) scale(.25);} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.7);} }
+  @keyframes starFly { 0%{opacity:0; transform:translate(0,0) scale(.4) rotate(0deg);} 14%{opacity:1;} 100%{opacity:0; transform:translate(var(--dx), var(--dy)) scale(1.25) rotate(var(--rot));} }
+  @keyframes bannerPop { 0%{transform:scale(.6) translateY(-34px); opacity:0;} 60%{transform:scale(1.07) translateY(2px); opacity:1;} 100%{transform:scale(1) translateY(0);} }
+  @keyframes bannerGlow { 0%,100%{ box-shadow:0 10px 34px rgba(251,191,36,.35), 0 0 0 2px rgba(251,191,36,.5);} 50%{ box-shadow:0 10px 44px rgba(16,185,129,.5), 0 0 22px rgba(251,191,36,.8), 0 0 0 3px rgba(16,185,129,.55);} }
+  @keyframes iconSpin { 0%{transform:rotate(-14deg) scale(.6);} 55%{transform:rotate(12deg) scale(1.25);} 100%{transform:rotate(0) scale(1);} }
+  .dojo-tile.celebrate { animation: megaPop .6s cubic-bezier(.34,1.56,.64,1), waveGlow .6s ease; }
+  .dojo-tile.flash-pos { animation: megaPop .62s cubic-bezier(.34,1.56,.64,1), goldGlow .9s ease; border-color:#FBBF24 !important; background:linear-gradient(180deg,#FFFBEB,#ECFDF5) !important; }
+  html.dark .dojo-tile.flash-pos { background:linear-gradient(180deg,#1E293B,#064E3B) !important; }
   .dojo-tile.flash-neg { animation: glowNeg .6s ease; border-color:#FB7185 !important; }
-  .dojo-pts.badge-pop { animation: badgePop .45s cubic-bezier(.34,1.56,.64,1); }
+  .dojo-pts.badge-pop { animation: badgePop .55s cubic-bezier(.34,1.56,.64,1); }
+  .avatar-jump { animation: avatarJump .62s cubic-bezier(.34,1.56,.64,1) !important; }
   .float-plus { position:absolute; left:50%; top:34px; z-index:5; font-weight:900; font-size:20px; pointer-events:none; animation: floatUp 1s ease-out forwards; text-shadow:0 2px 8px rgba(0,0,0,.25); }
   .float-plus.pos { color:#10B981; }
   .float-plus.neg { color:#F43F5E; }
+  .float-plus.mega { top:26px; font-size:32px; letter-spacing:.5px; animation: floatUpMega 1.15s cubic-bezier(.22,1,.36,1) forwards; text-shadow:0 2px 0 #fff, 0 4px 14px rgba(16,185,129,.55), 0 0 18px rgba(251,191,36,.7); background:linear-gradient(180deg,#059669,#10B981 55%,#F59E0B); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .shockwave { position:absolute; left:50%; top:42%; width:130px; height:130px; margin:0; border-radius:999px; border:5px solid rgba(251,191,36,.9); box-shadow:0 0 0 3px rgba(16,185,129,.5), 0 0 26px rgba(251,191,36,.8); z-index:4; pointer-events:none; transform:translate(-50%,-50%); animation: shockExpand .65s ease-out forwards; }
+  .shockwave.green { border-color:rgba(16,185,129,.9); box-shadow:0 0 0 3px rgba(251,191,36,.55), 0 0 26px rgba(16,185,129,.8); }
+  .star-particle { position:absolute; left:50%; top:42%; z-index:6; font-size:20px; line-height:1; pointer-events:none; animation: starFly .9s cubic-bezier(.22,1,.36,1) forwards; filter:drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
+  #goldFlash { position:fixed; inset:0; z-index:199; pointer-events:none; opacity:0; border:7px solid #FBBF24; box-shadow: inset 0 0 0 3px rgba(255,255,255,.6), inset 0 0 80px rgba(251,191,36,.45), 0 0 44px rgba(251,191,36,.45); border-radius:10px; }
+  #goldFlash.on { animation: goldPulse .7s ease forwards; }
+  @keyframes goldPulse { 0%{opacity:0; transform:scale(.985);} 14%{opacity:1; transform:scale(1);} 70%{opacity:1;} 100%{opacity:0; transform:scale(1.01);} }
+  #successBannerInner.banner-mega { animation: bannerDrop 2.2s ease forwards, bannerGlow 1.1s ease-in-out infinite; border-width:3px !important; }
+  #successBannerIcon.icon-spin { animation: iconSpin .55s cubic-bezier(.34,1.56,.64,1); }
 
-  /* ---------- Aggressive MINUS feedback ---------- */
+  /* ---------- BRUTAL MINUS feedback (much more aggressive) ---------- */
   @keyframes shakeHard { 0%,100%{transform:translateX(0) rotate(0)} 15%{transform:translateX(-10px) rotate(-1.5deg)} 30%{transform:translateX(9px) rotate(1.2deg)} 45%{transform:translateX(-7px) rotate(-1deg)} 60%{transform:translateX(6px) rotate(1deg)} 75%{transform:translateX(-4px)} 90%{transform:translateX(3px)} }
+  @keyframes shakeBrutal { 0%,100%{transform:translate(0) rotate(0)} 8%{transform:translate(-16px,3px) rotate(-3deg)} 18%{transform:translate(14px,-3px) rotate(2.6deg)} 30%{transform:translate(-13px,2px) rotate(-2.4deg)} 42%{transform:translate(11px,-2px) rotate(2deg)} 54%{transform:translate(-9px,2px) rotate(-1.8deg)} 66%{transform:translate(7px,-1px) rotate(1.4deg)} 78%{transform:translate(-5px,1px) rotate(-1deg)} 90%{transform:translate(3px,0) rotate(.6deg)} }
   @keyframes glowNegHard { 0%{ box-shadow:0 0 0 0 rgba(220,38,38,0);} 25%{ box-shadow:0 0 0 10px rgba(220,38,38,.55), 0 14px 34px rgba(220,38,38,.45);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
-  .dojo-tile.flash-neg { animation: shakeHard .5s ease, glowNegHard .8s ease; border-color:#DC2626 !important; }
-  .dojo-tile.shake { animation: shakeHard .5s ease; }
+  @keyframes glowNegBrutal { 0%{ box-shadow:0 0 0 0 rgba(220,38,38,0);} 20%{ box-shadow:0 0 0 18px rgba(220,38,38,.65), 0 0 44px rgba(220,38,38,.8), 0 18px 44px rgba(127,29,29,.6);} 45%{ box-shadow:0 0 0 10px rgba(220,38,38,.5), 0 0 30px rgba(220,38,38,.7);} 100%{ box-shadow:0 4px 14px rgba(2,132,199,.08);} }
+  .dojo-tile.flash-neg { animation: shakeBrutal .6s ease, glowNegBrutal 1s ease; border-color:#B91C1C !important; border-width:3px !important; background:linear-gradient(180deg,#FEF2F2,#FEE2E2) !important; }
+  html.dark .dojo-tile.flash-neg { background:linear-gradient(180deg,#1E293B,#7F1D1D) !important; }
+  .dojo-tile.shake { animation: shakeBrutal .6s ease; }
   /* sweat drop that drips off the character */
   .sweat-drop { position:absolute; top:14px; right:38px; z-index:6; font-size:24px; line-height:1; pointer-events:none; animation: sweatFall 1.2s ease-in forwards; filter: drop-shadow(0 2px 3px rgba(2,132,199,.4)); }
+  .sweat-drop.storm { top:8px; font-size:30px; animation: stormPour 1.4s ease-in forwards; filter: drop-shadow(0 2px 5px rgba(220,38,38,.55)); }
   @keyframes sweatFall { 0%{opacity:0; transform:translateY(-10px) scale(.5);} 18%{opacity:1; transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0; transform:translateY(30px) scale(1.15);} }
-  /* full-screen red outline flash */
-  #minusFlash { position:fixed; inset:0; z-index:200; pointer-events:none; opacity:0; border:8px solid #DC2626; box-shadow: inset 0 0 0 4px rgba(255,255,255,.35), inset 0 0 70px rgba(220,38,38,.65), 0 0 40px rgba(220,38,38,.5); border-radius:6px; }
-  #minusFlash.on { animation: redPulse .75s ease forwards; }
+  @keyframes stormPour { 0%{opacity:0; transform:translateY(-14px) scale(.4) rotate(-8deg);} 15%{opacity:1; transform:translateY(0) scale(1.25);} 70%{opacity:1;} 100%{opacity:0; transform:translateY(40px) scale(1.3);} }
+  @keyframes angerFly { 0%{opacity:0; transform:translate(0,0) scale(.4) rotate(0deg);} 12%{opacity:1; transform:translate(calc(var(--dx)*.3), calc(var(--dy)*.3)) scale(1.3);} 100%{opacity:0; transform:translate(var(--dx), var(--dy)) scale(1.1) rotate(var(--rot));} }
+  .anger-particle { position:absolute; left:50%; top:40%; z-index:7; line-height:1; pointer-events:none; animation: angerFly 1s cubic-bezier(.22,1,.36,1) forwards; filter:drop-shadow(0 2px 4px rgba(127,29,29,.5)); }
+  .red-shockwave { position:absolute; left:50%; top:42%; width:150px; height:150px; border-radius:999px; border:6px solid rgba(220,38,38,.9); box-shadow:0 0 0 3px rgba(127,29,29,.5), 0 0 34px rgba(220,38,38,.85); z-index:4; pointer-events:none; transform:translate(-50%,-50%); animation: shockExpand .7s ease-out forwards; }
+  @keyframes monsterDroop { 0%{transform:translateY(0) scale(1) rotate(0); filter:none;} 30%{transform:translateY(6px) scale(.9,.86) rotate(-4deg); filter:grayscale(.7) brightness(.85);} 60%{transform:translateY(-3px) scale(1.02) rotate(2deg); filter:grayscale(.5);} 100%{transform:translateY(0) scale(1); filter:none;} }
+  .avatar-droop { animation: monsterDroop .8s ease !important; }
+  .float-plus.neg-mega { top:24px; font-size:34px; animation: floatUpMega 1.2s cubic-bezier(.22,1,.36,1) forwards; color:#DC2626; text-shadow:0 2px 0 #fff, 0 4px 16px rgba(220,38,38,.65), 0 0 20px rgba(220,38,38,.5); }
+  /* full-screen red outline flash — THICKER + double hit */
+  #minusFlash { position:fixed; inset:0; z-index:200; pointer-events:none; opacity:0; border:14px solid #B91C1C; box-shadow: inset 0 0 0 5px rgba(255,255,255,.3), inset 0 0 110px rgba(220,38,38,.8), 0 0 60px rgba(220,38,38,.6); border-radius:8px; }
+  #minusFlash.on { animation: redPulse .9s ease forwards; }
+  #minusFlash.double { animation: redDouble .9s ease forwards; }
   @keyframes redPulse { 0%{opacity:0;} 12%{opacity:1;} 70%{opacity:1;} 100%{opacity:0;} }
-  body.screen-shake { animation: screenShake .45s ease; }
+  @keyframes redDouble { 0%{opacity:0;} 10%{opacity:1;} 28%{opacity:.25;} 42%{opacity:1;} 72%{opacity:1;} 100%{opacity:0;} }
+  #minusVignette { position:fixed; inset:0; z-index:198; pointer-events:none; opacity:0; background:radial-gradient(ellipse at center, transparent 42%, rgba(127,29,29,.55) 100%); }
+  #minusVignette.on { animation: redPulse 1s ease forwards; }
+  body.screen-shake { animation: screenQuake .55s ease; }
   @keyframes screenShake { 0%,100%{transform:translate(0)} 20%{transform:translate(-7px,2px)} 40%{transform:translate(6px,-2px)} 60%{transform:translate(-4px,1px)} 80%{transform:translate(3px,-1px)} }
+  @keyframes screenQuake { 0%,100%{transform:translate(0) rotate(0)} 12%{transform:translate(-12px,4px) rotate(-.5deg)} 26%{transform:translate(11px,-4px) rotate(.5deg)} 40%{transform:translate(-9px,3px) rotate(-.4deg)} 55%{transform:translate(8px,-2px) rotate(.35deg)} 70%{transform:translate(-5px,2px)} 85%{transform:translate(4px,-1px)} }
+  @keyframes bannerShakeX { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(3px)} }
+  #successBannerInner.banner-neg { animation: bannerDrop 2.2s ease forwards, bannerShakeX .5s ease .15s 2; border-width:3px !important; border-color:#FCA5A5 !important; background:linear-gradient(135deg, rgba(255,255,255,.97), rgba(254,242,242,.96)) !important; box-shadow:0 10px 34px rgba(220,38,38,.4), 0 0 0 2px rgba(220,38,38,.35) !important; }
 
   /* ---------- Navigation polish ---------- */
   html { scroll-behavior: smooth; }
@@ -243,6 +281,10 @@ tailwind.config = {
 
 <!-- aggressive minus red screen outline -->
 <div id="minusFlash"></div>
+<!-- golden +1 screen flash -->
+<div id="goldFlash"></div>
+<!-- dark red vignette for brutal -1 -->
+<div id="minusVignette"></div>
 
 <!-- ambient blobs -->
 <div class="blob w-[440px] h-[440px] bg-sky-300 -top-24 -left-24"></div>
@@ -1530,21 +1572,32 @@ const SFX = {
   success(){ this.tone(660,0,.12,'sine',.45); this.tone(880,.09,.16,'sine',.45); this.tone(1320,.18,.22,'triangle',.35); this.noise(.18,.15,.18); },
   coin(){ this.tone(988,0,.08,'square',.30); this.tone(1319,.08,.28,'square',.28); },
   error(){ this.tone(220,0,.2,'sawtooth',.32); this.tone(160,.1,.26,'sawtooth',.30); },
-  /* ----- Aggressive LOUD minus-point buzzer (game-show wrong answer) ----- */
+  /* ----- BRUTAL minus-point alarm: air-raid siren + distortion slam + thunder ----- */
   bad(){
     if(!this.enabled) return;
     const ctx = this.ensure(); if(!ctx) return;
     try{
-      // Harsh dissonant blast: two clashing low squares + descending buzz — MUCH louder (vol ~0.8)
-      this.tone(196, 0, .38, 'square', 0.80);
-      this.tone(185, 0, .38, 'sawtooth', 0.80);
-      this.tone(147, .05, .5, 'square', 0.90, 82);
-      this.tone(110, .05, .55, 'sawtooth', 0.85, 55);
-      this.tone(233, 0, .3, 'square', 0.60, 116);
-      this.tone(220, .32, .28, 'square', 0.75, 98);
-      this.noise(0, .35, 0.50);
-      this.noise(.3, .25, 0.40);
-      try{ if(navigator.vibrate) navigator.vibrate([120, 60, 120]); }catch(e){}
+      // Hit 1: dissonant air-horn blast (clashing lows, max volume)
+      this.tone(196, 0, .42, 'square', 0.85);
+      this.tone(185, 0, .42, 'sawtooth', 0.85);
+      this.tone(147, .02, .55, 'square', 0.95, 70);
+      this.tone(110, .02, .6, 'sawtooth', 0.9, 48);
+      this.tone(233, 0, .32, 'square', 0.65, 110);
+      // Hit 2: second slam a beat later — double-punish feel
+      this.tone(196, .42, .38, 'square', 0.85);
+      this.tone(174, .42, .38, 'sawtooth', 0.85);
+      this.tone(139, .44, .5, 'square', 0.95, 65);
+      this.tone(104, .44, .55, 'sawtooth', 0.9, 45);
+      // Descending "womp-womp" sad trombone tail
+      this.tone(311, .55, .22, 'sawtooth', 0.55, 233);
+      this.tone(233, .77, .3, 'sawtooth', 0.6, 155);
+      this.tone(155, 1.0, .4, 'sawtooth', 0.55, 90);
+      // Crashes + low thunder rumble bed
+      this.noise(0, .4, 0.55);
+      this.noise(.4, .4, 0.55);
+      this.noise(.8, .35, 0.4);
+      this.tone(60, 0, 1.1, 'sine', 0.7, 32);
+      try{ if(navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 320]); }catch(e){}
     }catch(e){}
   },
   pop(){ this.tone(300,0,.12,'sine',.45,900); },
@@ -1688,22 +1741,44 @@ const SFX = {
       }
     }catch(e){}
   },
-  /* ----- Full add-point celebration: clapping only ----- */
+  /* ----- Full add-point celebration: claps + coin + rising fanfare sparkle ----- */
   celebrate(big){
     if(!this.enabled) return;
     this.applause(big ? 2.2 : 1.8);
-    this.tone(880,0.05,0.15,'triangle',0.18);
-    this.tone(1175,0.18,0.2,'triangle',0.16);
+    // bright coin "cha-ching" on top
+    this.tone(988,0,.09,'square',.22);
+    this.tone(1319,.09,.3,'square',.20);
+    // rising happy arpeggio sparkle
+    const seq = big ? [523,659,784,1046,1319,1568] : [659,784,1046,1319];
+    seq.forEach((f,i)=>this.tone(f, .12+i*.08, .18, 'triangle', .20));
+    this.noise(.12,.25,.12);
+    try{ if(navigator.vibrate) navigator.vibrate(25); }catch(e){}
   },
 };
 SFX.load();
 let audioCtx = null; // legacy alias (SFX owns the context now)
 function tone(freq, t0, dur, type, vol){ SFX.tone(freq, t0, dur, type, vol); }
-/* ---------- Praise voice clips for +1 (random every time) + Clapping Sound ----------
-   Language-aware: English mode plays Amazing / Great Job / Well Done,
-   Arabic mode plays only احسنت / ممتاز. */
+/* ---------- Praise voice clips for +1 (sequential rotation) + Clapping Sound ----------
+   Language-aware + in-order: English mode cycles Amazing -> Great Job -> Well Done -> ...,
+   Arabic mode cycles احسنت -> ممتاز -> ... . English never plays Arabic and vice versa. */
 const PRAISE_SOUNDS_EN = ['Amazing.mp3', 'Great Job.mp3', 'Well Done.mp3'];
 const PRAISE_SOUNDS_AR = ['احسنت.mp3', 'ممتاز.mp3'];
+/* Sequential rotation indices — one per language so switching languages never
+   mixes the order. Persisted so the rotation continues across reloads. */
+let praiseIdxEn = 0;
+let praiseIdxAr = 0;
+try {
+  const vEn = parseInt(localStorage.getItem('starclass_praise_idx_en'), 10);
+  if(!isNaN(vEn) && vEn >= 0) praiseIdxEn = vEn;
+  const vAr = parseInt(localStorage.getItem('starclass_praise_idx_ar'), 10);
+  if(!isNaN(vAr) && vAr >= 0) praiseIdxAr = vAr;
+}catch(e){}
+function savePraiseIndices(){
+  try{
+    localStorage.setItem('starclass_praise_idx_en', String(praiseIdxEn));
+    localStorage.setItem('starclass_praise_idx_ar', String(praiseIdxAr));
+  }catch(e){}
+}
 function makePraisePool(list){
   return list.map(src => {
     try {
@@ -1722,6 +1797,31 @@ function currentPraisePool(){
     if(typeof currentLang !== 'undefined' && currentLang === 'ar') return praiseAudioAr.filter(Boolean);
   }catch(e){}
   return praiseAudioEn.filter(Boolean);
+}
+/* Next voice in sequence for the active language. EN rotates its own list,
+   AR rotates its own list — they never mix. Each call advances the counter
+   so consecutive +1 clicks play one-after-another (Amazing -> Great Job ->
+   Well Done -> Amazing ... / احسنت -> ممتاز -> احسنت ...). */
+function nextPraiseAudio(){
+  try{
+    const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+    if(isAr){
+      const pool = praiseAudioAr.filter(Boolean);
+      if(!pool.length) return null;
+      praiseIdxAr = praiseIdxAr % pool.length;
+      const a = pool[praiseIdxAr];
+      praiseIdxAr = (praiseIdxAr + 1) % pool.length;
+      savePraiseIndices();
+      return a;
+    }
+    const pool = praiseAudioEn.filter(Boolean);
+    if(!pool.length) return null;
+    praiseIdxEn = praiseIdxEn % pool.length;
+    const a = pool[praiseIdxEn];
+    praiseIdxEn = (praiseIdxEn + 1) % pool.length;
+    savePraiseIndices();
+    return a;
+  }catch(e){ return null; }
 }
 /* Dedicated clap clip — plays on every point-plus. Single shared element so
    spam clicks restart it instead of stacking/overlapping. */
@@ -1748,11 +1848,9 @@ function playRandomPraise(){
   if(!SFX.enabled) return true; // muted — caller should skip fallback synth too
   try{
     SFX.ensure(); // unlock audio on first user gesture
-    const pool = currentPraisePool();
-    if(!pool.length) return false;
     stopPointSounds(); // kill any still-playing praise/clap so spam restarts clean
-    const idx = Math.floor(Math.random() * pool.length);
-    const a = pool[idx];
+    const a = nextPraiseAudio(); // sequential, language-aware (EN list or AR list only)
+    if(!a) return false;
     const p = a.play();
     if(p && p.catch) p.catch(()=>{ try{ SFX.celebrate(false); }catch(e){} });
     return true;
@@ -1770,9 +1868,9 @@ function playClapSound(){
     return true;
   }catch(e){ return false; }
 }
-/* Full +1 celebration: clap every time + a random praise voice on top.
-   Language-aware: Arabic mode picks only from احسنت / ممتاز,
-   English mode picks only from Amazing / Great Job / Well Done.
+/* Full +1 celebration: clap every time + next praise voice in sequence on top.
+   Language-aware + in-order: Arabic mode cycles only احسنت -> ممتاز -> ...,
+   English mode cycles only Amazing -> Great Job -> Well Done -> Amazing -> ....
    One stop up-front, then both start together — rapid clicks stop both and
    start both over, never stacking. Returns true if any clip played. */
 function playPositiveSound(){
@@ -1789,9 +1887,8 @@ function playPositiveSound(){
       }
     }catch(e){}
     try{
-      const pool = currentPraisePool();
-      if(pool.length){
-        const a = pool[Math.floor(Math.random() * pool.length)];
+      const a = nextPraiseAudio();
+      if(a){
         const p2 = a.play();
         if(p2 && p2.catch) p2.catch(()=>{});
         played = true;
@@ -1800,31 +1897,52 @@ function playPositiveSound(){
     return played;
   }catch(e){ return false; }
 }
-/* ---------- Light-but-festive confetti (lag-free) ---------- */
+/* ---------- MEGA celebration confetti (much cooler, still lag-free) ---------- */
 let lastConfettiAt = 0;
-function bigCelebrationConfetti(big){
+function confettiOriginFromEl(el){
+  try{
+    if(!el) return null;
+    const r = el.getBoundingClientRect();
+    if(!r.width && !r.height) return null;
+    return { x: (r.left + r.width/2) / window.innerWidth, y: (r.top + r.height*0.35) / window.innerHeight };
+  }catch(e){ return null; }
+}
+function bigCelebrationConfetti(big, tileEl){
   if(!window.confetti) return;
   try{
     const now = Date.now();
-    // Anti-spam: rapid +1 clicks only get one tiny pop instead of stacking full shows
+    // Anti-spam: rapid +1 clicks still get a fun mini-burst from the tile
     if(now - lastConfettiAt < 450){
-      window.confetti({ particleCount: 25, spread: 60, startVelocity: 28, scalar: 0.85, ticks: 120, gravity: 1.1, disableForReducedMotion: true, zIndex: 200, origin: { y: 0.6 } });
+      const o = confettiOriginFromEl(tileEl) || { y: 0.6 };
+      window.confetti({ particleCount: 35, spread: 75, startVelocity: 34, scalar: 1.0, ticks: 130, gravity: 1.0, disableForReducedMotion: true, zIndex: 200, origin: o, colors: ['#10B981','#FBBF24','#0EA5E9','#F43F5E','#A855F7'] });
       return;
     }
     lastConfettiAt = now;
-    const colors = ['#4F46E5','#0EA5E9','#10B981','#FBBF24','#F43F5E','#A855F7','#22D3EE'];
-    const base = { colors: colors, disableForReducedMotion: true, zIndex: 200, gravity: 1.1, ticks: 150 };
-    // Burst 1: main pop — still big, but ~50% fewer particles, smaller + shorter-lived
-    window.confetti(Object.assign({}, base, { particleCount: big?130:85, spread: 90, startVelocity: 38, scalar: 0.9, origin: { y: 0.6 } }));
-    // Burst 2: side cannons, single timeout
+    const colors = ['#10B981','#FBBF24','#F59E0B','#0EA5E9','#4F46E5','#F43F5E','#A855F7','#22D3EE','#FFFFFF'];
+    const base = { colors: colors, disableForReducedMotion: true, zIndex: 200, gravity: 1.0, ticks: 220 };
+    const tileOrigin = confettiOriginFromEl(tileEl);
+    // Burst 1: STAR BLAST straight from the student's tile (the wow moment)
+    if(tileOrigin){
+      window.confetti(Object.assign({}, base, { particleCount: big?90:65, spread: 100, startVelocity: 42, scalar: 1.15, shapes: ['star'], origin: tileOrigin }));
+      window.confetti(Object.assign({}, base, { particleCount: big?70:50, spread: 70, startVelocity: 30, scalar: 0.95, origin: tileOrigin }));
+    }
+    // Burst 2: big center pop with stars + circles
+    window.confetti(Object.assign({}, base, { particleCount: big?170:120, spread: 100, startVelocity: 44, scalar: 1.05, shapes: ['star','circle'], origin: { y: 0.6 } }));
+    // Burst 3: side cannons
     setTimeout(function(){
-      window.confetti(Object.assign({}, base, { particleCount: big?45:30, angle: 60, spread: 55, startVelocity: 32, scalar: 0.85, origin: { x: 0, y: 0.7 } }));
-      window.confetti(Object.assign({}, base, { particleCount: big?45:30, angle: 120, spread: 55, startVelocity: 32, scalar: 0.85, origin: { x: 1, y: 0.7 } }));
-    }, 180);
-    // Burst 3: final sprinkle (skipped on spam, lighter on normal)
+      window.confetti(Object.assign({}, base, { particleCount: big?70:45, angle: 60, spread: 60, startVelocity: 42, scalar: 1.0, shapes: ['star'], origin: { x: 0, y: 0.7 } }));
+      window.confetti(Object.assign({}, base, { particleCount: big?70:45, angle: 120, spread: 60, startVelocity: 42, scalar: 1.0, shapes: ['star'], origin: { x: 1, y: 0.7 } }));
+    }, 160);
+    // Burst 4: golden rain from the top
     setTimeout(function(){
-      window.confetti(Object.assign({}, base, { particleCount: big?70:45, spread: 110, startVelocity: 28, scalar: 0.8, origin: { y: 0.5 } }));
-    }, 400);
+      window.confetti(Object.assign({}, base, { particleCount: big?90:55, spread: 120, startVelocity: 22, gravity: 1.3, scalar: 0.95, shapes: ['circle'], colors: ['#FBBF24','#F59E0B','#FDE68A','#FFFFFF','#10B981'], origin: { y: 0.25 } }));
+    }, 340);
+    // Burst 5 (big awards only): long fireworks finale
+    if(big){
+      setTimeout(function(){
+        window.confetti(Object.assign({}, base, { particleCount: 110, spread: 130, startVelocity: 38, scalar: 1.1, shapes: ['star','circle'], origin: { y: 0.55 } }));
+      }, 620);
+    }
   }catch(e){}
 }
 function playPositive(){ if(!playPositiveSound()) SFX.celebrate(false); bigCelebrationConfetti(false); }
@@ -1984,6 +2102,10 @@ function toast(msg, type){
   lucide.createIcons();
   setTimeout(()=>{ el.style.transition='all .35s'; el.style.opacity='0'; el.style.transform='translateY(10px)'; setTimeout(()=>el.remove(),350); }, 2600);
 }
+/* Banner praise titles rotate in the SAME order as the voice sounds */
+const BANNER_TITLES_EN = ['Amazing! 🤩', 'Great Job! 🎉', 'Well Done! 👏'];
+const BANNER_TITLES_AR = ['أحسنت! 🌟', 'ممتاز! 🎉'];
+let bannerIdxEn = 0, bannerIdxAr = 0;
 function showBanner(student, delta, behavior){
   const b = document.getElementById('successBanner');
   const inner = document.getElementById('successBannerInner');
@@ -1991,14 +2113,41 @@ function showBanner(student, delta, behavior){
   const title = document.getElementById('successBannerTitle');
   const sub = document.getElementById('successBannerSub');
   const pos = delta > 0;
-  icon.className = 'w-10 h-10 rounded-full text-white flex items-center justify-center font-black text-xl ' + (pos?'bg-emerald-500':'bg-rose-500');
-  icon.textContent = (pos?'+':'') + delta;
-  inner.classList.remove('border-emerald-200','border-rose-200');
-  inner.classList.add(pos?'border-emerald-200':'border-rose-200');
-  title.textContent = pos ? 'Awesome! 🎉' : 'Noted';
-  sub.textContent = student.firstName + ' ' + (pos?'earned '+delta:'lost '+Math.abs(delta)) + " for '" + behavior + "'";
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  if(pos){
+    // match the voice rotation: EN cycles 3, AR cycles 2
+    if(isAr){ title.textContent = BANNER_TITLES_AR[bannerIdxAr % BANNER_TITLES_AR.length]; bannerIdxAr++; }
+    else { title.textContent = BANNER_TITLES_EN[bannerIdxEn % BANNER_TITLES_EN.length]; bannerIdxEn++; }
+    icon.className = 'w-12 h-12 rounded-full text-white flex items-center justify-center font-black text-xl shrink-0 icon-spin';
+    icon.style.background = 'linear-gradient(135deg,#10B981,#059669 55%,#F59E0B)';
+    icon.style.boxShadow = '0 6px 18px rgba(16,185,129,.55), 0 0 16px rgba(251,191,36,.7)';
+    icon.textContent = (delta >= 2 ? '+' + delta + ' 🎉' : '+' + delta + ' ⭐');
+    inner.classList.remove('border-rose-200','banner-neg');
+    inner.classList.add('border-emerald-200','banner-mega');
+    title.style.color = '';
+    inner.style.background = 'linear-gradient(135deg, rgba(255,255,255,.97), rgba(236,253,245,.95))';
+    sub.textContent = student.firstName + ' ' + (isAr ? 'حصل على +' + delta : 'earned +' + delta + ' ⭐') + " • '" + behavior + "'";
+  } else {
+    // BRUTAL warning banner — rotates stern titles, shakes, glares red
+    const NEG_EN = ['Oops! 🛑', 'Careful! ⚠️', 'Try Again! 💪', 'Oh No! 😬'];
+    const NEG_AR = ['انتبه! 🛑', 'حاول مجددًا! 💪', 'أوه لا! 😬'];
+    let negTitle;
+    if(isAr){ negTitle = NEG_AR[(bannerIdxAr++) % NEG_AR.length]; }
+    else { negTitle = NEG_EN[(bannerIdxEn++) % NEG_EN.length]; }
+    icon.className = 'w-12 h-12 rounded-full text-white flex items-center justify-center font-black text-xl shrink-0 icon-spin';
+    icon.style.background = 'linear-gradient(135deg,#DC2626,#991B1B 60%,#000000)';
+    icon.style.boxShadow = '0 6px 20px rgba(220,38,38,.7), 0 0 18px rgba(220,38,38,.6)';
+    icon.textContent = delta + ' 💢';
+    inner.classList.remove('border-emerald-200','banner-mega');
+    inner.classList.add('banner-neg');
+    inner.style.background = '';
+    title.textContent = negTitle;
+    title.style.color = '#B91C1C';
+    sub.textContent = student.firstName + ' ' + (isAr ? 'خسر ' + Math.abs(delta) + ' — ' + behavior + ' ⚠️' : 'lost ' + Math.abs(delta) + " — '" + behavior + "' — let's fix it! 💪");
+  }
   b.classList.remove('hidden');
   inner.classList.remove('banner-anim'); void inner.offsetWidth; inner.classList.add('banner-anim');
+  icon.classList.remove('icon-spin'); void icon.offsetWidth; icon.classList.add('icon-spin');
   clearTimeout(showBanner._t);
   showBanner._t = setTimeout(()=>b.classList.add('hidden'), 2250);
 }
@@ -2233,9 +2382,10 @@ function doAwardEveryone(instant){
   kids.forEach(s=>{ s.points=(s.points||0)+1; });
   state.pointsHistory.push({ id: uid(), studentId:'system', classroomId: state.selectedClassroom, studentName:'Everyone', type:'positive', behavior: instant ? 'Whole-class praise (instant ⚡)' : 'Whole-class praise', delta: kids.length, timestamp: Date.now() });
   saveState(); renderAll(); if(!playPositiveSound()) SFX.celebrate(true);
-  bigCelebrationConfetti(true);
+  bigCelebrationConfetti(true, null);
+  try{ triggerPlusFlash(); }catch(e){}
   toast(instant ? 'Whole class +1 instantly! ⚡🎉👏' : 'Whole class +1! 🎉👏 Well done!');
-  // staggered wave of color animations across all tiles
+  // staggered MEGA wave across all tiles
   const tiles = Array.from(document.querySelectorAll('[id^="card-"]'));
   tiles.forEach((tile, i)=>{
     setTimeout(()=>{
@@ -2244,44 +2394,214 @@ function doAwardEveryone(instant){
       const badge = tile.querySelector('.dojo-pts');
       if(badge){ badge.classList.remove('badge-pop'); void badge.offsetWidth; badge.classList.add('badge-pop'); }
       spawnFloater(tile, '+1', true);
-      setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 750);
+      spawnShockwave(tile);
+      spawnStarBurst(tile, false);
+      jumpAvatar(tile);
+      setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 900);
     }, i * 55);
   });
 }
 function spawnFloater(tile, text, pos){
   try{
+    // remove old floaters so spam clicks stay clean
+    tile.querySelectorAll('.float-plus').forEach(el=>el.remove());
     const f = document.createElement('div');
-    f.className = 'float-plus ' + (pos ? 'pos' : 'neg');
-    f.textContent = text;
+    if(pos){
+      f.className = 'float-plus pos mega';
+      f.textContent = text + ' ⭐';
+    } else {
+      f.className = 'float-plus neg neg-mega';
+      f.textContent = text + ' 💢';
+    }
     tile.appendChild(f);
-    setTimeout(()=>f.remove(), 1050);
+    setTimeout(()=>f.remove(), 1250);
   }catch(e){}
 }
-/* ----- Aggressive minus: full-screen red outline + shake ----- */
-function triggerMinusAlert(){
+/* Golden shockwave ring that blasts out of the tile */
+function spawnShockwave(tile){
+  try{
+    if(!tile) return;
+    tile.querySelectorAll('.shockwave').forEach(el=>el.remove());
+    const s = document.createElement('div');
+    s.className = 'shockwave green';
+    tile.appendChild(s);
+    setTimeout(()=>s.remove(), 700);
+    const s2 = document.createElement('div');
+    s2.className = 'shockwave';
+    s2.style.animationDelay = '.08s';
+    tile.appendChild(s2);
+    setTimeout(()=>s2.remove(), 780);
+  }catch(e){}
+}
+/* 8 mini stars / emojis that explode out of the monster */
+function spawnStarBurst(tile, big){
+  try{
+    if(!tile) return;
+    tile.querySelectorAll('.star-particle').forEach(el=>el.remove());
+    const emojis = big ? ['⭐','🌟','✨','🎉','👏','💛','⚡','🎊'] : ['⭐','✨','🌟','💛','🎉','✨','⭐','💫'];
+    emojis.forEach((em, i)=>{
+      const el = document.createElement('div');
+      el.className = 'star-particle';
+      el.textContent = em;
+      const ang = (i / emojis.length) * Math.PI * 2 + (Math.random()*.5);
+      const dist = (big ? 75 : 60) + Math.random()*30;
+      el.style.setProperty('--dx', Math.cos(ang)*dist + 'px');
+      el.style.setProperty('--dy', (Math.sin(ang)*dist - 22) + 'px');
+      el.style.setProperty('--rot', (Math.random()*260-130) + 'deg');
+      el.style.fontSize = (16 + Math.random()*(big?16:10)) + 'px';
+      el.style.animationDelay = (i*0.02) + 's';
+      tile.appendChild(el);
+      setTimeout(()=>el.remove(), 1100);
+    });
+  }catch(e){}
+}
+/* Make the monster itself jump with joy */
+function jumpAvatar(tile){
+  try{
+    if(!tile) return;
+    const av = tile.querySelector('.avatar-wrap');
+    if(!av) return;
+    av.classList.remove('avatar-jump'); void av.offsetWidth; av.classList.add('avatar-jump');
+    setTimeout(()=>av.classList.remove('avatar-jump'), 700);
+  }catch(e){}
+}
+/* Golden full-screen flash for +1 (matches the red one for -1) */
+function triggerPlusFlash(){
+  try{
+    const flash = document.getElementById('goldFlash');
+    if(flash){
+      flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+      clearTimeout(triggerPlusFlash._t);
+      triggerPlusFlash._t = setTimeout(()=>flash.classList.remove('on'), 750);
+    }
+  }catch(e){}
+}
+function megaPlusCelebrate(tile, delta){
+  try{
+    const big = (delta||1) >= 2;
+    spawnShockwave(tile);
+    spawnStarBurst(tile, big);
+    jumpAvatar(tile);
+    triggerPlusFlash();
+    bigCelebrationConfetti(big, tile);
+  }catch(e){ try{ bigCelebrationConfetti((delta||1)>=2, tile); }catch(_){} }
+}
+/* ----- BRUTAL minus: double red flash + dark vignette + screen quake + warning rain ----- */
+function triggerMinusAlert(tile){
   try{
     const flash = document.getElementById('minusFlash');
     if(flash){
-      flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+      flash.classList.remove('on','double'); void flash.offsetWidth; flash.classList.add('double');
       clearTimeout(triggerMinusAlert._t);
-      triggerMinusAlert._t = setTimeout(()=>flash.classList.remove('on'), 800);
+      triggerMinusAlert._t = setTimeout(()=>flash.classList.remove('on','double'), 950);
+    }
+    const vig = document.getElementById('minusVignette');
+    if(vig){
+      vig.classList.remove('on'); void vig.offsetWidth; vig.classList.add('on');
+      clearTimeout(triggerMinusAlert._v);
+      triggerMinusAlert._v = setTimeout(()=>vig.classList.remove('on'), 1050);
     }
     document.body.classList.remove('screen-shake'); void document.body.offsetWidth;
     document.body.classList.add('screen-shake');
-    setTimeout(()=>document.body.classList.remove('screen-shake'), 500);
+    setTimeout(()=>document.body.classList.remove('screen-shake'), 600);
+    // second quake punch half a beat later
+    clearTimeout(triggerMinusAlert._q);
+    triggerMinusAlert._q = setTimeout(()=>{
+      document.body.classList.remove('screen-shake'); void document.body.offsetWidth;
+      document.body.classList.add('screen-shake');
+      setTimeout(()=>document.body.classList.remove('screen-shake'), 600);
+    }, 320);
+    // red warning shards raining from the tile / top
+    try{
+      if(window.confetti){
+        let origin = { y: 0.3 };
+        try{
+          if(tile){
+            const r = tile.getBoundingClientRect();
+            origin = { x: (r.left + r.width/2) / window.innerWidth, y: (r.top + 40) / window.innerHeight };
+          }
+        }catch(e){}
+        window.confetti({ particleCount: 45, spread: 65, startVelocity: 32, gravity: 1.6, ticks: 150, scalar: 0.95, shapes: ['square'], colors: ['#DC2626','#991B1B','#F87171','#7F1D1D','#000000'], disableForReducedMotion: true, zIndex: 200, origin: origin });
+        setTimeout(()=>{
+          window.confetti({ particleCount: 30, spread: 100, startVelocity: 24, gravity: 1.5, ticks: 140, scalar: 0.85, shapes: ['square'], colors: ['#DC2626','#7F1D1D','#FCA5A5'], disableForReducedMotion: true, zIndex: 200, origin: { y: 0.25 } });
+        }, 220);
+      }
+    }catch(e){}
   }catch(e){}
 }
-/* ----- Little sweat drop on the character ----- */
+/* ----- Storm punishment on the character: thunder + anger + sweat ----- */
 function spawnSweat(tile){
   try{
     if(!tile) return;
     tile.querySelectorAll('.sweat-drop').forEach(el=>el.remove());
-    const d = document.createElement('div');
-    d.className = 'sweat-drop';
-    d.textContent = '💧';
-    tile.appendChild(d);
-    setTimeout(()=>d.remove(), 1250);
+    const drops = ['⛈️','💧','💦'];
+    drops.forEach((em, i)=>{
+      const d = document.createElement('div');
+      d.className = 'sweat-drop' + (i===0 ? ' storm' : '');
+      d.textContent = em;
+      d.style.right = (30 + i*22) + 'px';
+      d.style.animationDelay = (i*0.12) + 's';
+      if(i>0) d.style.fontSize = '20px';
+      tile.appendChild(d);
+      setTimeout(()=>d.remove(), 1600);
+    });
   }catch(e){}
+}
+/* 💢⚡💔 anger shrapnel exploding out of the tile */
+function spawnAngerBurst(tile, big){
+  try{
+    if(!tile) return;
+    tile.querySelectorAll('.anger-particle').forEach(el=>el.remove());
+    const emojis = big ? ['💢','⚡','💔','⛈️','😡','🛑','⚠️','💥'] : ['💢','⚡','💔','😠','💢','⚡'];
+    emojis.forEach((em, i)=>{
+      const el = document.createElement('div');
+      el.className = 'anger-particle';
+      el.textContent = em;
+      const ang = (i / emojis.length) * Math.PI * 2 + (Math.random()*.6);
+      const dist = (big ? 85 : 68) + Math.random()*34;
+      el.style.setProperty('--dx', Math.cos(ang)*dist + 'px');
+      el.style.setProperty('--dy', (Math.sin(ang)*dist - 26) + 'px');
+      el.style.setProperty('--rot', (Math.random()*300-150) + 'deg');
+      el.style.fontSize = (20 + Math.random()*(big?16:10)) + 'px';
+      el.style.animationDelay = (i*0.025) + 's';
+      tile.appendChild(el);
+      setTimeout(()=>el.remove(), 1200);
+    });
+  }catch(e){}
+}
+function spawnRedShockwave(tile){
+  try{
+    if(!tile) return;
+    tile.querySelectorAll('.red-shockwave').forEach(el=>el.remove());
+    const s = document.createElement('div');
+    s.className = 'red-shockwave';
+    tile.appendChild(s);
+    setTimeout(()=>s.remove(), 750);
+    const s2 = document.createElement('div');
+    s2.className = 'red-shockwave';
+    s2.style.animationDelay = '.1s';
+    s2.style.width = '110px'; s2.style.height = '110px';
+    tile.appendChild(s2);
+    setTimeout(()=>s2.remove(), 850);
+  }catch(e){}
+}
+function droopAvatar(tile){
+  try{
+    if(!tile) return;
+    const av = tile.querySelector('.avatar-wrap');
+    if(!av) return;
+    av.classList.remove('avatar-droop'); void av.offsetWidth; av.classList.add('avatar-droop');
+    setTimeout(()=>av.classList.remove('avatar-droop'), 900);
+  }catch(e){}
+}
+function megaMinusCelebrate(tile, delta){
+  try{
+    const big = Math.abs(delta||1) >= 2;
+    spawnRedShockwave(tile);
+    spawnAngerBurst(tile, big);
+    droopAvatar(tile);
+    triggerMinusAlert(tile);
+  }catch(e){ try{ triggerMinusAlert(tile); }catch(_){} }
 }
 function setClassTab(t){
   classTab = t;
@@ -2550,10 +2870,26 @@ function applyPoints(studentId, delta, behavior, type){
   // re-grab card after renders that don't touch grid (grid isn't re-rendered here, so same node)
   const tile = document.getElementById('card-'+s.id) || card;
   refreshAwardPoints();
-  if(delta>0){ if(!playPositiveSound()) SFX.celebrate(delta>=2); bigCelebrationConfetti(delta>=2);
-    if(tile){ tile.classList.remove('flash-pos','celebrate','shake','flash-neg'); void tile.offsetWidth; tile.classList.add('flash-pos'); spawnFloater(tile, '+'+delta, true); setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 750); } }
-  else if(delta<0){ try{ stopPointSounds(); }catch(e){} SFX.bad(); triggerMinusAlert();
-    if(tile){ tile.classList.remove('shake','flash-neg','flash-pos','celebrate'); void tile.offsetWidth; tile.classList.add('flash-neg','shake'); spawnFloater(tile, ''+delta, false); spawnSweat(tile); setTimeout(()=>tile.classList.remove('flash-neg','shake'), 800); } }
+  if(delta>0){ if(!playPositiveSound()) SFX.celebrate(delta>=2);
+    if(tile){
+      tile.classList.remove('flash-pos','celebrate','shake','flash-neg'); void tile.offsetWidth; tile.classList.add('flash-pos');
+      spawnFloater(tile, '+'+delta, true);
+      megaPlusCelebrate(tile, delta);
+      // milestone extras: bigger roar at 20 (royal) and 50 (rainbow)
+      try{
+        const total = s.points || 0;
+        if(total === 20 || total === 50){ setTimeout(()=>bigCelebrationConfetti(true, tile), 250); }
+      }catch(e){}
+      setTimeout(()=>tile.classList.remove('flash-pos','celebrate'), 900);
+    } else { bigCelebrationConfetti(delta>=2, null); } }
+  else if(delta<0){ try{ stopPointSounds(); }catch(e){} SFX.bad();
+    if(tile){
+      tile.classList.remove('shake','flash-neg','flash-pos','celebrate'); void tile.offsetWidth; tile.classList.add('flash-neg','shake');
+      spawnFloater(tile, ''+delta, false);
+      spawnSweat(tile);
+      megaMinusCelebrate(tile, delta);
+      setTimeout(()=>tile.classList.remove('flash-neg','shake'), 1050);
+    } else { triggerMinusAlert(null); } }
   else { SFX.pop(); }
   showBanner(s, delta, behavior);
   setTimeout(closeAwardModal, 420);
