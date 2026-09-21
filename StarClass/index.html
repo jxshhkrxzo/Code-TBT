@@ -48,6 +48,7 @@ tailwind.config = {
 </script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   * { -webkit-tap-highlight-color: transparent; }
   body { font-family: 'Nunito', sans-serif; background: linear-gradient(120deg,#E0F2FE 0%, #BAE6FD 22%, #E0F7FF 48%, #BFDBFE 74%, #F0F9FF 100%); background-size: 200% 200%; animation: coolDrift 18s ease-in-out infinite; min-height:100vh; }
@@ -507,6 +508,12 @@ tailwind.config = {
             <option value="pointsDesc" data-i18n="sort_top">Sort: Top points</option>
             <option value="pointsAsc" data-i18n="sort_low">Sort: Lowest points</option>
           </select>
+          <button onclick="openBulkAddModal('paste')" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 rounded-2xl px-4 py-2.5 text-[13px] font-extrabold flex items-center gap-2 shadow-sm hover:-translate-y-0.5 transition-all active:scale-95">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i> <span data-i18n="bulk_add">Bulk Add</span>
+          </button>
+          <button onclick="openBulkAddModal('photo')" title="Import from photo" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 rounded-2xl px-3 py-2.5 text-[13px] font-extrabold flex items-center gap-2 shadow-sm hover:-translate-y-0.5 transition-all active:scale-95">
+            <i data-lucide="scan-text" class="w-4 h-4"></i> <span class="hidden md:inline" data-i18n="bulk_photo">Photo</span>
+          </button>
           <button onclick="openRandomPicker()" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl px-4 py-2.5 text-[13px] font-extrabold items-center gap-2 shadow-md hover:-translate-y-0.5 transition-all active:scale-95 hidden sm:flex">
             <i data-lucide="dices" class="w-4 h-4"></i> <span data-i18n="pick_random">Pick Random</span>
           </button>
@@ -520,7 +527,11 @@ tailwind.config = {
           <div class="w-24 h-24 mx-auto p-2 bg-indigo-50 rounded-3xl" id="emptyMonster"></div>
           <h3 class="font-poppins font-extrabold text-xl mt-4">No monsters yet</h3>
           <p class="text-slate-500 font-semibold text-sm mt-1">Add your first superstar to fill the class!</p>
-          <button onclick="openStudentModal()" class="mt-4 bg-indigo-600 text-white font-extrabold text-sm rounded-2xl px-6 py-3 shadow-lg hover:-translate-y-0.5 transition-all">+ Add Student</button>
+          <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
+            <button id="emptyAddBtn" onclick="openStudentModal()" class="bg-indigo-600 text-white font-extrabold text-sm rounded-2xl px-6 py-3 shadow-lg hover:-translate-y-0.5 transition-all">+ Add Student</button>
+            <button id="emptyBulkPasteBtn" onclick="openBulkAddModal('paste')" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-sm rounded-2xl px-5 py-3 shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4"></i> <span data-i18n="bulk_paste_btn">Paste list</span></button>
+            <button id="emptyBulkPhotoBtn" onclick="openBulkAddModal('photo')" class="bg-white border-2 border-indigo-100 hover:border-indigo-300 text-indigo-700 font-extrabold text-sm rounded-2xl px-5 py-3 shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2"><i data-lucide="scan-text" class="w-4 h-4"></i> <span data-i18n="bulk_photo_btn">Photo list</span></button>
+          </div>
         </div>
       </div>
       <!-- Groups view (Dojo Groups tab) -->
@@ -911,6 +922,7 @@ tailwind.config = {
         <button onclick="closeStudentModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all" data-i18n="cancel">Cancel</button>
         <button onclick="saveStudent()" class="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> <span id="saveStudentLabel">Add Student</span></button>
       </div>
+      <button onclick="closeStudentModal(); openBulkAddModal('paste');" class="w-full rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold text-[13px] py-2.5 flex items-center justify-center gap-2 transition-all active:scale-[.98]"><i data-lucide="clipboard-list" class="w-4 h-4"></i> <span data-i18n="have_list">Have a whole list? Paste names / scan photo →</span></button>
       <button id="deleteStudentBtn" onclick="deleteStudent()" class="hidden w-full text-rose-500 hover:text-rose-700 hover:bg-rose-50 text-[13px] font-extrabold rounded-xl py-2 transition-all flex items-center justify-center gap-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i> <span data-i18n="delete_student">Delete student</span></button>
     </div>
   </div>
@@ -974,6 +986,75 @@ tailwind.config = {
     <div class="flex gap-2 mt-5">
       <button onclick="closeConfirm()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-extrabold text-sm rounded-2xl py-3 text-slate-600" data-i18n="cancel">Cancel</button>
       <button id="confirmYesBtn" onclick="doConfirm()" class="flex-1 bg-rose-500 hover:bg-rose-600 font-extrabold text-sm rounded-2xl py-3 text-white shadow-md" data-i18n="yes_do_it">Yes, do it</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BULK ADD MODAL (Paste list + Photo OCR) ============ -->
+<div id="bulkAddModal" class="fixed inset-0 z-[86] flex items-end sm:items-center justify-center sm:p-4 modal-hidden modal-bg">
+  <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeBulkAddModal()"></div>
+  <div class="modal-panel relative w-full sm:max-w-[520px] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-pop overflow-hidden max-h-[92vh] flex flex-col">
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-500 p-5 text-white shrink-0">
+      <div class="flex items-center justify-between">
+        <h3 class="font-poppins font-extrabold text-lg flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5"></i> <span data-i18n="bulk_title">Add many students</span></h3>
+        <button onclick="closeBulkAddModal()" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-indigo-100 text-[13px] font-semibold mt-1"><span data-i18n="bulk_sub">Paste a name list, or scan a photo of one — into</span> <span id="bulkClassName" class="font-black text-white">Classroom</span></p>
+      <div class="grid grid-cols-2 gap-1.5 mt-4 bg-white/15 rounded-2xl p-1.5">
+        <button id="bulkTabPaste" onclick="switchBulkTab('paste')" class="rounded-xl py-2 text-[12px] font-extrabold bg-white text-indigo-700 shadow transition-all flex items-center justify-center gap-1.5"><i data-lucide="clipboard-paste" class="w-4 h-4"></i> <span data-i18n="bulk_tab_paste">Paste text</span></button>
+        <button id="bulkTabPhoto" onclick="switchBulkTab('photo')" class="rounded-xl py-2 text-[12px] font-extrabold text-indigo-100 transition-all flex items-center justify-center gap-1.5"><i data-lucide="scan-text" class="w-4 h-4"></i> <span data-i18n="bulk_tab_photo">Photo scan</span></button>
+      </div>
+    </div>
+
+    <div class="p-5 space-y-4 overflow-y-auto">
+      <!-- PASTE TAB -->
+      <div id="bulkPanePaste">
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide" data-i18n="bulk_paste_label">One student per line (or comma-separated)</label>
+        <textarea id="bulkTextInput" oninput="updateBulkPreview()" rows="7" data-i18n-placeholder="bulk_paste_ph" placeholder="Sophia Carter&#10;Liam&#10;Olivia Ahmed&#10;... one name per line works best" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all resize-y min-h-[140px]"></textarea>
+        <p class="text-[11px] font-bold text-slate-400 mt-1.5" data-i18n="bulk_paste_hint">Tip: numbers, bullets (1. 2) 3)) and extra spaces are cleaned automatically. "First Last" splits into first + last name.</p>
+      </div>
+
+      <!-- PHOTO TAB -->
+      <div id="bulkPanePhoto" class="hidden">
+        <label class="w-full cursor-pointer rounded-2xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/50 hover:bg-indigo-50 transition-all p-5 flex flex-col items-center justify-center gap-2 text-center">
+          <span class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center"><i data-lucide="camera" class="w-6 h-6"></i></span>
+          <span class="font-extrabold text-[14px] text-indigo-700" data-i18n="bulk_photo_cta">Tap to choose a photo of the name list</span>
+          <span class="text-[11px] font-bold text-slate-400" data-i18n="bulk_photo_cta_sub">JPG / PNG screenshot of handwritten or printed names</span>
+          <input id="bulkPhotoInput" type="file" accept="image/*" class="hidden" onchange="handleBulkPhotoSelect(event)" />
+        </label>
+        <div id="bulkOcrPreviewWrap" class="hidden mt-3">
+          <img id="bulkOcrPreview" class="w-full max-h-[180px] object-contain rounded-2xl border-2 border-slate-100 bg-slate-50" alt="" />
+        </div>
+        <div id="bulkOcrStatus" class="hidden mt-3 rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-indigo-600" id="bulkOcrSpinner"></i>
+            <p id="bulkOcrStatusText" class="text-[13px] font-extrabold text-slate-600">Reading names… 0%</p>
+          </div>
+          <div class="h-2 bg-slate-200 rounded-full mt-2 overflow-hidden"><div id="bulkOcrBar" class="h-full rounded-full bg-indigo-600 transition-all" style="width:0%"></div></div>
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button id="bulkScanBtn" onclick="runBulkOcr()" disabled class="flex-1 bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-amber-500 text-white font-extrabold text-sm rounded-2xl py-2.5 flex items-center justify-center gap-2 transition-all active:scale-95"><i data-lucide="scan-line" class="w-4 h-4"></i> <span data-i18n="bulk_scan">Scan photo</span></button>
+          <button onclick="document.getElementById('bulkPhotoInput').click()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl px-4 py-2.5 transition-all" data-i18n="bulk_change">Change</button>
+        </div>
+        <label class="text-[12px] font-extrabold text-slate-500 uppercase tracking-wide mt-3 block" data-i18n="bulk_ocr_label">Detected names (editable — fix mistakes before adding)</label>
+        <textarea id="bulkOcrText" oninput="updateBulkPreview()" rows="5" placeholder="Detected text will appear here — you can edit it" class="mt-1 w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-400 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all resize-y min-h-[110px]"></textarea>
+      </div>
+
+      <!-- LIVE PREVIEW -->
+      <div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-3.5">
+        <div class="flex items-center justify-between">
+          <p class="font-extrabold text-[13px] text-slate-700 flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4 text-indigo-600"></i> <span data-i18n="bulk_preview">Preview</span></p>
+          <span id="bulkPreviewCount" class="text-[12px] font-black bg-indigo-600 text-white rounded-full px-2.5 py-0.5">0</span>
+        </div>
+        <div id="bulkPreviewList" class="flex flex-wrap gap-1.5 mt-2.5 max-h-[132px] overflow-y-auto"></div>
+        <p id="bulkPreviewEmpty" class="text-[12px] font-bold text-slate-400 mt-2" data-i18n="bulk_preview_empty">Nothing detected yet — paste names or scan a photo.</p>
+        <p id="bulkPreviewDup" class="text-[11px] font-bold text-amber-600 mt-1.5 hidden"></p>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeBulkAddModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold text-sm rounded-2xl py-3 transition-all" data-i18n="cancel">Cancel</button>
+        <button id="bulkAddBtn" onclick="confirmBulkAdd()" disabled class="flex-[2] bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-700 text-white font-extrabold text-sm rounded-2xl py-3 shadow-lg active:scale-95 flex items-center justify-center gap-2"><i data-lucide="user-plus" class="w-4 h-4"></i> <span id="bulkAddBtnLabel">Add students</span></button>
+      </div>
     </div>
   </div>
 </div>
@@ -1202,6 +1283,15 @@ en: {
   everyone:'Everyone', everyone_sub:'Tap +1 • ⇧-click = instant ⚡', add_tile:'Add',
   students_unit:'students', pts_unit:'pts', total_pts:'total pts',
   no_class:'No Class', new_label:'+ New', new_class_label:'+ New class',
+  bulk_add:'Bulk Add', bulk_photo:'Photo', bulk_paste_btn:'Paste list', bulk_photo_btn:'Photo list',
+  bulk_title:'Add many students', bulk_sub:'Paste a name list, or scan a photo of one — into',
+  bulk_tab_paste:'Paste text', bulk_tab_photo:'Photo scan',
+  bulk_paste_label:'One student per line (or comma-separated)', bulk_paste_ph:'Sophia Carter\nLiam\nOlivia Ahmed\n... one name per line works best',
+  bulk_paste_hint:'Tip: numbers, bullets (1. 2) 3)) and extra spaces are cleaned automatically. "First Last" splits into first + last name.',
+  bulk_photo_cta:'Tap to choose a photo of the name list', bulk_photo_cta_sub:'JPG / PNG screenshot of handwritten or printed names',
+  bulk_scan:'Scan photo', bulk_change:'Change', bulk_ocr_label:'Detected names (editable — fix mistakes before adding)',
+  bulk_preview:'Preview', bulk_preview_empty:'Nothing detected yet — paste names or scan a photo.',
+  have_list:'Have a whole list? Paste names / scan photo →',
 },
 ar: {
   tagline:'فصول دراسية ممتعة', nav_students:'الطلاب', nav_toolkit:'الأدوات', nav_reports:'التقارير',
@@ -1258,6 +1348,17 @@ ar: {
   everyone:'الجميع', everyone_sub:'انقر +1 • ⇧-نقر = فوري ⚡', add_tile:'إضافة',
   students_unit:'طالب', pts_unit:'نقطة', total_pts:'إجمالي النقاط',
   no_class:'لا يوجد صف', new_label:'+ جديد', new_class_label:'+ فصل جديد',
+  bulk_add:'إضافة جماعية', bulk_photo:'صورة',
+  bulk_paste_btn:'لصق قائمة', bulk_photo_btn:'قائمة صورة',
+  bulk_title:'إضافة العديد من الطلاب', bulk_sub:'الصق قائمة أسماء، أو امسح صورة لها — إلى',
+  bulk_tab_paste:'لصق نص', bulk_tab_photo:'مسح صورة',
+  bulk_paste_label:'طالب واحد في كل سطر (أو مفصولة بفواصل)',
+  bulk_paste_hint:'تلميح: الأرقام والنقاط والمسافات الزائدة تنظف تلقائيا.',
+  bulk_photo_cta:'انقر لاختيار صورة لقائمة الأسماء', bulk_photo_cta_sub:'صورة JPG / PNG لأسماء مكتوبة بخط اليد أو مطبوعة',
+  bulk_scan:'امسح الصورة', bulk_change:'تغيير', bulk_ocr_label:'الأسماء المكتشفة (قابلة للتعديل)',
+  bulk_preview:'معاينة', bulk_preview_empty:'لا شيء بعد — الصق الأسماء أو امسح صورة.',
+  have_list:'لديك قائمة كاملة؟ الصق الأسماء / امسح صورة',
+  bulk_paste_ph:'سارة أحمد\nليام\nأوليفيا خالد\n... اسم واحد في كل سطر هو الأفضل'
 }
 };
 let currentLang = 'en';
@@ -2043,15 +2144,21 @@ function renderGrid(){
     grid.innerHTML='';
     const em=document.getElementById('emptyMonster'); if(em) em.innerHTML = chubbySVG(123456);
     // Empty state CTA depends on whether any classroom exists yet
-    const title = empty.querySelector('h3'), sub = empty.querySelector('p'), btn = empty.querySelector('button');
+    const title = empty.querySelector('h3'), sub = empty.querySelector('p');
+    const btn = document.getElementById('emptyAddBtn');
+    const bulkPaste = document.getElementById('emptyBulkPasteBtn'), bulkPhoto = document.getElementById('emptyBulkPhotoBtn');
     if(!hasClass){
       if(title) title.textContent = t('empty_create_class');
       if(sub) sub.textContent = t('empty_create_sub');
       if(btn){ btn.textContent = t('new_classroom_btn'); btn.setAttribute('onclick','openClassroomModal()'); }
+      if(bulkPaste) bulkPaste.classList.add('hidden');
+      if(bulkPhoto) bulkPhoto.classList.add('hidden');
     } else {
       if(title) title.textContent = t('empty_no_monsters');
       if(sub) sub.textContent = t('empty_add_first');
       if(btn){ btn.textContent = t('add_student'); btn.setAttribute('onclick','openStudentModal()'); }
+      if(bulkPaste) bulkPaste.classList.remove('hidden');
+      if(bulkPhoto) bulkPhoto.classList.remove('hidden');
     }
     if(window.lucide) lucide.createIcons(); renderDojoPills(); return;
   }
@@ -2852,7 +2959,7 @@ function exportCSV(){
 // keyboard shortcuts + navigation
 document.addEventListener('keydown', e=>{
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'');
-  if(e.key==='Escape'){ closeAwardModal(); closeStudentModal(); closeClassroomModal(); closeRandomPicker(); closeConfirm(); closeShortcuts(); closeSettings(); toggleHistory(false); return; }
+  if(e.key==='Escape'){ closeAwardModal(); closeStudentModal(); closeBulkAddModal(); closeClassroomModal(); closeRandomPicker(); closeConfirm(); closeShortcuts(); closeSettings(); toggleHistory(false); return; }
   if(typing){
     if(e.key==='Enter' && document.getElementById('studentModal').classList.contains('modal-visible')) saveStudent();
     if(e.key==='Escape') document.activeElement.blur();
@@ -2877,6 +2984,280 @@ window.addEventListener('scroll', ()=>{
   const b = document.getElementById('backToTop');
   if(b) b.classList.toggle('show', window.scrollY > 500);
 }, {passive:true});
+
+/* =========================================================
+   BULK ADD — paste a name list OR scan a photo of one
+========================================================= */
+let bulkTab = 'paste';
+let bulkPhotoFile = null;
+let bulkOcrRunning = false;
+
+function cleanBulkName(raw){
+  let s = String(raw || '').trim();
+  if(!s) return '';
+  s = s.replace(/^(\d{1,3}\s*[\.\)\:\-\]]\s*|#\s*\d+\s*[\.\)\:\-]?\s*|[-*•·–—>]+\s+)/, '').trim();
+  s = s.replace(/[,;،]+$/, '').trim();
+  s = s.replace(/\s+/g, ' ').trim();
+  return s;
+}
+function splitBulkName(cleaned){
+  if(!cleaned) return null;
+  if(/^(names?|students?|class(\s+list)?|roster|list|pupils)[:\s]*$/i.test(cleaned)) return null;
+  if(/^(names?|students?|class|roster|الأسماء|الطلاب|القائمة)(:|：)/i.test(cleaned)){
+    cleaned = cleaned.replace(/^(names?|students?|class|roster|الأسماء|الطلاب|القائمة)(:|：)\s*/i, '').trim();
+    if(!cleaned) return null;
+  }
+  if(/^https?:/i.test(cleaned)) return null;
+  if(/[@\/\\]/.test(cleaned) && /\.(com|net|org)/i.test(cleaned)) return null;
+  if(!/[\p{L}]/u.test(cleaned)) return null;
+  cleaned = cleaned.replace(/^[^\p{L}]+/u, '').replace(/[^\p{L}'’\-]+$/u, '').trim();
+  if(cleaned.length < 2) return null;
+  if(cleaned.length > 42) cleaned = cleaned.slice(0, 42).trim();
+  const parts = cleaned.split(/\s+/).slice(0, 4);
+  if(!parts.length) return null;
+  const firstName = parts[0].slice(0, 20);
+  const lastName = parts.slice(1).join(' ').slice(0, 20);
+  return { firstName: firstName, lastName: lastName || '', display: parts.join(' ') };
+}
+function parseNameList(text){
+  const out = [];
+  const seen = new Set();
+  const lines = String(text || '').split(/\r?\n/);
+  lines.forEach(function(line){
+    const chunks = String(line).split(/[,;،]+/);
+    chunks.forEach(function(ch){
+      const c = cleanBulkName(ch);
+      const parsed = splitBulkName(c);
+      if(!parsed) return;
+      const key = (parsed.firstName + ' ' + parsed.lastName).toLowerCase().trim();
+      if(!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(parsed);
+    });
+  });
+  return out;
+}
+function bulkActiveText(){
+  if(bulkTab === 'photo'){
+    const el = document.getElementById('bulkOcrText');
+    return el ? el.value : '';
+  }
+  const el = document.getElementById('bulkTextInput');
+  return el ? el.value : '';
+}
+function getBulkParsed(){
+  return parseNameList(bulkActiveText());
+}
+function openBulkAddModal(tab){
+  if(!state.classrooms.length || !state.selectedClassroom){
+    toast(currentLang==='ar' ? 'أنشئ فصلاً أولاً ثم أضف القائمة إليه.' : 'Create a classroom first, then add your list to it.');
+    openClassroomModal();
+    return;
+  }
+  bulkTab = (tab === 'photo') ? 'photo' : 'paste';
+  const c = activeClassroom();
+  const lbl = document.getElementById('bulkClassName');
+  if(lbl) lbl.textContent = c ? (c.emoji ? c.emoji + ' ' : '') + c.name : t('no_classroom');
+  switchBulkTab(bulkTab, true);
+  updateBulkPreview();
+  showModal('bulkAddModal');
+  if(window.lucide) lucide.createIcons();
+  setTimeout(function(){
+    const f = bulkTab === 'photo' ? document.getElementById('bulkOcrText') : document.getElementById('bulkTextInput');
+    if(f) f.focus();
+  }, 250);
+}
+function closeBulkAddModal(){ hideModal('bulkAddModal'); }
+function switchBulkTab(tab, silent){
+  bulkTab = (tab === 'photo') ? 'photo' : 'paste';
+  const pBtn = document.getElementById('bulkTabPaste'), hBtn = document.getElementById('bulkTabPhoto');
+  if(pBtn) pBtn.className = 'rounded-xl py-2 text-[12px] font-extrabold transition-all flex items-center justify-center gap-1.5 ' + (bulkTab==='paste' ? 'bg-white text-indigo-700 shadow' : 'text-indigo-100');
+  if(hBtn) hBtn.className = 'rounded-xl py-2 text-[12px] font-extrabold transition-all flex items-center justify-center gap-1.5 ' + (bulkTab==='photo' ? 'bg-white text-indigo-700 shadow' : 'text-indigo-100');
+  const pp = document.getElementById('bulkPanePaste'), hp = document.getElementById('bulkPanePhoto');
+  if(pp) pp.classList.toggle('hidden', bulkTab !== 'paste');
+  if(hp) hp.classList.toggle('hidden', bulkTab !== 'photo');
+  if(!silent) SFX.click();
+  updateBulkPreview();
+}
+function updateBulkPreview(){
+  const parsed = getBulkParsed();
+  const countEl = document.getElementById('bulkPreviewCount');
+  const listEl = document.getElementById('bulkPreviewList');
+  const emptyEl = document.getElementById('bulkPreviewEmpty');
+  const dupEl = document.getElementById('bulkPreviewDup');
+  const addBtn = document.getElementById('bulkAddBtn');
+  const addLbl = document.getElementById('bulkAddBtnLabel');
+  if(countEl) countEl.textContent = parsed.length;
+  // duplicate check vs existing class
+  const existing = new Set(activeStudents().map(function(s){ return (s.firstName + ' ' + (s.lastName||'')).toLowerCase().trim(); }));
+  const fresh = [];
+  let dups = 0;
+  parsed.forEach(function(n){
+    const key = (n.firstName + ' ' + (n.lastName||'')).toLowerCase().trim();
+    if(existing.has(key)) dups++;
+    else fresh.push(n);
+  });
+  if(listEl){
+    if(!parsed.length){
+      listEl.innerHTML = '';
+    } else {
+      const show = parsed.slice(0, 60);
+      listEl.innerHTML = show.map(function(n){
+        const key = (n.firstName + ' ' + (n.lastName||'')).toLowerCase().trim();
+        const isDup = existing.has(key);
+        return '<span class="rounded-full px-2.5 py-1 text-[11px] font-extrabold shadow-sm ' + (isDup ? 'bg-amber-100 text-amber-700 line-through' : 'bg-white text-slate-700 border border-slate-100') + '">' + esc(n.display) + '</span>';
+      }).join('') + (parsed.length > 60 ? '<span class="text-[11px] font-bold text-slate-400">+ ' + (parsed.length - 60) + ' more…</span>' : '');
+    }
+  }
+  if(emptyEl) emptyEl.style.display = parsed.length ? 'none' : 'block';
+  if(dupEl){
+    if(dups > 0){
+      dupEl.classList.remove('hidden');
+      dupEl.textContent = currentLang==='ar'
+        ? '⚠️ ' + dups + ' اسم موجود مسبقًا في الصف — سيُتخطى.'
+        : '⚠️ ' + dups + ' name' + (dups>1?'s':'') + ' already in this class — will be skipped.';
+    } else { dupEl.classList.add('hidden'); dupEl.textContent = ''; }
+  }
+  if(addBtn) addBtn.disabled = !fresh.length;
+  if(addLbl) addLbl.textContent = fresh.length
+    ? (currentLang==='ar' ? 'إضافة ' + fresh.length + ' طالب' : 'Add ' + fresh.length + ' student' + (fresh.length>1?'s':''))
+    : (currentLang==='ar' ? 'إضافة الطلاب' : 'Add students');
+  if(window.lucide) lucide.createIcons();
+}
+function confirmBulkAdd(){
+  const parsed = getBulkParsed();
+  if(!parsed.length){ toast(currentLang==='ar' ? 'الصق أسماء أولاً أو امسح صورة.' : 'Paste some names or scan a photo first.', 'error'); SFX.error(); return; }
+  if(!state.selectedClassroom){ toast(currentLang==='ar' ? 'أنشئ فصلاً أولاً.' : 'Create a classroom first.', 'error'); return; }
+  const existing = new Set(activeStudents().map(function(s){ return (s.firstName + ' ' + (s.lastName||'')).toLowerCase().trim(); }));
+  let added = 0, skipped = 0;
+  parsed.forEach(function(n){
+    const key = (n.firstName + ' ' + (n.lastName||'')).toLowerCase().trim();
+    if(existing.has(key)){ skipped++; return; }
+    existing.add(key);
+    state.students.push({ id: uid(), classroomId: state.selectedClassroom, firstName: n.firstName, lastName: n.lastName || '', points: 0, photo: null, colorIndex: 0, monster: MONSTERS[Math.floor(Math.random()*MONSTERS.length)], monsterSeed: randomMonsterSeed() });
+    added++;
+  });
+  if(!added){ toast(currentLang==='ar' ? 'كل الأسماء موجودة مسبقًا — لا جديد.' : 'All those names are already in this class.', 'error'); SFX.error(); return; }
+  saveState(); closeBulkAddModal(); renderAll();
+  if(window.confetti) confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+  playClick();
+  let msg = currentLang==='ar'
+    ? 'تمت إضافة ' + added + ' طالب! 🎉'
+    : 'Added ' + added + ' student' + (added>1?'s':'') + '! 🎉';
+  if(skipped) msg += currentLang==='ar' ? ' (تُخطي ' + skipped + ' مكرر)' : ' (' + skipped + ' duplicate' + (skipped>1?'s':'') + ' skipped)';
+  toast(msg);
+  // clear inputs so a second import starts fresh
+  const t1 = document.getElementById('bulkTextInput'); if(t1) t1.value = '';
+  const t2 = document.getElementById('bulkOcrText'); if(t2) t2.value = '';
+  bulkPhotoFile = null;
+  const pv = document.getElementById('bulkOcrPreviewWrap'); if(pv) pv.classList.add('hidden');
+  const sb = document.getElementById('bulkScanBtn'); if(sb) sb.disabled = true;
+}
+function handleBulkPhotoSelect(ev){
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  if(!file.type || file.type.indexOf('image/') !== 0){ toast(currentLang==='ar' ? 'اختر ملف صورة.' : 'Please choose an image file.', 'error'); return; }
+  if(file.size > 12*1024*1024){ toast(currentLang==='ar' ? 'الصورة كبيرة (>12MB). جرّب صورة أصغر.' : 'Image is very large (>12MB). Try a smaller photo.', 'error'); return; }
+  bulkPhotoFile = file;
+  try{
+    const url = URL.createObjectURL(file);
+    const img = document.getElementById('bulkOcrPreview');
+    if(img) img.src = url;
+    const wrap = document.getElementById('bulkOcrPreviewWrap');
+    if(wrap) wrap.classList.remove('hidden');
+  }catch(e){}
+  const sb = document.getElementById('bulkScanBtn');
+  if(sb) sb.disabled = false;
+  switchBulkTab('photo', true);
+  if(window.lucide) lucide.createIcons();
+  runBulkOcr();
+}
+function downscaleForOcr(file, maxSide){
+  maxSide = maxSide || 1600;
+  return new Promise(function(resolve){
+    try{
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = function(){
+        try{
+          let w = img.width, h = img.height;
+          const scale = Math.min(1, maxSide / Math.max(w, h));
+          if(scale >= 1){ URL.revokeObjectURL(url); resolve(file); return; }
+          w = Math.round(w * scale); h = Math.round(h * scale);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          URL.revokeObjectURL(url);
+          if(canvas.toBlob){
+            canvas.toBlob(function(b){ resolve(b || file); }, 'image/jpeg', 0.92);
+          } else { resolve(file); }
+        }catch(e){ resolve(file); }
+      };
+      img.onerror = function(){ try{ URL.revokeObjectURL(url); }catch(e){} resolve(file); };
+      img.src = url;
+    }catch(e){ resolve(file); }
+  });
+}
+async function runBulkOcr(){
+  if(bulkOcrRunning) return;
+  if(!bulkPhotoFile){ toast(currentLang==='ar' ? 'اختر صورة أولاً.' : 'Choose a photo first.', 'error'); return; }
+  if(typeof Tesseract === 'undefined'){
+    toast(currentLang==='ar' ? 'تعذر تحميل محرك القراءة (تحقق من الإنترنت). الصق الأسماء كنص بدلاً.' : 'OCR engine could not load (check internet). Paste names as text instead.', 'error');
+    return;
+  }
+  bulkOcrRunning = true;
+  const status = document.getElementById('bulkOcrStatus');
+  const statusText = document.getElementById('bulkOcrStatusText');
+  const bar = document.getElementById('bulkOcrBar');
+  const scanBtn = document.getElementById('bulkScanBtn');
+  if(status) status.classList.remove('hidden');
+  if(scanBtn) scanBtn.disabled = true;
+  const setProgress = function(pct, label){
+    if(bar) bar.style.width = Math.round(pct * 100) + '%';
+    if(statusText) statusText.textContent = label || ((currentLang==='ar' ? 'قراءة الأسماء… ' : 'Reading names… ') + Math.round(pct * 100) + '%');
+  };
+  setProgress(0.02);
+  SFX.click();
+  try{
+    const imgForOcr = await downscaleForOcr(bulkPhotoFile, 1600);
+    const logger = function(m){
+      try{
+        if(m && m.status === 'recognizing text' && typeof m.progress === 'number') setProgress(0.1 + m.progress * 0.85);
+        else if(m && typeof m.progress === 'number') setProgress(Math.min(0.95, m.progress));
+      }catch(e){}
+    };
+    let text = '';
+    try{
+      const r = await Tesseract.recognize(imgForOcr, currentLang === 'ar' ? 'eng+ara' : 'eng', { logger: logger });
+      text = (r && r.data && r.data.text) ? r.data.text : '';
+    }catch(eLang){
+      const r2 = await Tesseract.recognize(imgForOcr, 'eng', { logger: logger });
+      text = (r2 && r2.data && r2.data.text) ? r2.data.text : '';
+    }
+    text = String(text || '').replace(/\r/g, '').trim();
+    const box = document.getElementById('bulkOcrText');
+    if(box) box.value = text;
+    setProgress(1, currentLang==='ar' ? 'اكتملت القراءة ✓ راجع الأسماء ثم أضف' : 'Scan complete ✓ review names, then add');
+    updateBulkPreview();
+    const n = parseNameList(text).length;
+    if(!n){
+      toast(currentLang==='ar' ? 'لم أجد أسماء واضحة — جرّب صورة أوضح أو عدّل النص يدويًا.' : 'No clear names found — try a clearer photo or edit the text manually.', 'error');
+      SFX.error();
+    } else {
+      toast(currentLang==='ar' ? 'وجدت ' + n + ' اسم — راجعها ثم اضغط إضافة ✓' : 'Found ' + n + ' name' + (n>1?'s':'') + ' — review, then hit Add ✓');
+      SFX.pop();
+    }
+  }catch(e){
+    setProgress(0, currentLang==='ar' ? 'فشلت القراءة — حاول مجددًا' : 'Scan failed — try again');
+    toast(currentLang==='ar' ? 'فشلت قراءة الصورة. تحقق من الإنترنت وحاول مجددًا.' : 'Could not read that photo. Check internet and try again.', 'error');
+    SFX.error();
+  }
+  bulkOcrRunning = false;
+  if(scanBtn) scanBtn.disabled = !bulkPhotoFile;
+  if(window.lucide) lucide.createIcons();
+}
 
 /* ---------- Boot ---------- */
 loadState();

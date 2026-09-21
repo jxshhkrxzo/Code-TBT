@@ -42,7 +42,7 @@ TROUBLESHOOT = (
     "4. On school wifi, start web-proxy first:  npm start  (in web-proxy/)"
 )
 
-PASSWORD = "broimsafe56213"
+PASSWORD = "sewfink123"
 
 
 # ---------------------------------------------------------------- instances ---
