@@ -6,6 +6,8 @@ Instances + Instant launch:
 - Shared install dir (.elysium/versions+libraries) so downloads happen ONCE
 - Instant path skips re-verify/re-download and launches in ~1-2s if version is ready
 """
+import hashlib
+import hmac
 import json
 import os
 import re
@@ -498,7 +500,39 @@ TROUBLESHOOT = (
     "4. On school wifi, start web-proxy first:  npm start  (in web-proxy/)"
 )
 
-PASSWORD = "sewfink123"
+# ---------------------------------------------------------------- password ---
+# The launcher password is NEVER stored in plaintext in this file.
+# Only its SHA-256 hash is kept here, so opening main.py reveals nothing
+# usable - there is no password string to find.
+#
+# To change the password without ever putting it in the code:
+#   1. Run:  python -c "import hashlib; print(hashlib.sha256('your-new-pass'.encode()).hexdigest())"
+#   2. Either replace PASSWORD_SHA256 below with that hash,
+#      or (better, no code edit at all) set the env var:
+#        ELYSIUM_PASSWORD_HASH=<that hash>
+#      before running the launcher.
+PASSWORD_SHA256 = "af28a492b12ca80a4b7f9e6215b897c6101eb01306a7688476c424f98a350ccd"
+
+
+def _expected_password_hash() -> str:
+    """Env override wins so the secret can live outside the source entirely."""
+    try:
+        env_hash = (os.environ.get("ELYSIUM_PASSWORD_HASH") or "").strip().lower()
+        if env_hash and len(env_hash) == 64 and all(
+                c in "0123456789abcdef" for c in env_hash):
+            return env_hash
+    except Exception:
+        pass
+    return PASSWORD_SHA256
+
+
+def verify_password(plain: str) -> bool:
+    """Compare SHA-256(typed password) against the stored hash (constant-time)."""
+    try:
+        typed_hash = hashlib.sha256((plain or "").encode("utf-8")).hexdigest()
+        return hmac.compare_digest(typed_hash, _expected_password_hash())
+    except Exception:
+        return False
 
 
 # ---------------------------------------------------------------- instances ---
@@ -631,7 +665,13 @@ def auto_import_missing(clean: list[dict]) -> bool:
 
 
 def _resolve_stored_gamedir(raw: object) -> str:
-    """Keep per-instance custom gameDir (used by the Excaliber SK import)."""
+    """Keep per-instance custom gameDir only when the folder still exists.
+
+    A deleted/missing SK folder must NOT survive as a stored path - keeping
+    it is what recreated an empty excaliber/ dir on every startup. There is
+    deliberately no special-case for excaliber here: if the folder is gone,
+    the pointer is dropped and the instance falls back to its isolated dir.
+    """
     if not isinstance(raw, str) or not raw.strip():
         return ""
     s = raw.strip()
@@ -640,12 +680,8 @@ def _resolve_stored_gamedir(raw: object) -> str:
         if not p.is_absolute():
             # stored relative (e.g. "excaliber") -> resolve against launcher dir
             p = BASE_DIR / s
-        # Only keep it if it looks like a gameDir (has mods/saves/config or is excaliber)
-        if p.exists():
+        if p.is_dir():
             return str(p)
-        # keep excaliber path even if temporarily missing so settings survive
-        if p == EXCALIBER_DIR or s.lower() in ("excaliber", "./excaliber"):
-            return str(EXCALIBER_DIR)
     except Exception:
         pass
     return ""
@@ -657,8 +693,13 @@ def load_instances() -> tuple[list[dict], str]:
             data = json.loads(INSTANCES_FILE.read_text(encoding="utf-8"))
             insts = data.get("instances", []) if isinstance(data, dict) else []
             last = data.get("last", "") if isinstance(data, dict) else ""
-            # sanitize
+            # sanitize (+ drop case-insensitive duplicates like
+            # "excaliber" vs "Excaliber", and dead gameDir pointers whose
+            # folder was deleted - keeping those is what recreated an empty
+            # excaliber/ dir on startup)
             clean: list[dict] = []
+            seen_names: set[str] = set()
+            dropped_dead = False
             for i in insts:
                 if not isinstance(i, dict) or not str(i.get("name", "")).strip():
                     continue
@@ -671,15 +712,33 @@ def load_instances() -> tuple[list[dict], str]:
                     "ram": str(i.get("ram", DEFAULT_RAM)) if str(i.get("ram", DEFAULT_RAM)) in RAM_CHOICES else DEFAULT_RAM,
                     "fast": bool(i.get("fast", True)),
                 }
-                gd = _resolve_stored_gamedir(i.get("gameDir", i.get("game_dir", "")))
+                raw_gd = str(i.get("gameDir", i.get("game_dir", "")) or "").strip()
+                gd = _resolve_stored_gamedir(raw_gd)
                 if gd:
                     entry["gameDir"] = gd
+                elif raw_gd:
+                    # folder deleted -> forget the pointer so it is never
+                    # recreated as an empty dir; persist the cleanup below
+                    dropped_dead = True
+                lname = entry["name"].strip().lower()
+                if lname in seen_names:
+                    # duplicate name (e.g. excaliber + Excaliber): keep the
+                    # first entry, but prefer the one with a live gameDir
+                    dropped_dead = True
+                    for existing in clean:
+                        if existing["name"].strip().lower() == lname:
+                            if "gameDir" not in existing and "gameDir" in entry:
+                                existing["gameDir"] = entry["gameDir"]
+                            break
+                    continue
+                seen_names.add(lname)
                 clean.append(entry)
             if clean:
                 # auto-import: excaliber/ + any folder dropped into
                 # .elysium/instances/<Name>/ becomes a normal instance
                 # (SKLauncher instances/<name>/ layout = gameDir).
-                if auto_import_missing(clean):
+                imported = auto_import_missing(clean)
+                if imported or dropped_dead:
                     try:
                         if EXCALIBER_NAME.lower() in [c["name"].lower() for c in clean]:
                             last = last or EXCALIBER_NAME
@@ -719,9 +778,13 @@ def get_instance_dir(name: str) -> Path:
 def get_game_dir_for_instance(inst: dict | str) -> Path:
     """Resolve the gameDir (saves/mods/config live here) for an instance.
 
-    - Excaliber / any instance with a stored gameDir -> that folder directly
-      (so <launcher>/excaliber runs in place, exactly like SKLauncher's
-      instances/<name>/ folder - no copy needed).
+    - Excaliber / any instance with a stored gameDir -> that folder directly,
+      but ONLY when it actually exists on disk (so <launcher>/excaliber runs
+      in place, exactly like SKLauncher's instances/<name>/ folder).
+    - A stored path that is missing/deleted is IGNORED (never mkdir'd here).
+      Recreating it is what produced an empty excaliber/ folder on every
+      startup after the pack was deleted. Directory creation happens at
+      launch time (launch_with_gamedir / instant_launch), not on resolve.
     - Everything else -> isolated .elysium/instances/<name>/ as before.
     """
     name = inst if isinstance(inst, str) else str(inst.get("name", "default"))
@@ -733,13 +796,21 @@ def get_game_dir_for_instance(inst: dict | str) -> Path:
             p = Path(stored)
             if not p.is_absolute():
                 p = BASE_DIR / stored
-            p.mkdir(parents=True, exist_ok=True)
-            return p
+            # Never create a custom gameDir on resolve - a missing/deleted
+            # SK folder must NOT be recreated as an empty dir on startup.
+            if p.is_dir():
+                return p
         except Exception:
             pass
-    # implicit excaliber mapping even if the JSON entry has no gameDir yet
-    if name.strip().lower() == EXCALIBER_NAME.lower() and EXCALIBER_DIR.exists():
-        return EXCALIBER_DIR
+        # stored path is dead -> fall through to the isolated dir below
+    # implicit excaliber mapping only when it is a real pack (has mods/saves/
+    # config/...), never for a missing folder or an empty dir
+    if name.strip().lower() == EXCALIBER_NAME.lower():
+        try:
+            if EXCALIBER_DIR.is_dir() and is_gamedir_folder(EXCALIBER_DIR):
+                return EXCALIBER_DIR
+        except Exception:
+            pass
     return get_instance_dir(name)
 
 
@@ -1118,7 +1189,7 @@ def request_password():
                    activebackground=CREAM, command=toggle_show).pack(anchor="w", pady=(6, 10))
 
     def on_submit(_event=None):
-        if pw_var.get() == PASSWORD:
+        if verify_password(pw_var.get()):
             pw_root.destroy()  # success -> let launcher open
         else:
             pw_root.destroy()  # wrong -> close instantly, no launcher
@@ -1325,11 +1396,10 @@ class Elysium(tk.Tk):
     def _warmup(self):
         try:
             ensure_dirs()
-            for inst in self.instances:
-                try:
-                    get_game_dir_for_instance(inst)
-                except Exception:
-                    pass
+            # NOTE: intentionally does NOT resolve/create per-instance gameDirs
+            # here. Resolving them on startup is what recreated an empty
+            # excaliber/ folder after the pack was deleted. Game dirs are
+            # created lazily at launch time instead.
             # warm java detection cache + version list
             try:
                 find_java("")
@@ -1378,8 +1448,15 @@ class Elysium(tk.Tk):
 
     # ----- instances -----
     def _find_instance(self, name: str) -> dict | None:
+        # case-insensitive so "excaliber" and "Excaliber" can never coexist
+        # as duplicate entries (exact match first, then case-folded)
+        want = (name or "").strip()
         for i in self.instances:
-            if i["name"] == name:
+            if str(i.get("name", "")) == want:
+                return i
+        low = want.lower()
+        for i in self.instances:
+            if str(i.get("name", "")).strip().lower() == low:
                 return i
         return None
 
@@ -1441,10 +1518,24 @@ class Elysium(tk.Tk):
         inst["fast"] = bool(self.fast_var.get())
         # never drop the custom gameDir of an imported SK pack (Excaliber in
         # <launcher>/excaliber, or any folder in .elysium/instances/<Name>/).
-        if inst.get("gameDir"):
-            return  # imported pack already points at its folder - keep it
+        # But a dead pointer (folder deleted) is dropped so it can never
+        # recreate an empty dir on startup/selection.
+        gd = str(inst.get("gameDir", "") or "").strip()
+        if gd:
+            try:
+                _p = Path(gd) if Path(gd).is_absolute() else BASE_DIR / gd
+                if _p.is_dir():
+                    return  # imported pack still on disk - keep it
+            except Exception:
+                pass
+            inst.pop("gameDir", None)
+            inst.pop("game_dir", None)
         if inst.get("name", "").strip().lower() == EXCALIBER_NAME.lower():
-            inst["gameDir"] = str(EXCALIBER_DIR)
+            try:
+                if EXCALIBER_DIR.is_dir() and is_gamedir_folder(EXCALIBER_DIR):
+                    inst["gameDir"] = str(EXCALIBER_DIR)
+            except Exception:
+                pass
         # normal instances stay isolated, no key needed
 
     def on_inst_new(self):
@@ -1467,10 +1558,8 @@ class Elysium(tk.Tk):
         save_instances(self.instances, name)
         self.refresh_inst_listbox()
         self._apply_instance(name)
-        try:
-            get_game_dir_for_instance(inst)
-        except Exception:
-            pass
+        # NOTE: no eager get_game_dir_for_instance() here - the isolated dir
+        # is created lazily at launch time, never on NEW/selection/startup.
 
     def on_inst_save(self):
         name = self.instance_var.get().strip()
@@ -1507,14 +1596,47 @@ class Elysium(tk.Tk):
             dest_root = get_mc_dir() / "instances"
             dest_root.mkdir(parents=True, exist_ok=True)
             # already inside instances (or is excaliber)? use in place.
+            # (dragging an SKLauncher instance folder straight into
+            # .elysium/instances/ lands here on the next refresh/import.)
             try:
-                inside = os.path.normcase(str(src_p.resolve(strict=False))).startswith(
+                src_norm = os.path.normcase(str(src_p.resolve(strict=False)))
+            except Exception:
+                src_norm = os.path.normcase(str(src_p))
+            try:
+                inside = src_norm.startswith(
                     os.path.normcase(str(dest_root.resolve(strict=False))))
             except Exception:
                 inside = False
-            if src_p == EXCALIBER_DIR or inside:
+            try:
+                is_excaliber = src_norm == os.path.normcase(
+                    str(EXCALIBER_DIR.resolve(strict=False)))
+            except Exception:
+                is_excaliber = False
+            if is_excaliber or inside:
                 dest = src_p
                 copied = False
+                # importing the same folder twice must select the existing
+                # instance instead of stacking duplicates that later crash
+                # on ambiguous lookup
+                try:
+                    for _existing in self.instances:
+                        _gd = str(_existing.get("gameDir", "") or "").strip()
+                        if not _gd:
+                            continue
+                        try:
+                            _ep = Path(_gd)
+                            if not _ep.is_absolute():
+                                _ep = BASE_DIR / _ep
+                            if os.path.normcase(str(_ep.resolve(strict=False))) == os.path.normcase(str(dest.resolve(strict=False))):
+                                self.refresh_inst_listbox()
+                                self._apply_instance(str(_existing.get("name", "")))
+                                self._writelog(
+                                    f"'{src_p.name}' is already imported as '{_existing.get('name', '')}'.\n")
+                                return
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
             else:
                 base = folder_name_to_instance_name(src_p)
                 safe = _safe_instance_name(base)
@@ -1570,7 +1692,8 @@ class Elysium(tk.Tk):
             return
         if not messagebox.askyesno("Delete?", f"Delete instance '{name}'?"):
             return
-        self.instances = [i for i in self.instances if i["name"] != name]
+        self.instances = [i for i in self.instances
+                          if str(i.get("name", "")).strip().lower() != name.strip().lower()]
         save_instances(self.instances, self.instances[0]["name"])
         self.refresh_inst_listbox()
         self._apply_instance(self.instances[0]["name"])

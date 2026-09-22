@@ -1,24 +1,14 @@
 {
   "instances": [
     {
-      "name": "excaliber",
-      "version": "1.20.1-forge-47.4.10",
-      "username": "El_KraZo",
-      "java": "",
-      "use_forge": true,
-      "ram": "16G",
-      "fast": true,
-      "gameDir": "C:\\Users\\DELL\\OneDrive - Ministry of Education and Higher Education\\Documents\\GitHub\\Code-TBT\\Main\\elysium-launcher\\.elysium\\instances\\excaliber"
-    },
-    {
-      "name": "Excaliber",
+      "name": "the-knight-s-journey-immersive-m",
       "version": "1.20.1-forge-47.4.10",
       "username": "El_KraZo",
       "java": "",
       "use_forge": true,
       "ram": "8G",
       "fast": true,
-      "gameDir": "C:\\Users\\DELL\\OneDrive - Ministry of Education and Higher Education\\Documents\\GitHub\\Code-TBT\\Main\\elysium-launcher\\excaliber"
+      "gameDir": "C:\\Users\\DELL\\OneDrive - Ministry of Education and Higher Education\\Documents\\GitHub\\Code-TBT\\Main\\elysium-launcher\\.elysium\\instances\\the-knight-s-journey-immersive-m"
     },
     {
       "name": "Forge Main",
@@ -48,5 +38,5 @@
       "fast": false
     }
   ],
-  "last": "excaliber"
+  "last": "the-knight-s-journey-immersive-m"
 }
