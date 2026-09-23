@@ -7,8 +7,7 @@
       "java": "",
       "use_forge": true,
       "ram": "8G",
-      "fast": true,
-      "gameDir": "C:\\Users\\DELL\\OneDrive - Ministry of Education and Higher Education\\Documents\\GitHub\\Code-TBT\\Main\\elysium-launcher\\.elysium\\instances\\the-knight-s-journey-immersive-m"
+      "fast": true
     },
     {
       "name": "Forge Main",
