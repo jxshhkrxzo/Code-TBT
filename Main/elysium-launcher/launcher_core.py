@@ -230,6 +230,74 @@ def java_info(java_cmd: str) -> str:
     return f"{java_cmd} (version unknown)"
 
 
+ARGFILE_NAME = "launch_args.txt"
+
+
+def _quote_java_arg(arg: str) -> str:
+    """Quote one JVM arg for a Java @argument-file.
+
+    Java argfiles split on whitespace, so args containing spaces/tabs
+    (e.g. classpath entries under 'OneDrive - ...' or '-D...=C:\\My Dir\\x')
+    must be double-quoted with backslash/quote escaping. Args without
+    whitespace or quotes are returned verbatim (one line per arg).
+    """
+    if arg == "":
+        return '""'
+    if not re.search(r'[\s"\']', arg):
+        return arg
+    escaped = arg.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def write_java_argfile(jvm_args: list[str], game_dir: Path | str,
+                       filename: str = ARGFILE_NAME) -> Path:
+    """Write JVM args (-Xmx, -D..., -cp <long classpath>, mainClass, ...) to file.
+
+    Each argument becomes one line in <game_dir>/launch_args.txt. The
+    ``with`` block closes the handle before the caller runs Popen, so
+    javaw.exe never reads a half-flushed file.
+    """
+    gdir = Path(game_dir)
+    gdir.mkdir(parents=True, exist_ok=True)
+    argfile = gdir / filename
+    with open(argfile, "w", encoding="utf-8", newline="\n") as f:
+        for a in jvm_args:
+            f.write(_quote_java_arg(str(a)) + "\n")
+    return argfile
+
+
+def popen_java_with_argfile(full_cmd: list[str], game_dir: Path | str,
+                            filename: str = ARGFILE_NAME) -> subprocess.Popen:
+    """Launch ``javaw.exe @launch_args.txt`` non-blocking with explicit cwd.
+
+    - ``full_cmd`` is the complete command from
+      ``minecraft_launcher_lib.command.get_minecraft_command`` where
+      ``full_cmd[0]`` is the java binary and ``full_cmd[1:]`` are the JVM
+      args / -D properties / -cp classpath / mainClass / game args.
+    - Writes ``full_cmd[1:]`` to ``<game_dir>/launch_args.txt``, closes it,
+      then runs ``[java_exe, "@launch_args.txt"]`` with ``cwd=str(game_dir)``
+      so mods/assets/configs resolve inside the instance root instead of the
+      launcher's directory. This keeps the Windows command line (~32k limit)
+      short for heavy modded packs.
+    - Non-blocking: DEVNULL stdio + no wait(), so the launcher GUI stays
+      responsive while the game loads.
+    """
+    if not full_cmd:
+        raise RuntimeError("Empty launch command")
+    gdir = Path(game_dir)
+    java_exe = str(full_cmd[0])
+    jvm_args = [str(a) for a in full_cmd[1:]]
+    write_java_argfile(jvm_args, gdir, filename=filename)
+    # Relative @file + explicit cwd: child resolves the argfile inside game_dir.
+    return subprocess.Popen(
+        [java_exe, f"@{filename}"],
+        cwd=str(gdir),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
+    )
+
+
 # ---------- install / verify ----------
 
 def _mll_callback(progress_cb):
@@ -470,10 +538,9 @@ def launch(username: str, version_id: str, java_path: str = "",
 
     print("[elysium] " + " ".join(cmd[:6]) + " ...")
     try:
-        proc = subprocess.Popen(cmd, cwd=mc_dir,
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL)
+        # @argfile: avoids Windows 32k command-line limit on modded classpaths;
+        # explicit cwd: game resolves mods/assets/configs inside instance root.
+        proc = popen_java_with_argfile(cmd, mc_dir)
     except FileNotFoundError as e:
         raise RuntimeError(f"Failed to start Java ({java}): {e}")
     return proc

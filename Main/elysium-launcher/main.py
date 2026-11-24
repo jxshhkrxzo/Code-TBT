@@ -27,6 +27,7 @@ from launcher_core import (
     via_proxy, INSTALLER_URL, save_config,
     version_json_path, build_offline_options,
     install_vanilla, clean_natives, verify_version,
+    popen_java_with_argfile,
 )
 
 CREAM = "#FDFBF0"
@@ -999,10 +1000,9 @@ def launch_with_gamedir(username: str, version_id: str, java_path: str = "",
         raise RuntimeError(f"Could not build launch command for '{target}' ({e}).")
     print("[elysium] " + " ".join(cmd[:6]) + " ...")
     try:
-        proc = subprocess.Popen(cmd, cwd=str(game_dir),
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL)
+        # @argfile (one arg per line in <game_dir>/launch_args.txt, handle
+        # closed before Popen) + explicit cwd + non-blocking Popen.
+        proc = popen_java_with_argfile(cmd, str(game_dir))
     except FileNotFoundError as e:
         raise RuntimeError(f"Failed to start Java ({java}): {e}")
     return proc
@@ -1137,10 +1137,8 @@ def instant_launch(username: str, version_id: str, java_path: str = "",
     try:
         # cwd = gameDir like SKLauncher (screenshots/logs/crashes land in the
         # pack folder, relative paths inside mods behave identically).
-        proc = subprocess.Popen(cmd, cwd=str(game_dir),
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL)
+        # @argfile keeps modded classpaths under the Win32 cmdline limit.
+        proc = popen_java_with_argfile(cmd, str(game_dir))
     except FileNotFoundError as e:
         raise RuntimeError(f"Failed to start Java ({java}): {e}")
     return proc
